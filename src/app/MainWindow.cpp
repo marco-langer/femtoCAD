@@ -32,6 +32,7 @@ MainWindow::MainWindow(Workspace& workspace, Settings& settings)
         );
     });
 
+    updateWindowTitle();
     setCentralWidget(m_sceneView);
 }
 
@@ -75,6 +76,16 @@ void MainWindow::createActions()
     fileMenu->addAction(quitAction);
 }
 
+void MainWindow::updateWindowTitle(const QString& filePath)
+{
+    if (filePath.isEmpty()) {
+        setWindowTitle(QStringLiteral(u"femtoCAD"));
+    } else {
+        const QFileInfo fileInfo{ filePath };
+        setWindowTitle(QStringView{ u"femtoCAD - %1" }.arg(fileInfo.completeBaseName()));
+    }
+}
+
 void MainWindow::onNewProject()
 {
     m_workspace.clear();
@@ -103,6 +114,7 @@ void MainWindow::onImportDxf()
         .transform([this, &filePath]() {
             m_settings.lastDxfImportPath = filePath;
             m_sceneView->updateWorkspace();
+            updateWindowTitle(filePath);
         })
         .map_error([this](const QString& errorMessage) {
             QMessageBox::critical(this, "Dxf import error", errorMessage);

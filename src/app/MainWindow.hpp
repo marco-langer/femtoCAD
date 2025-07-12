@@ -19,6 +19,7 @@ private slots:
 
 private:
     void createActions();
+    void updateWindowTitle(const QString& filename = QString{});
 
     SceneView* m_sceneView{ nullptr };
 
