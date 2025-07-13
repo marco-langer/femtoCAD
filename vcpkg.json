@@ -1,7 +1,8 @@
 {
   "dependencies": [
-    "gtest",
     "fmt",
+    "gtest",
+    "ms-gsl",
     "tl-expected"
   ],
   "builtin-baseline": "ce613c41372b23b1f51333815feb3edd87ef8a8b"

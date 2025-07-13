@@ -4,6 +4,8 @@
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
 
+#include <gsl/narrow>
+
 constexpr int windowWeight = 1076;
 constexpr int windowHeight = 768;
 constexpr BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
@@ -27,10 +29,10 @@ void SceneView::updateWorkspace()
     for (const Layer& layer : m_workspace.layers()) {
         if (layer.visible) {
             for (const Line& line : layer.lines) {
-                vertices.push_back(static_cast<float>(line.start.x));
-                vertices.push_back(static_cast<float>(line.start.y));
-                vertices.push_back(static_cast<float>(line.end.x));
-                vertices.push_back(static_cast<float>(line.end.y));
+                vertices.push_back(gsl::narrow_cast<float>(line.start.x));
+                vertices.push_back(gsl::narrow_cast<float>(line.start.y));
+                vertices.push_back(gsl::narrow_cast<float>(line.end.x));
+                vertices.push_back(gsl::narrow_cast<float>(line.end.y));
                 m_lines.vertexCount += 2;
             }
         }
@@ -40,7 +42,7 @@ void SceneView::updateWorkspace()
     m_lines.vbo.bind();
     m_lines.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
 
-    m_lines.vbo.allocate(vertices.data(), static_cast<int>(vertices.size() * sizeof(float)));
+    m_lines.vbo.allocate(vertices.data(), gsl::narrow<int>(vertices.size() * sizeof(float)));
 
     m_program->enableAttributeArray("position");
     m_program->setAttributeBuffer("position", GL_FLOAT, 0, m_lines.vertexCount);
@@ -145,10 +147,10 @@ void SceneView::mouseMoveEvent(QMouseEvent* event)
     const QPoint& eventPos{ event->pos() };
 
     const double x{ m_sceneBounds.min.x
-                    + static_cast<double>(eventPos.x()) / windowSize.width()
+                    + gsl::narrow_cast<double>(eventPos.x()) / windowSize.width()
                           * getWidth(m_sceneBounds) };
     const double y{ m_sceneBounds.min.y
-                    + static_cast<double>(eventPos.y()) / windowSize.height()
+                    + gsl::narrow_cast<double>(eventPos.y()) / windowSize.height()
                           * getHeight(m_sceneBounds) };
 
     const QPointF currentMousePosition{ x, y };
@@ -158,7 +160,7 @@ void SceneView::mouseMoveEvent(QMouseEvent* event)
 void SceneView::updateTransform()
 {
     m_viewMatrix.setToIdentity();
-    m_viewMatrix.translate(static_cast<float>(m_pan.x()), static_cast<float>(m_pan.y()));
+    m_viewMatrix.translate(gsl::narrow_cast<float>(m_pan.x()), gsl::narrow_cast<float>(m_pan.y()));
     m_viewMatrix.scale(m_zoom, m_zoom);
 }
 
@@ -169,18 +171,18 @@ void SceneView::resetViewToSceneBounds()
     const double bbHeight{ getHeight(m_sceneBounds) };
 
     glViewport(
-        static_cast<int>(min.x),
-        static_cast<int>(min.y),
-        static_cast<int>(bbWidth),
-        static_cast<int>(bbHeight)
+        gsl::narrow_cast<int>(min.x),
+        gsl::narrow_cast<int>(min.y),
+        gsl::narrow_cast<int>(bbWidth),
+        gsl::narrow_cast<int>(bbHeight)
     );
 
     m_projMatrix.setToIdentity();
     m_projMatrix.ortho(
-        static_cast<float>(min.x),
-        static_cast<float>(min.x + bbWidth),
-        static_cast<float>(min.y + bbHeight),
-        static_cast<float>(min.y),
+        gsl::narrow_cast<float>(min.x),
+        gsl::narrow_cast<float>(min.x + bbWidth),
+        gsl::narrow_cast<float>(min.y + bbHeight),
+        gsl::narrow_cast<float>(min.y),
         -1.0F,
         1.0F
     );
