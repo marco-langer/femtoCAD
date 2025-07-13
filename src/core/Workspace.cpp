@@ -6,11 +6,11 @@
 
 void Workspace::clear() { m_layers.clear(); }
 
-const std::vector<Layer>& Workspace::layers() const& { return m_layers; }
+const Layers& Workspace::layers() const& { return m_layers; }
 
 void Workspace::addLayer(Layer layer) { m_layers.push_back(std::move(layer)); }
 
-void Workspace::addLayers(std::vector<Layer>&& layers) { appendRange(m_layers, std::move(layers)); }
+void Workspace::addLayers(Layers&& layers) { appendRange(m_layers, std::move(layers)); }
 
 std::optional<BoundingBox> boundingBox(const Workspace& workspace)
 {

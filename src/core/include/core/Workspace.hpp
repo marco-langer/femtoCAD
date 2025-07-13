@@ -11,12 +11,12 @@ class Workspace
 public:
     void clear();
 
-    const std::vector<Layer>& layers() const&;
+    const Layers& layers() const&;
     void addLayer(Layer layer);
-    void addLayers(std::vector<Layer>&& layers);
+    void addLayers(Layers&& layers);
 
 private:
-    std::vector<Layer> m_layers;
+    Layers m_layers;
 };
 
 std::optional<BoundingBox> boundingBox(const Workspace& workspace);

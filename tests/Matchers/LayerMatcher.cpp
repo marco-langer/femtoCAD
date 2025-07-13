@@ -2,8 +2,24 @@
 
 #include "LineMatcher.hpp"
 
+#include <vector>
+
 testing::Matcher<Layer> IsLayer(const Layer& expected, double maxError)
 {
-    return testing::AllOf(testing::Field("lines", &Layer::lines, AreLines(expected.lines, maxError))
+    return testing::AllOf(
+        testing::Field("name", &Layer::name, expected.name),
+        testing::Field("visible", &Layer::visible, expected.visible),
+        testing::Field("lines", &Layer::lines, AreLines(expected.lines, maxError))
     );
+}
+
+testing::Matcher<Layers> AreLayers(const Layers& expected, double maxError)
+{
+    std::vector<testing::Matcher<Layer>> elementMatchers;
+    elementMatchers.reserve(expected.size());
+    for (const Layer& layer : expected) {
+        elementMatchers.push_back(IsLayer(layer, maxError));
+    }
+
+    return testing::ElementsAreArray(std::move(elementMatchers));
 }

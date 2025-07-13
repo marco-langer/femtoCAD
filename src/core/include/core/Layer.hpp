@@ -4,20 +4,23 @@
 #include "Circle.hpp"
 #include "Line.hpp"
 
+#include <QString>
+
 #include <optional>
-#include <string>
 #include <vector>
 
 struct Layer
 {
-    explicit Layer(std::string layerName)
+    explicit Layer(QString layerName)
         : name{ std::move(layerName) }
     {}
 
-    std::string name;
+    QString name;
     bool visible{ true };
     std::vector<Line> lines;
     std::vector<Circle> circles;
 };
+
+using Layers = std::vector<Layer>;
 
 std::optional<BoundingBox> boundingBox(const Layer& layer);
