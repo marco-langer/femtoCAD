@@ -18,7 +18,7 @@ struct Layer
     QString name;
     bool visible{ true };
     std::vector<Line> lines;
-    std::vector<Circle> circles;
+    Circles circles;
 };
 
 using Layers = std::vector<Layer>;

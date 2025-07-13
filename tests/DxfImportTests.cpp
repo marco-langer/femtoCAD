@@ -26,10 +26,10 @@ TEST(DxfImportTest, ImportExample)
 
     Layers expectedLayers;
 
-    Layer& testLayer{ expectedLayers.emplace_back(Layer{ "Test Layer" }) };
+    Layer& testLayer{ expectedLayers.emplace_back("Test Layer") };
     testLayer.visible = false;
 
-    Layer& linesLayer{ expectedLayers.emplace_back(Layer{ "Lines" }) };
+    Layer& linesLayer{ expectedLayers.emplace_back("Lines") };
     linesLayer.lines.push_back(Line{
         .start = { 100.0, 100.0 },
         .end = { 350.0, 400.0 },
@@ -37,6 +37,12 @@ TEST(DxfImportTest, ImportExample)
     linesLayer.lines.push_back(Line{
         .start = { 150.0, 130.0 },
         .end = { 250.0, 130.0 },
+    });
+
+    Layer& circlesLayer{ expectedLayers.emplace_back("Circles") };
+    circlesLayer.circles.push_back(Circle{
+        .center = { 50.4, 65.0 },
+        .radius = 2.5,
     });
 
     EXPECT_THAT(layers, AreLayers(expectedLayers));

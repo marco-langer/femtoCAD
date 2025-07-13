@@ -6,6 +6,8 @@ include(GoogleTest)
 add_executable(femtoCAD-core-tests
     Matchers/BoundingBoxMatcher.cpp
     Matchers/BoundingBoxMatcher.hpp
+    Matchers/CircleMatcher.cpp
+    Matchers/CircleMatcher.hpp
     Matchers/CoordinateMatcher.cpp
     Matchers/CoordinateMatcher.hpp
     Matchers/LayerMatcher.cpp

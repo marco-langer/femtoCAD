@@ -27,6 +27,10 @@ TEST(LayerTest, boundingBox)
         .start = Coordinate{ .x = 1.0, .y = 4.0 },
         .end = Coordinate{ .x = 3.0, .y = 2.0 },
     });
+    layer.circles.push_back(Circle{
+        .center = { 2.0, 3.7 },
+        .radius = 0.5,
+    });
 
     // Act
     const std::optional<BoundingBox> bb{ boundingBox(layer) };
@@ -36,7 +40,7 @@ TEST(LayerTest, boundingBox)
 
     const BoundingBox expectedBb{
         .min = Coordinate{ .x = 1.0, .y = 2.0 },
-        .max = Coordinate{ .x = 3.0, .y = 4.0 },
+        .max = Coordinate{ .x = 3.0, .y = 4.2 },
     };
 
     EXPECT_THAT(bb.value(), IsBoundingBox(expectedBb));

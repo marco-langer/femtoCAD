@@ -42,6 +42,20 @@ Line toLine(const odxf::Line& dxfLine)
     };
 }
 
+std::optional<Circle> toCircle(const odxf::Circle& dxfCircle)
+{
+    if (dxfCircle.radius < 0.0F) {
+        return std::nullopt;
+    }
+
+    Circle circle;
+
+    circle.center = toCoordinate(dxfCircle.center);
+    circle.radius = dxfCircle.radius;
+
+    return circle;
+}
+
 class ReadStream final : public odxf::IReadStream
 {
 public:
@@ -63,6 +77,19 @@ private:
         }
     }
 
+    void circle(const odxf::Circle& circle) override
+    {
+        const std::optional<std::size_t> layerIndex{ indexOf(m_layerNames, circle.layer) };
+
+        if (layerIndex.has_value()) {
+            const std::optional<Circle> maybeCircle{ toCircle(circle) };
+
+            if (maybeCircle.has_value()) {
+                m_layers.at(layerIndex.value()).circles.push_back(maybeCircle.value());
+            }
+        }
+    }
+
     Layers m_layers;
     std::vector<std::string> m_layerNames;
 };
@@ -76,9 +103,13 @@ void updateWorkspace(Workspace& workspace, ReadStream& stream)
 QString toErrorMessage(const odxf::Error& error)
 {
     if (error.lineNumber.has_value()) {
-        return QStringView{ u"Line '%1': %2" }.arg(
-            QString::number(error.lineNumber.value()), QString::fromStdString(error.what)
-        );
+        if (!error.what.empty()) {
+            return QStringView{ u"Line %1: %2" }.arg(
+                QString::number(error.lineNumber.value()), QString::fromStdString(error.what)
+            );
+        }
+
+        return QStringView{ u"Line %1" }.arg(QString::number(error.lineNumber.value()));
     }
 
     return QString::fromStdString(error.what);
