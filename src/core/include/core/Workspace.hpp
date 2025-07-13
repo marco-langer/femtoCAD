@@ -6,7 +6,7 @@
 #include <optional>
 #include <vector>
 
-class Workspace
+class Workspace final
 {
 public:
     void clear();

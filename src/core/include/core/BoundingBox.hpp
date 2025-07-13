@@ -5,7 +5,7 @@
 #include <concepts>
 #include <optional>
 
-struct BoundingBox
+struct BoundingBox final
 {
     Coordinate min;
     Coordinate max;
@@ -27,7 +27,7 @@ std::optional<BoundingBox>
 united(const std::optional<BoundingBox>& first, const std::optional<BoundingBox>& second);
 
 template <typename... Ts>
-requires (std::same_as<std::optional<BoundingBox>, Ts>&&...) std::optional<BoundingBox> united(
+requires(std::same_as<std::optional<BoundingBox>, Ts>&&...) std::optional<BoundingBox> united(
     const std::optional<BoundingBox>& first,
     const std::optional<BoundingBox>& second,
     const Ts&... rest

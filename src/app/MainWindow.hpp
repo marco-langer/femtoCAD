@@ -7,7 +7,7 @@
 
 #include <QMainWindow>
 
-class MainWindow : public QMainWindow
+class MainWindow final : public QMainWindow
 {
 public:
     MainWindow(Workspace& workspace, Settings& settings);

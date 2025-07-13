@@ -2,13 +2,13 @@
 
 #include <cassert>
 
-struct Coordinate
+struct Coordinate final
 {
     double x{};
     double y{};
 };
 
-struct Vector2d
+struct Vector2d final
 {
     double x{};
     double y{};

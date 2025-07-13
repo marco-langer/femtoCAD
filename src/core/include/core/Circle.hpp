@@ -5,7 +5,7 @@
 
 #include <vector>
 
-struct Circle
+struct Circle final
 {
     Coordinate center;
     double radius;

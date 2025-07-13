@@ -13,7 +13,7 @@
 
 #include <memory>
 
-class SceneView
+class SceneView final
     : public QOpenGLWidget
     , protected QOpenGLFunctions
 {

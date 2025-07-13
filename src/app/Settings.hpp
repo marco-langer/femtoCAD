@@ -4,7 +4,7 @@
 
 #include <optional>
 
-struct Settings
+struct Settings final
 {
     std::optional<QString> lastDxfImportPath;
 };

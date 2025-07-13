@@ -9,7 +9,7 @@
 #include <optional>
 #include <vector>
 
-struct Layer
+struct Layer final
 {
     explicit Layer(QString layerName)
         : name{ std::move(layerName) }

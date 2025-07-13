@@ -3,7 +3,7 @@
 #include "BoundingBox.hpp"
 #include "Coordinate.hpp"
 
-struct Line
+struct Line final
 {
     Coordinate start;
     Coordinate end;
