@@ -25,5 +25,5 @@ std::optional<BoundingBox> boundingBox(const std::vector<T>& geometries)
 
 std::optional<BoundingBox> boundingBox(const Layer& layer)
 {
-    return united(boundingBox(layer.lines), boundingBox(layer.circles));
+    return united(boundingBox(layer.arcs), boundingBox(layer.lines), boundingBox(layer.circles));
 };

@@ -31,6 +31,12 @@ TEST(LayerTest, boundingBox)
         .center = { 2.0, 3.7 },
         .radius = 0.5,
     });
+    layer.arcs.push_back(Arc{
+        .center = { 3.0, 1.0 },
+        .startAngle = Radians::zero,
+        .endAngle = Radians::pi,
+        .radius = 0.5,
+    });
 
     // Act
     const std::optional<BoundingBox> bb{ boundingBox(layer) };
@@ -39,8 +45,8 @@ TEST(LayerTest, boundingBox)
     ASSERT_TRUE(bb.has_value());
 
     const BoundingBox expectedBb{
-        .min = Coordinate{ .x = 1.0, .y = 2.0 },
-        .max = Coordinate{ .x = 3.0, .y = 4.2 },
+        .min = Coordinate{ .x = 1.0, .y = 1.0 },
+        .max = Coordinate{ .x = 3.5, .y = 4.2 },
     };
 
     EXPECT_THAT(bb.value(), IsBoundingBox(expectedBb));

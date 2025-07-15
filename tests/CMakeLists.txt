@@ -4,6 +4,8 @@ message(STATUS "Using GTest v.${GTest_VERSION}")
 include(GoogleTest)
 
 add_executable(femtoCAD-core-tests
+    Matchers/ArcMatcher.cpp
+    Matchers/ArcMatcher.hpp
     Matchers/BoundingBoxMatcher.cpp
     Matchers/BoundingBoxMatcher.hpp
     Matchers/CircleMatcher.cpp
@@ -14,6 +16,8 @@ add_executable(femtoCAD-core-tests
     Matchers/LayerMatcher.hpp
     Matchers/LineMatcher.cpp
     Matchers/LineMatcher.hpp
+    AngleTests.cpp
+    ArcTests.cpp
     CircleTests.cpp
     DxfImportTests.cpp
     LayerTests.cpp

@@ -1,5 +1,7 @@
 #include "core/io/DxfImport.hpp"
 
+#include "core/Arc.hpp"
+#include "core/Circle.hpp"
 #include "core/Layer.hpp"
 #include "core/Line.hpp"
 #include "core/utility/VectorExtensions.hpp"
@@ -56,6 +58,22 @@ std::optional<Circle> toCircle(const odxf::Circle& dxfCircle)
     return circle;
 }
 
+std::optional<Arc> toArc(const odxf::Arc& dxfArc)
+{
+    if (dxfArc.radius < 0.0F) {
+        return std::nullopt;
+    }
+
+    Arc arc;
+
+    arc.center = toCoordinate(dxfArc.center);
+    arc.startAngle = Radians::fromDegrees(dxfArc.startAngle);
+    arc.endAngle = Radians::fromDegrees(dxfArc.endAngle);
+    arc.radius = dxfArc.radius;
+
+    return arc;
+}
+
 class ReadStream final : public odxf::IReadStream
 {
 public:
@@ -66,6 +84,19 @@ private:
     {
         m_layers.push_back(toLayer(layer));
         m_layerNames.push_back(layer.name);
+    }
+
+    void arc(const odxf::Arc& arc) override
+    {
+        const std::optional<std::size_t> layerIndex{ indexOf(m_layerNames, arc.layer) };
+
+        if (layerIndex.has_value()) {
+            const std::optional<Arc> maybeArc{ toArc(arc) };
+
+            if (maybeArc.has_value()) {
+                m_layers.at(layerIndex.value()).arcs.push_back(maybeArc.value());
+            }
+        }
     }
 
     void line(const odxf::Line& line) override

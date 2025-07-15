@@ -1,6 +1,8 @@
 add_library(femtoCAD-core STATIC
     include/core/io/DxfImport.hpp
     include/core/utility/VectorExtensions.hpp
+    include/core/units/Angle.hpp
+    include/core/Arc.hpp
     include/core/BoundingBox.hpp
     include/core/Circle.hpp
     include/core/Coordinate.hpp
@@ -8,6 +10,7 @@ add_library(femtoCAD-core STATIC
     include/core/Line.hpp
     include/core/Workspace.hpp
     io/DxfImport.cpp
+    Arc.cpp
     BoundingBox.cpp
     Circle.cpp
     Coordinate.cpp

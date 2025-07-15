@@ -39,7 +39,7 @@ TABLE
 2
 LAYER
 70
-3
+4
 0
 LAYER
 2
@@ -64,6 +64,16 @@ CONTINUOUS
 LAYER
 2
 Circles
+70
+0
+62
+7
+6
+CONTINUOUS
+0
+LAYER
+2
+Arcs
 70
 0
 62
@@ -145,7 +155,7 @@ ARC
 100
 AcDbCircle
 8
-Test Layer
+Arcs
 62
 0
 10

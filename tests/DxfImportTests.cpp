@@ -1,5 +1,10 @@
 #include "core/io/DxfImport.hpp"
 
+#include "core/Arc.hpp"
+#include "core/Circle.hpp"
+#include "core/Layer.hpp"
+#include "core/Line.hpp"
+
 #include "Matchers/LayerMatcher.hpp"
 
 #include <QFile>
@@ -43,6 +48,14 @@ TEST(DxfImportTest, ImportExample)
     circlesLayer.circles.push_back(Circle{
         .center = { 50.4, 65.0 },
         .radius = 2.5,
+    });
+
+    Layer& arcsLayer{ expectedLayers.emplace_back("Arcs") };
+    arcsLayer.arcs.push_back(Arc{
+        .center = { 0.0, 2.0 },
+        .startAngle = Radians::fromDegrees(0.0),
+        .endAngle = Radians::fromDegrees(180.0),
+        .radius = 0.5,
     });
 
     EXPECT_THAT(layers, AreLayers(expectedLayers));

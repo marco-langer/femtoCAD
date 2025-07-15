@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Arc.hpp"
 #include "BoundingBox.hpp"
 #include "Circle.hpp"
 #include "Line.hpp"
@@ -17,6 +18,7 @@ struct Layer final
 
     QString name;
     bool visible{ true };
+    Arcs arcs;
     std::vector<Line> lines;
     Circles circles;
 };
