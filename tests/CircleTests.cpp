@@ -16,7 +16,7 @@ TEST(CircleTest, boundingBox)
                 .x = 1.0,
                 .y = 2.0,
             },
-        .radius = 3.0,
+        .radius = Radius{ 3.0 },
     };
 
     // Act
@@ -46,7 +46,7 @@ TEST_P(CircleNearestPointFixture, NearestPoint)
     // Arrange
     const auto& [point, expectedPoint]{ GetParam() };
 
-    const Circle circle{ .center = Coordinate{ .x = 1.0, .y = 2.0 }, .radius = 3.0 };
+    const Circle circle{ .center = Coordinate{ .x = 1.0, .y = 2.0 }, .radius = Radius{ 3.0 } };
 
     // Act
     const Coordinate result{ nearestPoint(circle, point) };

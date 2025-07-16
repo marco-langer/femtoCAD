@@ -1,7 +1,9 @@
 add_library(femtoCAD-core STATIC
     include/core/io/DxfImport.hpp
-    include/core/utility/VectorExtensions.hpp
+    include/core/primitives/NonNegative.hpp
+    include/core/primitives/Radius.hpp
     include/core/units/Angle.hpp
+    include/core/utility/VectorExtensions.hpp
     include/core/Arc.hpp
     include/core/BoundingBox.hpp
     include/core/Circle.hpp

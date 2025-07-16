@@ -46,21 +46,23 @@ Line toLine(const odxf::Line& dxfLine)
 
 std::optional<Circle> toCircle(const odxf::Circle& dxfCircle)
 {
-    if (dxfCircle.radius < 0.0F) {
+    const std::optional<Radius> radius{ Radius::fromValue(dxfCircle.radius) };
+    if (!radius.has_value()) {
         return std::nullopt;
     }
 
     Circle circle;
 
     circle.center = toCoordinate(dxfCircle.center);
-    circle.radius = dxfCircle.radius;
+    circle.radius = radius.value();
 
     return circle;
 }
 
 std::optional<Arc> toArc(const odxf::Arc& dxfArc)
 {
-    if (dxfArc.radius < 0.0F) {
+    const std::optional<Radius> radius{ Radius::fromValue(dxfArc.radius) };
+    if (!radius.has_value()) {
         return std::nullopt;
     }
 
@@ -69,7 +71,7 @@ std::optional<Arc> toArc(const odxf::Arc& dxfArc)
     arc.center = toCoordinate(dxfArc.center);
     arc.startAngle = Radians::fromDegrees(dxfArc.startAngle);
     arc.endAngle = Radians::fromDegrees(dxfArc.endAngle);
-    arc.radius = dxfArc.radius;
+    arc.radius = radius.value();
 
     return arc;
 }

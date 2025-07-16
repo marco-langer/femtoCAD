@@ -1,6 +1,7 @@
 #include "ArcMatcher.hpp"
 
 #include "CoordinateMatcher.hpp"
+#include "RadiusMatcher.hpp"
 
 #include <vector>
 
@@ -10,7 +11,7 @@ testing::Matcher<Arc> IsArc(const Arc& expected, double maxError)
         testing::Field("center", &Arc::center, IsCoordinate(expected.center, maxError)),
         testing::Field("startAngle", &Arc::startAngle, expected.startAngle),
         testing::Field("endAngle", &Arc::endAngle, expected.endAngle),
-        testing::Field("radius", &Arc::radius, testing::DoubleNear(expected.radius, maxError))
+        testing::Field("radius", &Arc::radius, IsRadius(expected.radius, maxError))
     );
 }
 

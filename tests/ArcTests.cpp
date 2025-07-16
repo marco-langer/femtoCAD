@@ -25,7 +25,7 @@ TEST_P(ArcBoundingBoxFixture, boundingBox)
         .center = { 1.0, 1.0 },
         .startAngle = startAngle,
         .endAngle = endAngle,
-        .radius = 1.0,
+        .radius = Radius{ 1.0 },
     };
 
     // Act

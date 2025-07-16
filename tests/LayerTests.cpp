@@ -29,13 +29,13 @@ TEST(LayerTest, boundingBox)
     });
     layer.circles.push_back(Circle{
         .center = { 2.0, 3.7 },
-        .radius = 0.5,
+        .radius = Radius{ 0.5 },
     });
     layer.arcs.push_back(Arc{
         .center = { 3.0, 1.0 },
         .startAngle = Radians::zero,
         .endAngle = Radians::pi,
-        .radius = 0.5,
+        .radius = Radius{ 0.5 },
     });
 
     // Act

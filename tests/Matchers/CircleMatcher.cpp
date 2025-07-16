@@ -1,12 +1,13 @@
 #include "CircleMatcher.hpp"
 
 #include "CoordinateMatcher.hpp"
+#include "RadiusMatcher.hpp"
 
 testing::Matcher<Circle> IsCircle(const Circle& expected, double maxError)
 {
     return testing::AllOf(
         testing::Field("center", &Circle::center, IsCoordinate(expected.center, maxError)),
-        testing::Field("radius", &Circle::radius, testing::DoubleNear(expected.radius, maxError))
+        testing::Field("radius", &Circle::radius, IsRadius(expected.radius, maxError))
     );
 }
 

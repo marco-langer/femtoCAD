@@ -47,7 +47,7 @@ TEST(DxfImportTest, ImportExample)
     Layer& circlesLayer{ expectedLayers.emplace_back("Circles") };
     circlesLayer.circles.push_back(Circle{
         .center = { 50.4, 65.0 },
-        .radius = 2.5,
+        .radius = Radius{ 2.5 },
     });
 
     Layer& arcsLayer{ expectedLayers.emplace_back("Arcs") };
@@ -55,7 +55,7 @@ TEST(DxfImportTest, ImportExample)
         .center = { 0.0, 2.0 },
         .startAngle = Radians::fromDegrees(0.0),
         .endAngle = Radians::fromDegrees(180.0),
-        .radius = 0.5,
+        .radius = Radius{ 0.5 },
     });
 
     EXPECT_THAT(layers, AreLayers(expectedLayers));

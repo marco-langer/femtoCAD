@@ -2,13 +2,14 @@
 
 #include "BoundingBox.hpp"
 #include "Coordinate.hpp"
+#include "primitives/Radius.hpp"
 
 #include <vector>
 
 struct Circle final
 {
     Coordinate center;
-    double radius;
+    Radius radius;
 };
 
 using Circles = std::vector<Circle>;

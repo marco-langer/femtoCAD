@@ -16,12 +16,15 @@ add_executable(femtoCAD-core-tests
     Matchers/LayerMatcher.hpp
     Matchers/LineMatcher.cpp
     Matchers/LineMatcher.hpp
+    Matchers/RadiusMatcher.cpp
+    Matchers/RadiusMatcher.hpp
     AngleTests.cpp
     ArcTests.cpp
     CircleTests.cpp
     DxfImportTests.cpp
     LayerTests.cpp
     LineTests.cpp
+    NonNegativeTests.cpp
 )
 
 set_target_properties(femtoCAD-core-tests PROPERTIES
