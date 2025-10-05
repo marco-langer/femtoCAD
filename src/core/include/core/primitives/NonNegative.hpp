@@ -8,7 +8,7 @@
 #include <stdexcept>
 
 template <std::floating_point F, typename Tag>
-class NonNegative
+class NonNegative final
 {
 public:
     NonNegative() = default;
