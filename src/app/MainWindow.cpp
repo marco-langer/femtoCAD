@@ -110,15 +110,15 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    importDxf(m_workspace, filePath)
-        .transform([this, &filePath]() {
-            m_settings.lastDxfImportPath = filePath;
-            m_sceneView->updateWorkspace();
-            updateWindowTitle(filePath);
-        })
-        .map_error([this](const QString& errorMessage) {
-            QMessageBox::critical(this, "Dxf import error", errorMessage);
-        });
+    std::ignore = importDxf(m_workspace, filePath)
+                      .transform([this, &filePath]() {
+                          m_settings.lastDxfImportPath = filePath;
+                          m_sceneView->updateWorkspace();
+                          updateWindowTitle(filePath);
+                      })
+                      .map_error([this](const QString& errorMessage) -> void {
+                          QMessageBox::critical(this, "Dxf import error", errorMessage);
+                      });
 }
 
 void MainWindow::onClose() { close(); }
