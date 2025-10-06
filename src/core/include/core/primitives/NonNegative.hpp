@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 
+#include <cmath>
 #include <compare>
 #include <concepts>
 #include <optional>
@@ -17,14 +18,14 @@ public:
     explicit NonNegative(F value)
         : m_value{ value }
     {
-        if (value < F{}) {
+        if (value < F{} || std::isnan(value)) {
             throw std::invalid_argument{ fmt::format("value is negative: {}", value) };
         }
     }
 
     [[nodiscard]] static constexpr std::optional<NonNegative> fromValue(F value) noexcept
     {
-        if (value < F{}) {
+        if (value < F{} || std::isnan(value)) {
             return std::nullopt;
         }
 
