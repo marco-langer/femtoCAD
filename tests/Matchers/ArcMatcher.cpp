@@ -5,7 +5,7 @@
 
 #include <vector>
 
-testing::Matcher<Arc> IsArc(const Arc& expected, double maxError)
+testing::Matcher<const Arc&> IsArc(const Arc& expected, double maxError)
 {
     return testing::AllOf(
         testing::Field("center", &Arc::center, IsCoordinate(expected.center, maxError)),
@@ -17,7 +17,7 @@ testing::Matcher<Arc> IsArc(const Arc& expected, double maxError)
 
 testing::Matcher<Arcs> AreArcs(const Arcs& expected, double maxError)
 {
-    std::vector<testing::Matcher<Arc>> elementMatchers;
+    std::vector<testing::Matcher<const Arc&>> elementMatchers;
     elementMatchers.reserve(expected.size());
     for (const Arc& expectedArc : expected) {
         elementMatchers.push_back(IsArc(expectedArc, maxError));

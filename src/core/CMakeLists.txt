@@ -11,6 +11,7 @@ add_library(femtoCAD-core STATIC
     include/core/InfiniteLine.hpp
     include/core/Layer.hpp
     include/core/Line.hpp
+    include/core/Polyline.hpp
     include/core/Workspace.hpp
     io/DxfImport.cpp
     Arc.cpp
@@ -20,6 +21,7 @@ add_library(femtoCAD-core STATIC
     InfiniteLine.cpp
     Layer.cpp
     Line.cpp
+    Polyline.cpp
     Workspace.cpp
 )
 

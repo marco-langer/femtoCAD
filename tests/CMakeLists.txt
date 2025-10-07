@@ -16,6 +16,8 @@ add_executable(femtoCAD-core-tests
     Matchers/LayerMatcher.hpp
     Matchers/LineMatcher.cpp
     Matchers/LineMatcher.hpp
+    Matchers/PolylineMatcher.cpp
+    Matchers/PolylineMatcher.hpp
     Matchers/RadiusMatcher.cpp
     Matchers/RadiusMatcher.hpp
     AngleTests.cpp
@@ -26,6 +28,7 @@ add_executable(femtoCAD-core-tests
     LayerTests.cpp
     LineTests.cpp
     NonNegativeTests.cpp
+    PolylineTests.cpp
 )
 
 set_target_properties(femtoCAD-core-tests PROPERTIES

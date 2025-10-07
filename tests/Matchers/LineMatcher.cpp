@@ -2,7 +2,7 @@
 
 #include "CoordinateMatcher.hpp"
 
-testing::Matcher<Line> IsLine(const Line& expected, double maxError)
+testing::Matcher<const Line&> IsLine(const Line& expected, double maxError)
 {
     return testing::AllOf(
         testing::Field("start", &Line::start, IsCoordinate(expected.start, maxError)),
@@ -12,7 +12,7 @@ testing::Matcher<Line> IsLine(const Line& expected, double maxError)
 
 testing::Matcher<std::vector<Line>> AreLines(const std::vector<Line>& expected, double maxError)
 {
-    std::vector<testing::Matcher<Line>> elementMatchers;
+    std::vector<testing::Matcher<const Line&>> elementMatchers;
     elementMatchers.reserve(expected.size());
     for (const Line& line : expected) {
         elementMatchers.push_back(IsLine(line, maxError));
