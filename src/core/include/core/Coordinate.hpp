@@ -16,6 +16,8 @@ struct Vector2d final
 
 double norm(const Vector2d& vector);
 
+inline Vector2d perp(const Vector2d& vector) { return Vector2d{ .x = -vector.y, .y = vector.x }; }
+
 inline Coordinate operator+(const Coordinate& first, const Coordinate& second)
 {
     return Coordinate{ .x = first.x + second.x, .y = first.y + second.y };
@@ -32,6 +34,11 @@ inline Coordinate operator+(const Coordinate& point, const Vector2d& vector)
 inline Vector2d operator-(const Coordinate& first, const Coordinate& second)
 {
     return Vector2d{ .x = first.x - second.x, .y = first.y - second.y };
+}
+
+inline Vector2d operator*(double scalar, const Vector2d& vector)
+{
+    return Vector2d{ .x = vector.x * scalar, .y = vector.y * scalar };
 }
 
 inline Vector2d operator*(const Vector2d& vector, double scalar)

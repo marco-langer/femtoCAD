@@ -2,6 +2,9 @@
 
 #include "BoundingBox.hpp"
 #include "Coordinate.hpp"
+#include "InfiniteLine.hpp"
+
+#include <optional>
 
 struct Line final
 {
@@ -10,3 +13,7 @@ struct Line final
 };
 
 BoundingBox boundingBox(const Line& line);
+
+Coordinate mid(const Line& line);
+
+std::optional<InfiniteLine> perpBisector(const Line& line);

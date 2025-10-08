@@ -11,6 +11,16 @@ testing::Matcher<Circle> IsCircle(const Circle& expected, double maxError)
     );
 }
 
+testing::Matcher<const std::optional<Circle>&>
+IsCircle(const std::optional<Circle>& expected, double maxError)
+{
+    if (expected.has_value()) {
+        return testing::Optional(IsCircle(expected.value(), maxError));
+    }
+
+    return testing::Eq(std::nullopt);
+}
+
 testing::Matcher<Circles> AreCircles(const Circles& expected, double maxError)
 {
     std::vector<testing::Matcher<Circle>> elementMatchers;

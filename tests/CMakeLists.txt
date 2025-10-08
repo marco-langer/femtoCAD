@@ -22,6 +22,7 @@ add_executable(femtoCAD-core-tests
     ArcTests.cpp
     CircleTests.cpp
     DxfImportTests.cpp
+    InfiniteLineTests.cpp
     LayerTests.cpp
     LineTests.cpp
     NonNegativeTests.cpp

@@ -8,6 +8,7 @@ add_library(femtoCAD-core STATIC
     include/core/BoundingBox.hpp
     include/core/Circle.hpp
     include/core/Coordinate.hpp
+    include/core/InfiniteLine.hpp
     include/core/Layer.hpp
     include/core/Line.hpp
     include/core/Workspace.hpp
@@ -16,6 +17,7 @@ add_library(femtoCAD-core STATIC
     BoundingBox.cpp
     Circle.cpp
     Coordinate.cpp
+    InfiniteLine.cpp
     Layer.cpp
     Line.cpp
     Workspace.cpp
