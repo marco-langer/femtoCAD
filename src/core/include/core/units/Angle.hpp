@@ -33,7 +33,7 @@ template <AngleUnit Unit, std::floating_point F>
 class BasicAngle final
 {
 public:
-    BasicAngle() = default;
+    constexpr BasicAngle() = default;
 
     constexpr explicit BasicAngle(std::floating_point auto value) noexcept
         : m_value{ normalized<Unit>(gsl::narrow_cast<F>(value)) }
@@ -70,41 +70,23 @@ public:
 
     static constexpr BasicAngle zero{};
 
-    static constexpr BasicAngle piHalf{ [] {
-        BasicAngle angle;
+    static constexpr BasicAngle piHalf{
+        Unit == AngleUnit::Radian
+            ? std::numbers::pi_v<F> / F{ 2.0 }
+            : F{ 90.0 }
+    };
 
-        if constexpr (Unit == AngleUnit::Radian) {
-            angle.m_value = std::numbers::pi_v<F> / F{ 2.0 };
-        } else {
-            angle.m_value = F{ 900.0 };
-        }
+    static constexpr BasicAngle pi{
+        Unit == AngleUnit::Radian
+            ? std::numbers::pi_v<F>
+            : F{ 180.0 }
+    };
 
-        return angle;
-    }() };
-
-    static constexpr BasicAngle pi{ [] {
-        BasicAngle angle;
-
-        if constexpr (Unit == AngleUnit::Radian) {
-            angle.m_value = std::numbers::pi_v<F>;
-        } else {
-            angle.m_value = F{ 180.0 };
-        }
-
-        return angle;
-    }() };
-
-    static constexpr BasicAngle piThreeHalf{ [] {
-        BasicAngle angle;
-
-        if constexpr (Unit == AngleUnit::Radian) {
-            angle.m_value = F{ 3.0 } / 2 * std::numbers::pi_v<F>;
-        } else {
-            angle.m_value = F{ 270.0 };
-        }
-
-        return angle;
-    }() };
+    static constexpr BasicAngle piThreeHalf{
+        Unit == AngleUnit::Radian
+            ? F{ 3.0 } / F{ 2.0 } * std::numbers::pi_v<F>
+            : F{ 270.0 }
+    };
 
 private:
     template <AngleUnit Unit2, std::floating_point F2>
