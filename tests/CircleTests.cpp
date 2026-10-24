@@ -2,9 +2,9 @@
 #include "core/Circle.hpp"
 #include "core/Coordinate.hpp"
 
-#include "Matchers/BoundingBoxMatcher.hpp"
-#include "Matchers/CircleMatcher.hpp"
-#include "Matchers/CoordinateMatcher.hpp"
+#include "test_utils/matchers/BoundingBoxMatcher.hpp"
+#include "test_utils/matchers/CircleMatcher.hpp"
+#include "test_utils/matchers/CoordinateMatcher.hpp"
 
 #include <gtest/gtest.h>
 
@@ -32,7 +32,7 @@ TEST(CircleTest, boundingBox)
         .max = Coordinate{ .x = 4.0, .y = 5.0 },
     };
 
-    EXPECT_THAT(bb, IsBoundingBox(expectedBoundingBox));
+    EXPECT_THAT(bb, fcad::test_utils::IsBoundingBox(expectedBoundingBox));
 }
 
 struct CircleNearestPointParams
@@ -56,7 +56,7 @@ TEST_P(CircleNearestPointFixture, NearestPoint)
     const Coordinate result{ nearestPoint(circle, point) };
 
     // Assert
-    EXPECT_THAT(result, IsCoordinate(expectedPoint));
+    EXPECT_THAT(result, fcad::test_utils::IsCoordinate(expectedPoint));
 }
 
 // clang-format off
@@ -109,7 +109,7 @@ TEST_P(CircleFromPointsTest, FromPoints)
     const std::optional<Circle> maybeCircle{ circleFromPoints(first, second, third) };
 
     // Assert
-    EXPECT_THAT(maybeCircle, IsCircle(expectedCircle));
+    EXPECT_THAT(maybeCircle, fcad::test_utils::IsCircle(expectedCircle));
 }
 
 // clang-format off

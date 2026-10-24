@@ -1,9 +1,11 @@
-#include "ArcMatcher.hpp"
+#include "test_utils/matchers/ArcMatcher.hpp"
 
-#include "CoordinateMatcher.hpp"
-#include "RadiusMatcher.hpp"
+#include "test_utils/matchers/CoordinateMatcher.hpp"
+#include "test_utils/matchers/RadiusMatcher.hpp"
 
 #include <vector>
+
+namespace fcad::test_utils {
 
 testing::Matcher<Arc> IsArc(const Arc& expected, double maxError)
 {
@@ -25,3 +27,5 @@ testing::Matcher<Arcs> AreArcs(const Arcs& expected, double maxError)
 
     return testing::ElementsAreArray(std::move(elementMatchers));
 }
+
+}   // namespace fcad::test_utils

@@ -1,6 +1,8 @@
-#include "LineMatcher.hpp"
+#include "test_utils/matchers/LineMatcher.hpp"
 
-#include "CoordinateMatcher.hpp"
+#include "test_utils/matchers/CoordinateMatcher.hpp"
+
+namespace fcad::test_utils {
 
 testing::Matcher<Line> IsLine(const Line& expected, double maxError)
 {
@@ -20,3 +22,5 @@ testing::Matcher<std::vector<Line>> AreLines(const std::vector<Line>& expected, 
 
     return testing::ElementsAreArray(elementMatchers);
 }
+
+}   // namespace fcad::test_utils

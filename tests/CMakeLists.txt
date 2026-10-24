@@ -4,20 +4,8 @@ message(STATUS "Using GTest v.${GTest_VERSION}")
 include(GoogleTest)
 
 add_executable(femtoCAD-core-tests
-    Matchers/ArcMatcher.cpp
-    Matchers/ArcMatcher.hpp
-    Matchers/BoundingBoxMatcher.cpp
-    Matchers/BoundingBoxMatcher.hpp
-    Matchers/CircleMatcher.cpp
-    Matchers/CircleMatcher.hpp
-    Matchers/CoordinateMatcher.cpp
-    Matchers/CoordinateMatcher.hpp
     Matchers/LayerMatcher.cpp
     Matchers/LayerMatcher.hpp
-    Matchers/LineMatcher.cpp
-    Matchers/LineMatcher.hpp
-    Matchers/RadiusMatcher.cpp
-    Matchers/RadiusMatcher.hpp
     AngleTests.cpp
     ArcTests.cpp
     CircleTests.cpp
@@ -42,6 +30,7 @@ target_compile_definitions(femtoCAD-core-tests
 target_link_libraries(femtoCAD-core-tests
     PRIVATE
         femtoCAD-core
+        femtoCAD-test_utils
         femtoCAD::qt-core
         femtoCAD::warnings
         GTest::gmock_main
