@@ -20,7 +20,6 @@ target_link_libraries(femtoCAD
     PRIVATE
         femtoCAD-domain
         femtoCAD-io
-        femtoCAD::tl-expected
         femtoCAD::ms-gsl
         femtoCAD::qt-widgets
         femtoCAD::warnings
