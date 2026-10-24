@@ -116,9 +116,9 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    std::expected<domain::Document, QString> importResult{ io::importDxf(filePath) };
+    core::Result<domain::Document> importResult{ io::importDxf(filePath) };
     if (!importResult.has_value()) {
-        QMessageBox::critical(this, "Dxf import error", importResult.error());
+        QMessageBox::critical(this, "Dxf import error", importResult.error().message);
         return;
     }
 

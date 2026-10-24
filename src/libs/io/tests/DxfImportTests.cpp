@@ -5,6 +5,7 @@
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
 #include "geo/Line.hpp"
+#include "io/DxfImportError.hpp"
 
 #include "matchers/LayerMatcher.hpp"
 
@@ -19,11 +20,11 @@ TEST(DxfImportTest, ImportExample)
     ASSERT_TRUE(QFile::exists(filePath));
 
     // Act
-    std::expected<fcad::domain::Document, QString> importResult{ fcad::io::importDxf(filePath) };
+    fcad::core::Result<fcad::domain::Document> importResult{ fcad::io::importDxf(filePath) };
 
     // Assert
     if (!importResult.has_value()) {
-        FAIL() << importResult.error().toStdString();
+        FAIL() << importResult.error().message.toStdString();
     }
 
     const fcad::domain::Layers& layers{ importResult.value().layers() };
@@ -66,4 +67,19 @@ TEST(DxfImportTest, ImportExample)
     );
 
     EXPECT_THAT(layers, AreLayers(expectedLayers));
+}
+
+TEST(DxfImportTest, MissingFile)
+{
+    // Arrange
+    const QString filePath{ TEST_DATA_DIR "missing.dxf" };
+    ASSERT_FALSE(QFile::exists(filePath));
+
+    // Act
+    fcad::core::Result<fcad::domain::Document> importResult{ fcad::io::importDxf(filePath) };
+
+    // Assert
+    ASSERT_FALSE(importResult.has_value());
+    EXPECT_EQ(importResult.error().code, fcad::io::DxfImportError::CannotOpenFile);
+    EXPECT_FALSE(importResult.error().message.isEmpty());
 }
