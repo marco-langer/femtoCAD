@@ -41,10 +41,9 @@ protected:
 
 private:
     QPointF mapToWorld(const QPointF& widgetPosition) const;
+    QMatrix4x4 viewProjection() const;
     void uploadGeometry();
-    void resetZoom();
-    void updateTransform();
-    void resetViewToSceneBounds();
+    void fitViewToScene();
 
     struct Geometry
     {
@@ -63,9 +62,11 @@ private:
     Geometry m_lines{ GL_LINES };
 
     BoundingBox m_sceneBounds;
-    QMatrix4x4 m_projMatrix;
-    QMatrix4x4 m_viewMatrix;
-    float m_zoom{ 1.0F };
-    QPointF m_pan;
+    // World point at the widget's centre.
+    Coordinate m_viewCenter;
+    // World units per logical pixel; 0 until the view has been fitted.
+    double m_viewScale{ 0.0 };
+    // m_viewScale after the last fit, the reference for the zoom limits.
+    double m_fittedViewScale{ 0.0 };
     QPointF m_lastMousePos;
 };
