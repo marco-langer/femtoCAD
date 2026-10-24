@@ -3,12 +3,6 @@ add_executable(femtoCAD-core-tests
     NonNegativeTests.cpp
 )
 
-set_target_properties(femtoCAD-core-tests PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
-
 target_link_libraries(femtoCAD-core-tests
     PRIVATE
         femtoCAD-core
