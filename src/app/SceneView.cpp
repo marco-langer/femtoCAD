@@ -26,6 +26,13 @@ QSize SceneView::sizeHint() const { return QSize{ windowWeight, windowHeight }; 
 
 void SceneView::updateWorkspace()
 {
+    makeCurrent();
+    uploadGeometry();
+    doneCurrent();
+}
+
+void SceneView::uploadGeometry()
+{
     const BoundingBox sceneBounds{ boundingBox(m_workspace).value_or(defaultBounds) };
     m_sceneBounds = sceneBounds;
 
@@ -91,7 +98,7 @@ void SceneView::initializeGL()
 
     m_program->release();
 
-    updateWorkspace();
+    uploadGeometry();
 }
 
 void SceneView::resizeGL(int /* width */, int /* height */) { resetViewToSceneBounds(); }

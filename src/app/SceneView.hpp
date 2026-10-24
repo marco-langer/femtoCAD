@@ -39,6 +39,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
 
 private:
+    void uploadGeometry();
     void updateTransform();
     void resetViewToSceneBounds();
 
