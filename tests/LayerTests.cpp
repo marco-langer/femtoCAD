@@ -2,7 +2,7 @@
 #include "core/Coordinate.hpp"
 #include "core/Layer.hpp"
 
-#include "Matchers/BoundingBoxMatcher.hpp"
+#include "test_utils/matchers/BoundingBoxMatcher.hpp"
 
 #include <gtest/gtest.h>
 
@@ -55,5 +55,5 @@ TEST(LayerTest, boundingBox)
         .max = Coordinate{ .x = 3.5, .y = 4.2 },
     };
 
-    EXPECT_THAT(bb.value(), IsBoundingBox(expectedBb));
+    EXPECT_THAT(bb.value(), fcad::test_utils::IsBoundingBox(expectedBb));
 }

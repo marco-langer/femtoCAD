@@ -1,4 +1,6 @@
-#include "CoordinateMatcher.hpp"
+#include "test_utils/matchers/CoordinateMatcher.hpp"
+
+namespace fcad::test_utils {
 
 testing::Matcher<Coordinate> IsCoordinate(const Coordinate& coordinate, double maxError)
 {
@@ -17,3 +19,5 @@ IsCoordinate(const std::optional<Coordinate>& expected, double maxError)
 
     return testing::Eq(std::nullopt);
 }
+
+}   // namespace fcad::test_utils

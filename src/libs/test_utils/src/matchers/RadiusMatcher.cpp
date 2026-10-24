@@ -1,4 +1,6 @@
-#include "RadiusMatcher.hpp"
+#include "test_utils/matchers/RadiusMatcher.hpp"
+
+namespace fcad::test_utils {
 
 testing::Matcher<Radius> IsRadius(Radius expected, double maxError)
 {
@@ -6,3 +8,5 @@ testing::Matcher<Radius> IsRadius(Radius expected, double maxError)
         "value", &Radius::value, testing::DoubleNear(expected.value(), maxError)
     );
 }
+
+}   // namespace fcad::test_utils

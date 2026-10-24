@@ -1,6 +1,8 @@
-#include "BoundingBoxMatcher.hpp"
+#include "test_utils/matchers/BoundingBoxMatcher.hpp"
 
-#include "CoordinateMatcher.hpp"
+#include "test_utils/matchers/CoordinateMatcher.hpp"
+
+namespace fcad::test_utils {
 
 testing::Matcher<BoundingBox> IsBoundingBox(const BoundingBox& boundingBox, double maxError)
 {
@@ -9,3 +11,5 @@ testing::Matcher<BoundingBox> IsBoundingBox(const BoundingBox& boundingBox, doub
         testing::Field("max", &BoundingBox::max, IsCoordinate(boundingBox.max, maxError))
     );
 }
+
+}   // namespace fcad::test_utils

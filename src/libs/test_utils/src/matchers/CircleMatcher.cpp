@@ -1,7 +1,9 @@
-#include "CircleMatcher.hpp"
+#include "test_utils/matchers/CircleMatcher.hpp"
 
-#include "CoordinateMatcher.hpp"
-#include "RadiusMatcher.hpp"
+#include "test_utils/matchers/CoordinateMatcher.hpp"
+#include "test_utils/matchers/RadiusMatcher.hpp"
+
+namespace fcad::test_utils {
 
 testing::Matcher<Circle> IsCircle(const Circle& expected, double maxError)
 {
@@ -31,3 +33,5 @@ testing::Matcher<Circles> AreCircles(const Circles& expected, double maxError)
 
     return testing::ElementsAreArray(std::move(elementMatchers));
 }
+
+}   // namespace fcad::test_utils

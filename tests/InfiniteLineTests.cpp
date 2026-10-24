@@ -2,7 +2,7 @@
 
 #include "core/Coordinate.hpp"
 
-#include "Matchers/CoordinateMatcher.hpp"
+#include "test_utils/matchers/CoordinateMatcher.hpp"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -31,7 +31,7 @@ TEST_P(InfiniteLineTest, Intersection)
     const std::optional<Coordinate> maybeIntersection{ intersection(first, second) };
 
     // Assert
-    EXPECT_THAT(maybeIntersection, IsCoordinate(expectedIntersection));
+    EXPECT_THAT(maybeIntersection, fcad::test_utils::IsCoordinate(expectedIntersection));
 }
 
 // clang-format off

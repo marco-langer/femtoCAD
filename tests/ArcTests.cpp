@@ -1,6 +1,6 @@
 #include "core/Arc.hpp"
 
-#include "Matchers/BoundingBoxMatcher.hpp"
+#include "test_utils/matchers/BoundingBoxMatcher.hpp"
 
 #include <fmt/core.h>
 #include <gtest/gtest.h>
@@ -32,7 +32,7 @@ TEST_P(ArcBoundingBoxFixture, boundingBox)
     const BoundingBox arcBoundingBox{ boundingBox(arc) };
 
     // Assert
-    EXPECT_THAT(arcBoundingBox, IsBoundingBox(expectedBoundingBox));
+    EXPECT_THAT(arcBoundingBox, fcad::test_utils::IsBoundingBox(expectedBoundingBox));
 }
 
 // clang-format off
