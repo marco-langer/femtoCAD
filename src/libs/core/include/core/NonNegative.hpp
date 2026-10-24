@@ -1,7 +1,5 @@
 #pragma once
 
-#include <fmt/format.h>
-
 #include <cmath>
 #include <compare>
 #include <concepts>
@@ -16,12 +14,11 @@ class NonNegative final
 public:
     NonNegative() = default;
 
-    // TODO C++23: constexpr
-    explicit NonNegative(F value)
+    consteval explicit NonNegative(F value)
         : m_value{ value }
     {
         if (value < F{} || std::isnan(value)) {
-            throw std::invalid_argument{ fmt::format("value is negative: {}", value) };
+            throw std::invalid_argument{ "NonNegative: value is negative or NaN" };
         }
     }
 

@@ -4,7 +4,6 @@
 
 #include <cmath>
 #include <limits>
-#include <stdexcept>
 
 namespace {
 
@@ -34,11 +33,6 @@ TEST(NonNegative, ConstructorSuccess)
     const SUTNonNegative sut{ 1.5 };
 
     EXPECT_EQ(sut.value(), 1.5);
-}
-
-TEST(NonNegative, ConstructorFailure)
-{
-    EXPECT_THROW({ SUTNonNegative sut{ -1.5 }; }, std::invalid_argument);
 }
 
 class NonNegativeFromValueTest : public testing::TestWithParam<std::pair<double, bool>>
