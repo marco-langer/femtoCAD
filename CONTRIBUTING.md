@@ -94,8 +94,4 @@ isn't obvious.>
 
 ### Pull requests
 
-- **Title:** like a commit summary.
-- **Summary:** what and why, in a few sentences.
-- **Changes:** a bullet list of the notable changes.
-- **Testing:** how it was verified (tests added, manual checks).
-- **Notes:** open questions, follow-ups, known limitations (optional).
+Use the template in `.github/pull_request_template.md`.
