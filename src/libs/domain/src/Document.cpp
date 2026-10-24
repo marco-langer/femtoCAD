@@ -1,7 +1,5 @@
 #include "domain/Document.hpp"
 
-#include "core/VectorExtensions.hpp"
-
 #include <ranges>
 
 namespace fcad::domain {
@@ -10,7 +8,7 @@ const Layers& Document::layers() const& { return m_layers; }
 
 void Document::addLayer(Layer layer) { m_layers.push_back(std::move(layer)); }
 
-void Document::addLayers(Layers&& layers) { core::appendRange(m_layers, std::move(layers)); }
+void Document::addLayers(Layers&& layers) { m_layers.append_range(layers | std::views::as_rvalue); }
 
 std::optional<geo::BoundingBox> boundingBox(const Document& document)
 {
