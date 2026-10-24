@@ -1,6 +1,7 @@
 #include "io/DxfImport.hpp"
 
 #include "core/VectorExtensions.hpp"
+#include "domain/Document.hpp"
 #include "domain/Layer.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
@@ -131,10 +132,12 @@ namespace {
         std::vector<std::string> m_layerNames;
     };
 
-    void updateWorkspace(domain::Workspace& workspace, ReadStream& stream)
+    domain::Document toDocument(ReadStream&& stream)
     {
-        workspace.clear();
-        workspace.addLayers(std::move(stream).getLayers());
+        domain::Document document;
+        document.addLayers(std::move(stream).getLayers());
+
+        return document;
     }
 
     QString toErrorMessage(const odxf::Error& error)
@@ -154,12 +157,12 @@ namespace {
 
 }   // namespace
 
-tl::expected<void, QString> importDxf(domain::Workspace& workspace, const QString& filePath)
+tl::expected<domain::Document, QString> importDxf(const QString& filePath)
 {
     ReadStream stream;
 
     return odxf::read(stream, toStdFilePath(filePath))
-        .transform([&workspace, &stream] { updateWorkspace(workspace, stream); })
+        .transform([&stream] { return toDocument(std::move(stream)); })
         .map_error([](const odxf::Error& error) { return toErrorMessage(error); });
 }
 

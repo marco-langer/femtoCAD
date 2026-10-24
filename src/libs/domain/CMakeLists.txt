@@ -1,6 +1,8 @@
 add_library(femtoCAD-domain STATIC
+    include/domain/Document.hpp
     include/domain/Layer.hpp
     include/domain/Workspace.hpp
+    src/Document.cpp
     src/Layer.cpp
     src/Workspace.cpp
 )

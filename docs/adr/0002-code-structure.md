@@ -30,7 +30,7 @@ the app gets tests.
   - `geo`: geometric value types (`Coordinate`, `Line`, `Circle`, `Arc`, `Radius`, ...) and
     geometric algorithms.
   - `domain`: the CAD model and its logic, without UI: entities, `EntityId`, `Layer`, `LayerId`,
-    `Workspace`.
+    `Document`, `Workspace`.
   - `io`: importers and exporters, today the DXF import. They map file formats to the domain and
     back, but the domain knows nothing about file formats.
   - `app`: the executable with the widgets.

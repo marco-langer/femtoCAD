@@ -1,5 +1,6 @@
 #include "io/DxfImport.hpp"
 
+#include "domain/Document.hpp"
 #include "domain/Layer.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
@@ -17,17 +18,15 @@ TEST(DxfImportTest, ImportExample)
     const QString filePath{ TEST_DATA_DIR "example.dxf" };
     ASSERT_TRUE(QFile::exists(filePath));
 
-    fcad::domain::Workspace workspace;
-
     // Act
-    tl::expected<void, QString> importResult{ fcad::io::importDxf(workspace, filePath) };
+    tl::expected<fcad::domain::Document, QString> importResult{ fcad::io::importDxf(filePath) };
 
     // Assert
     if (!importResult.has_value()) {
         FAIL() << importResult.error().toStdString();
     }
 
-    const fcad::domain::Layers& layers{ workspace.layers() };
+    const fcad::domain::Layers& layers{ importResult.value().layers() };
 
     fcad::domain::Layers expectedLayers;
 
