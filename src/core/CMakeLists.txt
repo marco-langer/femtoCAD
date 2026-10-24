@@ -24,6 +24,9 @@ add_library(femtoCAD-core STATIC
 )
 
 target_link_libraries(femtoCAD-core
+    PUBLIC
+        femtoCAD::fmt
+        femtoCAD::ms-gsl
     PRIVATE
         femtoCAD::opendxf
         femtoCAD::tl-expected
