@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 namespace fcad::app {
 
@@ -63,11 +64,18 @@ void SceneView::uploadGeometry()
         }
     }
 
+    // QOpenGLBuffer takes the size as int. Draw nothing rather than truncate the buffer.
+    if (!std::in_range<int>(vertices.size() * sizeof(float))) {
+        qWarning() << "Too many lines to draw:" << m_lines.instanceCount;
+        vertices.clear();
+        m_lines.instanceCount = 0;
+    }
+
     m_lines.vao.bind();
     m_lines.vbo.bind();
     m_lines.vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
 
-    m_lines.vbo.allocate(vertices.data(), gsl::narrow<int>(vertices.size() * sizeof(float)));
+    m_lines.vbo.allocate(vertices.data(), gsl::narrow_cast<int>(vertices.size() * sizeof(float)));
 
     // Per line: start point, then end point.
     constexpr int stride{ 2 * componentsPerVertex * sizeof(float) };
