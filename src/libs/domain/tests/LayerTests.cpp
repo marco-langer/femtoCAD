@@ -1,6 +1,6 @@
 #include "core/BoundingBox.hpp"
 #include "core/Coordinate.hpp"
-#include "core/Layer.hpp"
+#include "domain/Layer.hpp"
 
 #include "test_utils/matchers/BoundingBoxMatcher.hpp"
 
@@ -9,7 +9,7 @@
 TEST(LayerTest, boundingBox_Empty)
 {
     // Arrange
-    const Layer layer{ "Layer Name" };
+    const fcad::domain::Layer layer{ "Layer Name" };
 
     // Act
     const std::optional<BoundingBox> bb{ boundingBox(layer) };
@@ -21,7 +21,7 @@ TEST(LayerTest, boundingBox_Empty)
 TEST(LayerTest, boundingBox)
 {
     // Arrange
-    Layer layer{ "Layer Name" };
+    fcad::domain::Layer layer{ "Layer Name" };
 
     layer.lines.push_back(
         Line{

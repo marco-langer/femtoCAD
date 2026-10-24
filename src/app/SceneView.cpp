@@ -26,7 +26,7 @@ constexpr double zoomStepFactor = 1.2;
 constexpr double minimumZoom = 0.01;
 constexpr double maximumZoom = 10000.0;
 
-SceneView::SceneView(Workspace& workspace)
+SceneView::SceneView(fcad::domain::Workspace& workspace)
     : m_workspace{ workspace }
 {
     setMouseTracking(true);
@@ -49,7 +49,7 @@ void SceneView::uploadGeometry()
     std::vector<float> vertices;
 
     m_lines.instanceCount = 0;
-    for (const Layer& layer : m_workspace.layers()) {
+    for (const fcad::domain::Layer& layer : m_workspace.layers()) {
         if (layer.visible) {
             for (const Line& line : layer.lines) {
                 vertices.push_back(gsl::narrow_cast<float>(line.start.x));

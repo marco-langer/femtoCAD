@@ -6,26 +6,33 @@
 
 #include <vector>
 
-testing::Matcher<Layer> IsLayer(const Layer& expected, double maxError)
+testing::Matcher<fcad::domain::Layer> IsLayer(const fcad::domain::Layer& expected, double maxError)
 {
     return testing::AllOf(
-        testing::Field("name", &Layer::name, expected.name),
-        testing::Field("visible", &Layer::visible, expected.visible),
-        testing::Field("arcs", &Layer::arcs, fcad::test_utils::AreArcs(expected.arcs, maxError)),
+        testing::Field("name", &fcad::domain::Layer::name, expected.name),
+        testing::Field("visible", &fcad::domain::Layer::visible, expected.visible),
         testing::Field(
-            "lines", &Layer::lines, fcad::test_utils::AreLines(expected.lines, maxError)
+            "arcs", &fcad::domain::Layer::arcs, fcad::test_utils::AreArcs(expected.arcs, maxError)
         ),
         testing::Field(
-            "circles", &Layer::circles, fcad::test_utils::AreCircles(expected.circles, maxError)
+            "lines",
+            &fcad::domain::Layer::lines,
+            fcad::test_utils::AreLines(expected.lines, maxError)
+        ),
+        testing::Field(
+            "circles",
+            &fcad::domain::Layer::circles,
+            fcad::test_utils::AreCircles(expected.circles, maxError)
         )
     );
 }
 
-testing::Matcher<Layers> AreLayers(const Layers& expected, double maxError)
+testing::Matcher<fcad::domain::Layers>
+AreLayers(const fcad::domain::Layers& expected, double maxError)
 {
-    std::vector<testing::Matcher<Layer>> elementMatchers;
+    std::vector<testing::Matcher<fcad::domain::Layer>> elementMatchers;
     elementMatchers.reserve(expected.size());
-    for (const Layer& layer : expected) {
+    for (const fcad::domain::Layer& layer : expected) {
         elementMatchers.push_back(IsLayer(layer, maxError));
     }
 

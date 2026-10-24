@@ -1,14 +1,16 @@
 #pragma once
 
-#include "Arc.hpp"
-#include "BoundingBox.hpp"
-#include "Circle.hpp"
-#include "Line.hpp"
+#include "core/Arc.hpp"
+#include "core/BoundingBox.hpp"
+#include "core/Circle.hpp"
+#include "core/Line.hpp"
 
 #include <QString>
 
 #include <optional>
 #include <vector>
+
+namespace fcad::domain {
 
 struct Layer final
 {
@@ -26,3 +28,5 @@ struct Layer final
 using Layers = std::vector<Layer>;
 
 std::optional<BoundingBox> boundingBox(const Layer& layer);
+
+}   // namespace fcad::domain

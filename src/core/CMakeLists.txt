@@ -8,17 +8,13 @@ add_library(femtoCAD-core STATIC
     include/core/Circle.hpp
     include/core/Coordinate.hpp
     include/core/InfiniteLine.hpp
-    include/core/Layer.hpp
     include/core/Line.hpp
-    include/core/Workspace.hpp
     Arc.cpp
     BoundingBox.cpp
     Circle.cpp
     Coordinate.cpp
     InfiniteLine.cpp
-    Layer.cpp
     Line.cpp
-    Workspace.cpp
 )
 
 target_link_libraries(femtoCAD-core
@@ -26,7 +22,6 @@ target_link_libraries(femtoCAD-core
         femtoCAD::fmt
         femtoCAD::ms-gsl
     PRIVATE
-        femtoCAD::qt-core
         femtoCAD::warnings
 )
 

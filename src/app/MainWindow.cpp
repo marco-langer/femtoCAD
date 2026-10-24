@@ -11,13 +11,13 @@
 
 #include "SceneView.hpp"
 
-MainWindow::MainWindow(Workspace& workspace, Settings& settings)
+MainWindow::MainWindow(fcad::domain::Workspace& workspace, Settings& settings)
     : m_workspace{ workspace }
     , m_settings{ settings }
 {
     createActions();
 
-    Layer layer{ "Layer 1" };
+    fcad::domain::Layer layer{ "Layer 1" };
     layer.lines.push_back(
         Line{ .start = Coordinate{ 50.0, 50.0 }, .end = Coordinate{ 200.0, 200.0 } }
     );
@@ -90,7 +90,7 @@ void MainWindow::updateWindowTitle(const QString& filePath)
 void MainWindow::onNewProject()
 {
     m_workspace.clear();
-    m_workspace.addLayer(Layer{ "Layer 1" });
+    m_workspace.addLayer(fcad::domain::Layer{ "Layer 1" });
     m_sceneView->updateWorkspace();
 }
 
