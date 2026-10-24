@@ -2,17 +2,20 @@
 
 #include "domain/Document.hpp"
 
+#include <optional>
+
 namespace fcad::domain {
 
 class Workspace final
 {
 public:
-    const Document& document() const&;
-    // Move-assigns, so references to document() stay valid.
+    // Empty until a document is created or imported.
+    const std::optional<Document>& document() const&;
+    // Assigns in place, so references to document() stay valid.
     void setDocument(Document document);
 
 private:
-    Document m_document;
+    std::optional<Document> m_document;
 };
 
 }   // namespace fcad::domain

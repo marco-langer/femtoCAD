@@ -19,14 +19,6 @@ MainWindow::MainWindow(domain::Workspace& workspace, Settings& settings)
 {
     createActions();
 
-    domain::Layer layer{ "Layer 1" };
-    layer.lines.push_back(
-        geo::Line{ .start = geo::Coordinate{ 50.0, 50.0 }, .end = geo::Coordinate{ 200.0, 200.0 } }
-    );
-    domain::Document document;
-    document.addLayer(layer);
-    m_workspace.setDocument(std::move(document));
-
     m_sceneView = new SceneView{ m_workspace.document() };
 
     setStatusBar(new QStatusBar{});

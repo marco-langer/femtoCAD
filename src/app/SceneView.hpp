@@ -12,6 +12,7 @@
 #include <QPointF>
 
 #include <memory>
+#include <optional>
 
 namespace fcad::app {
 
@@ -25,7 +26,7 @@ signals:
     void mousePositionChanged(const QPointF&);
 
 public:
-    SceneView(const domain::Document& document);
+    SceneView(const std::optional<domain::Document>& document);
 
     QSize sizeHint() const override;
 
@@ -55,7 +56,7 @@ private:
         int instanceCount{ 0 };
     };
 
-    const domain::Document& m_document;
+    const std::optional<domain::Document>& m_document;
     std::unique_ptr<QOpenGLShaderProgram> m_program;
     Geometry m_lines;
 
