@@ -147,17 +147,19 @@ void SceneView::mousePressEvent(QMouseEvent* /* event */) {}
 
 void SceneView::mouseMoveEvent(QMouseEvent* event)
 {
-    const QSize windowSize{ size() };
-    const QPoint& eventPos{ event->pos() };
+    const QSize widgetSize{ size() };
+    const QPointF eventPos{ event->position() };
 
-    const double x{ m_sceneBounds.min.x
-                    + gsl::narrow_cast<double>(eventPos.x()) / windowSize.width()
-                          * getWidth(m_sceneBounds) };
-    const double y{ m_sceneBounds.min.y
-                    + gsl::narrow_cast<double>(eventPos.y()) / windowSize.height()
-                          * getHeight(m_sceneBounds) };
+    // Map widget pixels (y down) to normalized device coordinates (y up) and back
+    // through the inverse of the transformation used for rendering.
+    const QVector4D ndc{ gsl::narrow_cast<float>(2.0 * eventPos.x() / widgetSize.width() - 1.0),
+                         gsl::narrow_cast<float>(1.0 - 2.0 * eventPos.y() / widgetSize.height()),
+                         0.0F,
+                         1.0F };
+    const QVector4D world{ (m_projMatrix * m_viewMatrix).inverted() * ndc };
 
-    const QPointF currentMousePosition{ x, y };
+    const QPointF currentMousePosition{ static_cast<double>(world.x()),
+                                        static_cast<double>(world.y()) };
     emit mousePositionChanged(currentMousePosition);
 }
 
