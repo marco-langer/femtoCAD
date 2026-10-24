@@ -210,8 +210,8 @@ void SceneView::resetViewToSceneBounds()
     m_projMatrix.ortho(
         gsl::narrow_cast<float>(center.x - viewWidth / 2.0),
         gsl::narrow_cast<float>(center.x + viewWidth / 2.0),
-        gsl::narrow_cast<float>(center.y + viewHeight / 2.0),
         gsl::narrow_cast<float>(center.y - viewHeight / 2.0),
+        gsl::narrow_cast<float>(center.y + viewHeight / 2.0),
         -1.0F,
         1.0F
     );
