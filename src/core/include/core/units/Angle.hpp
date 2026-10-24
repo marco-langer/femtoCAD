@@ -40,8 +40,8 @@ public:
     {}
 
     template <AngleUnit Unit2>
-    requires(Unit2 != Unit) constexpr explicit BasicAngle(const BasicAngle<Unit2, F>& other
-    ) noexcept
+        requires(Unit2 != Unit)
+    constexpr explicit BasicAngle(const BasicAngle<Unit2, F>& other) noexcept
     {
         if constexpr (Unit2 == AngleUnit::Degree) {
             m_value = other.m_value / F{ 180.0 } * std::numbers::pi_v<F>;
@@ -70,23 +70,15 @@ public:
 
     static constexpr BasicAngle zero{};
 
-    static constexpr BasicAngle piHalf{
-        Unit == AngleUnit::Radian
-            ? std::numbers::pi_v<F> / F{ 2.0 }
-            : F{ 90.0 }
-    };
+    static constexpr BasicAngle piHalf{ Unit == AngleUnit::Radian ? std::numbers::pi_v<F> / F{ 2.0 }
+                                                                  : F{ 90.0 } };
 
-    static constexpr BasicAngle pi{
-        Unit == AngleUnit::Radian
-            ? std::numbers::pi_v<F>
-            : F{ 180.0 }
-    };
+    static constexpr BasicAngle pi{ Unit == AngleUnit::Radian ? std::numbers::pi_v<F>
+                                                              : F{ 180.0 } };
 
-    static constexpr BasicAngle piThreeHalf{
-        Unit == AngleUnit::Radian
-            ? F{ 3.0 } / F{ 2.0 } * std::numbers::pi_v<F>
-            : F{ 270.0 }
-    };
+    static constexpr BasicAngle piThreeHalf{ Unit == AngleUnit::Radian
+                                                 ? F{ 3.0 } / F{ 2.0 } * std::numbers::pi_v<F>
+                                                 : F{ 270.0 } };
 
 private:
     template <AngleUnit Unit2, std::floating_point F2>

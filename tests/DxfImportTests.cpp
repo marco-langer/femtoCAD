@@ -35,28 +35,36 @@ TEST(DxfImportTest, ImportExample)
     testLayer.visible = false;
 
     Layer& linesLayer{ expectedLayers.emplace_back("Lines") };
-    linesLayer.lines.push_back(Line{
-        .start = { 100.0, 100.0 },
-        .end = { 350.0, 400.0 },
-    });
-    linesLayer.lines.push_back(Line{
-        .start = { 150.0, 130.0 },
-        .end = { 250.0, 130.0 },
-    });
+    linesLayer.lines.push_back(
+        Line{
+            .start = { 100.0, 100.0 },
+            .end = { 350.0, 400.0 },
+        }
+    );
+    linesLayer.lines.push_back(
+        Line{
+            .start = { 150.0, 130.0 },
+            .end = { 250.0, 130.0 },
+        }
+    );
 
     Layer& circlesLayer{ expectedLayers.emplace_back("Circles") };
-    circlesLayer.circles.push_back(Circle{
-        .center = { 50.4, 65.0 },
-        .radius = Radius{ 2.5 },
-    });
+    circlesLayer.circles.push_back(
+        Circle{
+            .center = { 50.4, 65.0 },
+            .radius = Radius{ 2.5 },
+        }
+    );
 
     Layer& arcsLayer{ expectedLayers.emplace_back("Arcs") };
-    arcsLayer.arcs.push_back(Arc{
-        .center = { 0.0, 2.0 },
-        .startAngle = Radians::fromDegrees(0.0),
-        .endAngle = Radians::fromDegrees(180.0),
-        .radius = Radius{ 0.5 },
-    });
+    arcsLayer.arcs.push_back(
+        Arc{
+            .center = { 0.0, 2.0 },
+            .startAngle = Radians::fromDegrees(0.0),
+            .endAngle = Radians::fromDegrees(180.0),
+            .radius = Radius{ 0.5 },
+        }
+    );
 
     EXPECT_THAT(layers, AreLayers(expectedLayers));
 }
