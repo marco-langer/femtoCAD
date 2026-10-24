@@ -1,7 +1,7 @@
 #include "io/DxfImport.hpp"
 
-#include "domain/Document.hpp"
 #include "domain/Layer.hpp"
+#include "domain/LengthUnit.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
 #include "geo/Line.hpp"
@@ -13,6 +13,8 @@
 
 #include <gtest/gtest.h>
 
+#include <optional>
+
 TEST(DxfImportTest, ImportExample)
 {
     // Arrange
@@ -20,14 +22,14 @@ TEST(DxfImportTest, ImportExample)
     ASSERT_TRUE(QFile::exists(filePath));
 
     // Act
-    fcad::core::Result<fcad::domain::Document> importResult{ fcad::io::importDxf(filePath) };
+    fcad::core::Result<fcad::io::ImportedDxf> importResult{ fcad::io::importDxf(filePath) };
 
     // Assert
     if (!importResult.has_value()) {
         FAIL() << importResult.error().message.toStdString();
     }
 
-    const fcad::domain::Layers& layers{ importResult.value().layers() };
+    const fcad::domain::Layers& layers{ importResult.value().layers };
 
     fcad::domain::Layers expectedLayers;
 
@@ -69,6 +71,40 @@ TEST(DxfImportTest, ImportExample)
     EXPECT_THAT(layers, AreLayers(expectedLayers));
 }
 
+TEST(DxfImportTest, ImportWithoutUnit)
+{
+    // Arrange
+    const QString filePath{ TEST_DATA_DIR "example.dxf" };
+    ASSERT_TRUE(QFile::exists(filePath));
+
+    // Act
+    fcad::core::Result<fcad::io::ImportedDxf> importResult{ fcad::io::importDxf(filePath) };
+
+    // Assert
+    if (!importResult.has_value()) {
+        FAIL() << importResult.error().message.toStdString();
+    }
+
+    EXPECT_EQ(importResult.value().unit, std::nullopt);
+}
+
+TEST(DxfImportTest, ImportUnit)
+{
+    // Arrange
+    const QString filePath{ TEST_DATA_DIR "example-millimeter.dxf" };
+    ASSERT_TRUE(QFile::exists(filePath));
+
+    // Act
+    fcad::core::Result<fcad::io::ImportedDxf> importResult{ fcad::io::importDxf(filePath) };
+
+    // Assert
+    if (!importResult.has_value()) {
+        FAIL() << importResult.error().message.toStdString();
+    }
+
+    EXPECT_EQ(importResult.value().unit, fcad::domain::LengthUnit::Millimeter);
+}
+
 TEST(DxfImportTest, MissingFile)
 {
     // Arrange
@@ -76,7 +112,7 @@ TEST(DxfImportTest, MissingFile)
     ASSERT_FALSE(QFile::exists(filePath));
 
     // Act
-    fcad::core::Result<fcad::domain::Document> importResult{ fcad::io::importDxf(filePath) };
+    fcad::core::Result<fcad::io::ImportedDxf> importResult{ fcad::io::importDxf(filePath) };
 
     // Assert
     ASSERT_FALSE(importResult.has_value());

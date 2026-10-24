@@ -108,13 +108,15 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    core::Result<domain::Document> importResult{ io::importDxf(filePath) };
+    core::Result<io::ImportedDxf> importResult{ io::importDxf(filePath) };
     if (!importResult.has_value()) {
         QMessageBox::critical(this, "Dxf import error", importResult.error().message);
         return;
     }
 
-    m_workspace.setDocument(std::move(importResult).value());
+    domain::Document document;
+    document.addLayers(std::move(importResult.value().layers));
+    m_workspace.setDocument(std::move(document));
     m_settings.lastDxfImportPath = filePath;
     m_sceneView->updateDocument();
     updateWindowTitle(filePath);
