@@ -19,7 +19,10 @@ or call APIs that throw.
 
 ### Our code doesn't throw
 
-- Production code in `src/libs/` and `src/app/` never throws.
+- Production code in `src/libs/` and `src/app/` never throws at runtime.
+- A `throw` in a `consteval` function is allowed. It never runs: an argument that would reach it
+  makes the call a compile error. This lets a constructor for literals reject invalid values at
+  compile time.
 - Test code may throw. An exception fails the test, which keeps tests short and readable.
 - Exceptions stay enabled in the build. The standard library, fmt, GSL and GoogleTest keep working
   as specified.
@@ -53,6 +56,9 @@ or call APIs that throw.
   `operator*`. The check makes the throw unreachable, and compilers usually remove the second check
   in release builds. If a check is ever missing, `.value()` throws instead of reading a value that
   isn't there.
+- The same goes for `.at()` on containers when the index is valid by construction, e.g. because
+  it comes from a lookup in a list that is kept in sync with the container. If that invariant is
+  ever broken, `.at()` throws instead of reading out of bounds.
 - Where no non-throwing alternative exists, catch the exception at the call and convert it into an
   `Error`.
 
