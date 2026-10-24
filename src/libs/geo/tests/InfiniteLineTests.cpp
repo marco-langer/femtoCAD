@@ -28,7 +28,9 @@ TEST_P(InfiniteLineTest, Intersection)
     const auto& [first, second, expectedIntersection, _]{ GetParam() };
 
     // Act
-    const std::optional<fcad::geo::Coordinate> maybeIntersection{ intersection(first, second) };
+    const std::optional<fcad::geo::Coordinate> maybeIntersection{
+        fcad::geo::intersection(first, second)
+    };
 
     // Assert
     EXPECT_THAT(maybeIntersection, fcad::test_utils::IsCoordinate(expectedIntersection));

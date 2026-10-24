@@ -45,7 +45,7 @@ void SceneView::updateWorkspace()
 
 void SceneView::uploadGeometry()
 {
-    const geo::BoundingBox sceneBounds{ boundingBox(m_workspace).value_or(defaultBounds) };
+    const geo::BoundingBox sceneBounds{ domain::boundingBox(m_workspace).value_or(defaultBounds) };
     m_sceneBounds = sceneBounds;
 
     std::vector<float> vertices;
@@ -254,8 +254,8 @@ void SceneView::fitViewToScene()
         return;
     }
 
-    double bbWidth{ getWidth(m_sceneBounds) };
-    double bbHeight{ getHeight(m_sceneBounds) };
+    double bbWidth{ geo::getWidth(m_sceneBounds) };
+    double bbHeight{ geo::getHeight(m_sceneBounds) };
     if (bbWidth == 0.0 && bbHeight == 0.0) {
         bbWidth = minimumViewExtent;
         bbHeight = minimumViewExtent;

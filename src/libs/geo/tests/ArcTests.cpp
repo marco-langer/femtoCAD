@@ -29,7 +29,7 @@ TEST_P(ArcBoundingBoxFixture, boundingBox)
     };
 
     // Act
-    const fcad::geo::BoundingBox arcBoundingBox{ boundingBox(arc) };
+    const fcad::geo::BoundingBox arcBoundingBox{ fcad::geo::boundingBox(arc) };
 
     // Assert
     EXPECT_THAT(arcBoundingBox, fcad::test_utils::IsBoundingBox(expectedBoundingBox));

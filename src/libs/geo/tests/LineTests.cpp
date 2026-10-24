@@ -15,7 +15,7 @@ TEST(LineTest, boundingBox)
     };
 
     // Act
-    const fcad::geo::BoundingBox bb{ boundingBox(line) };
+    const fcad::geo::BoundingBox bb{ fcad::geo::boundingBox(line) };
 
     // Assert
     const fcad::geo::BoundingBox expectedBb{

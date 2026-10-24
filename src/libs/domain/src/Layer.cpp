@@ -14,10 +14,10 @@ namespace {
             return std::nullopt;
         }
 
-        geo::BoundingBox bb{ boundingBox(geometries.front()) };
+        geo::BoundingBox bb{ geo::boundingBox(geometries.front()) };
 
         for (const T& geometry : geometries | std::views::drop(1)) {
-            bb = united(bb, boundingBox(geometry));
+            bb = geo::united(bb, geo::boundingBox(geometry));
         }
 
         return bb;
@@ -27,7 +27,9 @@ namespace {
 
 std::optional<geo::BoundingBox> boundingBox(const Layer& layer)
 {
-    return united(boundingBox(layer.arcs), boundingBox(layer.lines), boundingBox(layer.circles));
+    return geo::united(
+        boundingBox(layer.arcs), boundingBox(layer.lines), boundingBox(layer.circles)
+    );
 };
 
 }   // namespace fcad::domain

@@ -12,7 +12,7 @@ TEST(LayerTest, boundingBox_Empty)
     const fcad::domain::Layer layer{ "Layer Name" };
 
     // Act
-    const std::optional<fcad::geo::BoundingBox> bb{ boundingBox(layer) };
+    const std::optional<fcad::geo::BoundingBox> bb{ fcad::domain::boundingBox(layer) };
 
     // Assert
     EXPECT_FALSE(bb.has_value());
@@ -45,7 +45,7 @@ TEST(LayerTest, boundingBox)
     );
 
     // Act
-    const std::optional<fcad::geo::BoundingBox> bb{ boundingBox(layer) };
+    const std::optional<fcad::geo::BoundingBox> bb{ fcad::domain::boundingBox(layer) };
 
     // Assert
     ASSERT_TRUE(bb.has_value());
