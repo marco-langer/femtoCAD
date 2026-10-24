@@ -168,7 +168,20 @@ void SceneView::wheelEvent(QWheelEvent* event)
     event->accept();
 }
 
-void SceneView::mousePressEvent(QMouseEvent* /* event */) {}
+void SceneView::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::MiddleButton) {
+        m_lastMousePos = event->position();
+        setCursor(Qt::ClosedHandCursor);
+    }
+}
+
+void SceneView::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::MiddleButton) {
+        unsetCursor();
+    }
+}
 
 void SceneView::mouseDoubleClickEvent(QMouseEvent* event)
 {
@@ -184,6 +197,17 @@ void SceneView::mouseDoubleClickEvent(QMouseEvent* event)
 
 void SceneView::mouseMoveEvent(QMouseEvent* event)
 {
+    const bool panning{ event->buttons().testFlag(Qt::MiddleButton) };
+    if (panning) {
+        // Move the view so the grabbed world point stays under the cursor.
+        // Widget y points down, world y up.
+        const QPointF delta{ event->position() - m_lastMousePos };
+        m_viewCenter.x -= delta.x() * m_viewScale;
+        m_viewCenter.y += delta.y() * m_viewScale;
+        m_lastMousePos = event->position();
+        update();
+    }
+
     emit mousePositionChanged(mapToWorld(event->position()));
 }
 
