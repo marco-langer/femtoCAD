@@ -6,6 +6,9 @@
 
 #include <gsl/narrow>
 
+#include <algorithm>
+#include <cmath>
+
 constexpr int windowWeight = 1076;
 constexpr int windowHeight = 768;
 constexpr BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
@@ -15,6 +18,11 @@ constexpr double viewMargin = 0.05;
 constexpr double minimumViewExtent = 1.0;
 // Floats per vertex in the vertex buffers (x, y).
 constexpr int componentsPerVertex = 2;
+// Zoom factor per mouse wheel notch.
+constexpr double zoomStepFactor = 1.2;
+// Zoom limits relative to the fitted view, to stay within float precision.
+constexpr double minimumZoom = 0.01;
+constexpr double maximumZoom = 10000.0;
 
 SceneView::SceneView(Workspace& workspace)
     : m_workspace{ workspace }
@@ -63,6 +71,10 @@ void SceneView::uploadGeometry()
     m_lines.vbo.release();
     m_lines.vao.release();
     m_program->release();
+
+    m_zoom = 1.0F;
+    m_pan = QPointF{};
+    updateTransform();
 
     update();
     resetViewToSceneBounds();
@@ -120,56 +132,52 @@ void SceneView::paintGL()
     m_program->release();
 }
 
-void SceneView::wheelEvent(QWheelEvent* /* event */)
+void SceneView::wheelEvent(QWheelEvent* event)
 {
-    //    // Step 1: Get mouse position in widget coordinates
-    //    QPointF mousePos = event->position();
-    //
-    //    // Step 2: Convert to world coordinates BEFORE zoom
-    //    QMatrix4x4 inverseOldTransform = (m_projMatrix * m_viewMatrix).inverted();
-    //    QVector4D before = inverseOldTransform * QVector4D(mousePos.x(), mousePos.y(), 0, 1);
-    //    before /= before.w();
-    //
-    //    // Step 3: Apply zoom change
-    //    float delta = event->angleDelta().y() / 120.0f;   // mouse wheel notches
-    //    float factor = std::pow(1.1f, delta);
-    //    m_zoom *= factor;
-    //
-    //    // Step 4: Update view matrix
-    //    updateTransform();
-    //
-    //    // Step 5: Convert to world coordinates AFTER zoom
-    //    QMatrix4x4 inverseNewTransform = (m_projMatrix * m_viewMatrix).inverted();
-    //    QVector4D after = inverseNewTransform * QVector4D(mousePos.x(), mousePos.y(), 0, 1);
-    //    after /= after.w();
-    //
-    //    // Step 6: Compute difference and adjust pan to keep cursor fixed
-    //    QVector2D worldShift = QVector2D(after - before);
-    //    m_pan -= QPointF(worldShift.x(), worldShift.y());
-    //
-    //    // Step 7: Update again with adjusted pan
-    //    updateTransform();
-    //    update();
+    const double notches{ event->angleDelta().y() / 120.0 };
+    if (notches == 0.0) {
+        return;
+    }
+
+    // Keep the world point under the cursor fixed: with view = zoom * world + pan,
+    // its view position must stay the same after changing the zoom.
+    const QPointF world{ mapToWorld(event->position()) };
+    const double oldZoom{ static_cast<double>(m_zoom) };
+    const QPointF view{ oldZoom * world + m_pan };
+
+    const double newZoom{
+        std::clamp(oldZoom * std::pow(zoomStepFactor, notches), minimumZoom, maximumZoom)
+    };
+    m_zoom = gsl::narrow_cast<float>(newZoom);
+    m_pan = view - newZoom * world;
+
+    updateTransform();
+    update();
+    event->accept();
 }
 
 void SceneView::mousePressEvent(QMouseEvent* /* event */) {}
 
 void SceneView::mouseMoveEvent(QMouseEvent* event)
 {
+    emit mousePositionChanged(mapToWorld(event->position()));
+}
+
+QPointF SceneView::mapToWorld(const QPointF& widgetPosition) const
+{
     const QSize widgetSize{ size() };
-    const QPointF eventPos{ event->position() };
 
     // Map widget pixels (y down) to normalized device coordinates (y up) and back
     // through the inverse of the transformation used for rendering.
-    const QVector4D ndc{ gsl::narrow_cast<float>(2.0 * eventPos.x() / widgetSize.width() - 1.0),
-                         gsl::narrow_cast<float>(1.0 - 2.0 * eventPos.y() / widgetSize.height()),
-                         0.0F,
-                         1.0F };
+    const QVector4D ndc{
+        gsl::narrow_cast<float>(2.0 * widgetPosition.x() / widgetSize.width() - 1.0),
+        gsl::narrow_cast<float>(1.0 - 2.0 * widgetPosition.y() / widgetSize.height()),
+        0.0F,
+        1.0F
+    };
     const QVector4D world{ (m_projMatrix * m_viewMatrix).inverted() * ndc };
 
-    const QPointF currentMousePosition{ static_cast<double>(world.x()),
-                                        static_cast<double>(world.y()) };
-    emit mousePositionChanged(currentMousePosition);
+    return QPointF{ static_cast<double>(world.x()), static_cast<double>(world.y()) };
 }
 
 void SceneView::updateTransform()

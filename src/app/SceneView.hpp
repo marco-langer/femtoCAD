@@ -39,6 +39,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
 
 private:
+    QPointF mapToWorld(const QPointF& widgetPosition) const;
     void uploadGeometry();
     void updateTransform();
     void resetViewToSceneBounds();
