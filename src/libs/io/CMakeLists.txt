@@ -1,6 +1,8 @@
 add_library(femtoCAD-io STATIC
     include/io/DxfImport.hpp
+    include/io/DxfImportError.hpp
     src/DxfImport.cpp
+    src/DxfImportError.cpp
 )
 
 target_link_libraries(femtoCAD-io

@@ -6,6 +6,7 @@
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
 #include "geo/Line.hpp"
+#include "io/DxfImportError.hpp"
 
 #include <opendxf/entities.hpp>
 #include <opendxf/ireadstream.hpp>
@@ -155,15 +156,30 @@ namespace {
         return QString::fromStdString(error.what);
     }
 
+    DxfImportError toErrorCode(odxf::Error::Type type)
+    {
+        switch (type) {
+        case odxf::Error::Type::FileOpenError: return DxfImportError::CannotOpenFile;
+        case odxf::Error::Type::InvalidFile: return DxfImportError::InvalidFile;
+        }
+
+        return DxfImportError::InvalidFile;
+    }
+
+    core::Error toError(const odxf::Error& error)
+    {
+        return core::Error{ .code = toErrorCode(error.type), .message = toErrorMessage(error) };
+    }
+
 }   // namespace
 
-std::expected<domain::Document, QString> importDxf(const QString& filePath)
+core::Result<domain::Document> importDxf(const QString& filePath)
 {
     ReadStream stream;
 
     return odxf::read(stream, toStdFilePath(filePath))
         .transform([&stream] { return toDocument(std::move(stream)); })
-        .transform_error([](const odxf::Error& error) { return toErrorMessage(error); });
+        .transform_error([](const odxf::Error& error) { return toError(error); });
 }
 
 }   // namespace fcad::io

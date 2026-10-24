@@ -1,13 +1,12 @@
 #pragma once
 
+#include "core/Result.hpp"
 #include "domain/Document.hpp"
-
-#include <expected>
 
 #include <QString>
 
 namespace fcad::io {
 
-std::expected<domain::Document, QString> importDxf(const QString& filePath);
+core::Result<domain::Document> importDxf(const QString& filePath);
 
 }   // namespace fcad::io
