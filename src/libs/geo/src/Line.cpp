@@ -1,4 +1,6 @@
-#include "core/Line.hpp"
+#include "geo/Line.hpp"
+
+namespace fcad::geo {
 
 BoundingBox boundingBox(const Line& line)
 {
@@ -32,3 +34,5 @@ std::optional<InfiniteLine> perpBisector(const Line& line)
 
     return InfiniteLine{ .point = midPoint, .direction = perp(lineDirection) / length };
 }
+
+}   // namespace fcad::geo

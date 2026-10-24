@@ -1,6 +1,6 @@
-#include "core/InfiniteLine.hpp"
+#include "geo/InfiniteLine.hpp"
 
-#include "core/Coordinate.hpp"
+#include "geo/Coordinate.hpp"
 
 #include "test_utils/matchers/CoordinateMatcher.hpp"
 
@@ -12,9 +12,9 @@
 
 struct InfiniteLineTestParams
 {
-    InfiniteLine first;
-    InfiniteLine second;
-    std::optional<Coordinate> expectedIntersection;
+    fcad::geo::InfiniteLine first;
+    fcad::geo::InfiniteLine second;
+    std::optional<fcad::geo::Coordinate> expectedIntersection;
     std::string testCase;
 };
 
@@ -28,7 +28,7 @@ TEST_P(InfiniteLineTest, Intersection)
     const auto& [first, second, expectedIntersection, _]{ GetParam() };
 
     // Act
-    const std::optional<Coordinate> maybeIntersection{ intersection(first, second) };
+    const std::optional<fcad::geo::Coordinate> maybeIntersection{ intersection(first, second) };
 
     // Assert
     EXPECT_THAT(maybeIntersection, fcad::test_utils::IsCoordinate(expectedIntersection));
@@ -40,11 +40,11 @@ INSTANTIATE_TEST_SUITE_P(
     InfiniteLineTest,
     testing::Values(
         InfiniteLineTestParams{
-            .first = InfiniteLine{
+            .first = fcad::geo::InfiniteLine{
                 .point = { 2.0, 2.0 },
                 .direction = { 1.0, 0.0 }
             },
-            .second= InfiniteLine{
+            .second= fcad::geo::InfiniteLine{
                 .point = { 2.0, 3.0 },
                 .direction = { 1.0, 0.0 }
             },
@@ -52,11 +52,11 @@ INSTANTIATE_TEST_SUITE_P(
             .testCase = "parallel"
         },
         InfiniteLineTestParams{
-            .first = InfiniteLine{
+            .first = fcad::geo::InfiniteLine{
                 .point = { 2.0, 2.0 },
                 .direction = { 1.0, 0.0 }
             },
-            .second= InfiniteLine{
+            .second= fcad::geo::InfiniteLine{
                 .point = { 2.0, 2.0 },
                 .direction = { 1.0, 0.0 }
             },
@@ -64,15 +64,15 @@ INSTANTIATE_TEST_SUITE_P(
             .testCase = "coincident"
         },
         InfiniteLineTestParams{
-            .first = InfiniteLine{
+            .first = fcad::geo::InfiniteLine{
                 .point = { 0.0, 2.0 },
                 .direction = { 1.0, 0.0 }
             },
-            .second= InfiniteLine{
+            .second= fcad::geo::InfiniteLine{
                 .point = { 1.0, 0.0 },
                 .direction = { 0.0, 1.0 }
             },
-            .expectedIntersection = Coordinate{ 1.0, 2.0 },
+            .expectedIntersection = fcad::geo::Coordinate{ 1.0, 2.0 },
             .testCase = "normalized"
         }
     ),

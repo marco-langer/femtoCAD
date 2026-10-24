@@ -1,5 +1,9 @@
-#include "core/Coordinate.hpp"
+#include "geo/Coordinate.hpp"
 
 #include <cmath>
 
+namespace fcad::geo {
+
 double norm(const Vector2d& vector) { return std::sqrt(vector.x * vector.x + vector.y * vector.y); }
+
+}   // namespace fcad::geo

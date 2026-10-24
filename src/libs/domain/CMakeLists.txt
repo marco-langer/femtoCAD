@@ -7,7 +7,7 @@ add_library(femtoCAD-domain STATIC
 
 target_link_libraries(femtoCAD-domain
     PUBLIC
-        femtoCAD-core
+        femtoCAD-geo
         femtoCAD::qt-core
     PRIVATE
         femtoCAD::warnings

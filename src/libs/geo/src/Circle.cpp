@@ -1,6 +1,8 @@
-#include "core/Circle.hpp"
+#include "geo/Circle.hpp"
 
-#include "core/Line.hpp"
+#include "geo/Line.hpp"
+
+namespace fcad::geo {
 
 BoundingBox boundingBox(const Circle& circle)
 {
@@ -47,3 +49,5 @@ circleFromPoints(const Coordinate& first, const Coordinate& second, const Coordi
 
     return Circle{ .center = center, .radius = Radius{ radius } };
 }
+
+}   // namespace fcad::geo

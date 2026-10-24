@@ -4,19 +4,20 @@
 
 namespace fcad::test_utils {
 
-testing::Matcher<Line> IsLine(const Line& expected, double maxError)
+testing::Matcher<geo::Line> IsLine(const geo::Line& expected, double maxError)
 {
     return testing::AllOf(
-        testing::Field("start", &Line::start, IsCoordinate(expected.start, maxError)),
-        testing::Field("end", &Line::end, IsCoordinate(expected.end, maxError))
+        testing::Field("start", &geo::Line::start, IsCoordinate(expected.start, maxError)),
+        testing::Field("end", &geo::Line::end, IsCoordinate(expected.end, maxError))
     );
 }
 
-testing::Matcher<std::vector<Line>> AreLines(const std::vector<Line>& expected, double maxError)
+testing::Matcher<std::vector<geo::Line>>
+AreLines(const std::vector<geo::Line>& expected, double maxError)
 {
-    std::vector<testing::Matcher<Line>> elementMatchers;
+    std::vector<testing::Matcher<geo::Line>> elementMatchers;
     elementMatchers.reserve(expected.size());
-    for (const Line& line : expected) {
+    for (const geo::Line& line : expected) {
         elementMatchers.push_back(IsLine(line, maxError));
     }
 

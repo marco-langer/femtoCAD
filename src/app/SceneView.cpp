@@ -11,7 +11,7 @@
 
 constexpr int windowWeight = 1076;
 constexpr int windowHeight = 768;
-constexpr BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
+constexpr fcad::geo::BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
 // Empty space around the fitted scene, as a fraction of its extent, per side.
 constexpr double viewMargin = 0.05;
 // Extent shown when the scene has neither width nor height (e.g. a single point).
@@ -43,7 +43,7 @@ void SceneView::updateWorkspace()
 
 void SceneView::uploadGeometry()
 {
-    const BoundingBox sceneBounds{ boundingBox(m_workspace).value_or(defaultBounds) };
+    const fcad::geo::BoundingBox sceneBounds{ boundingBox(m_workspace).value_or(defaultBounds) };
     m_sceneBounds = sceneBounds;
 
     std::vector<float> vertices;
@@ -51,7 +51,7 @@ void SceneView::uploadGeometry()
     m_lines.instanceCount = 0;
     for (const fcad::domain::Layer& layer : m_workspace.layers()) {
         if (layer.visible) {
-            for (const Line& line : layer.lines) {
+            for (const fcad::geo::Line& line : layer.lines) {
                 vertices.push_back(gsl::narrow_cast<float>(line.start.x));
                 vertices.push_back(gsl::narrow_cast<float>(line.start.y));
                 vertices.push_back(gsl::narrow_cast<float>(line.end.x));
@@ -167,8 +167,8 @@ void SceneView::wheelEvent(QWheelEvent* event)
     // view centre.
     const QPointF world{ mapToWorld(event->position()) };
     const double ratio{ newScale / m_viewScale };
-    m_viewCenter = Coordinate{ .x = world.x() - (world.x() - m_viewCenter.x) * ratio,
-                               .y = world.y() - (world.y() - m_viewCenter.y) * ratio };
+    m_viewCenter = fcad::geo::Coordinate{ .x = world.x() - (world.x() - m_viewCenter.x) * ratio,
+                                          .y = world.y() - (world.y() - m_viewCenter.y) * ratio };
     m_viewScale = newScale;
 
     update();
@@ -264,6 +264,6 @@ void SceneView::fitViewToScene()
     m_viewScale =
         std::max(bbWidth * marginFactor / widgetWidth, bbHeight * marginFactor / widgetHeight);
     m_fittedViewScale = m_viewScale;
-    m_viewCenter = Coordinate{ .x = (m_sceneBounds.min.x + m_sceneBounds.max.x) / 2.0,
-                               .y = (m_sceneBounds.min.y + m_sceneBounds.max.y) / 2.0 };
+    m_viewCenter = fcad::geo::Coordinate{ .x = (m_sceneBounds.min.x + m_sceneBounds.max.x) / 2.0,
+                                          .y = (m_sceneBounds.min.y + m_sceneBounds.max.y) / 2.0 };
 }

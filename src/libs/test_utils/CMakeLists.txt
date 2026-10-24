@@ -15,7 +15,7 @@ add_library(femtoCAD-test_utils STATIC
 
 target_link_libraries(femtoCAD-test_utils
     PUBLIC
-        femtoCAD-core
+        femtoCAD-geo
         GTest::gmock
     PRIVATE
         femtoCAD::warnings

@@ -1,6 +1,6 @@
-#include "core/BoundingBox.hpp"
-#include "core/Circle.hpp"
-#include "core/Coordinate.hpp"
+#include "geo/BoundingBox.hpp"
+#include "geo/Circle.hpp"
+#include "geo/Coordinate.hpp"
 
 #include "test_utils/matchers/BoundingBoxMatcher.hpp"
 #include "test_utils/matchers/CircleMatcher.hpp"
@@ -14,22 +14,22 @@
 TEST(CircleTest, boundingBox)
 {
     // Arrange
-    const Circle circle{
+    const fcad::geo::Circle circle{
         .center =
-            Coordinate{
+            fcad::geo::Coordinate{
                 .x = 1.0,
                 .y = 2.0,
             },
-        .radius = Radius{ 3.0 },
+        .radius = fcad::geo::Radius{ 3.0 },
     };
 
     // Act
-    const BoundingBox bb{ boundingBox(circle) };
+    const fcad::geo::BoundingBox bb{ boundingBox(circle) };
 
     // Assert
-    const BoundingBox expectedBoundingBox{
-        .min = Coordinate{ .x = -2.0, .y = -1.0 },
-        .max = Coordinate{ .x = 4.0, .y = 5.0 },
+    const fcad::geo::BoundingBox expectedBoundingBox{
+        .min = fcad::geo::Coordinate{ .x = -2.0, .y = -1.0 },
+        .max = fcad::geo::Coordinate{ .x = 4.0, .y = 5.0 },
     };
 
     EXPECT_THAT(bb, fcad::test_utils::IsBoundingBox(expectedBoundingBox));
@@ -37,8 +37,8 @@ TEST(CircleTest, boundingBox)
 
 struct CircleNearestPointParams
 {
-    Coordinate point;
-    Coordinate expectedPoint;
+    fcad::geo::Coordinate point;
+    fcad::geo::Coordinate expectedPoint;
 };
 
 class CircleNearestPointFixture : public testing::TestWithParam<CircleNearestPointParams>
@@ -50,10 +50,11 @@ TEST_P(CircleNearestPointFixture, NearestPoint)
     // Arrange
     const auto& [point, expectedPoint]{ GetParam() };
 
-    const Circle circle{ .center = Coordinate{ .x = 1.0, .y = 2.0 }, .radius = Radius{ 3.0 } };
+    const fcad::geo::Circle circle{ .center = fcad::geo::Coordinate{ .x = 1.0, .y = 2.0 },
+                                    .radius = fcad::geo::Radius{ 3.0 } };
 
     // Act
-    const Coordinate result{ nearestPoint(circle, point) };
+    const fcad::geo::Coordinate result{ nearestPoint(circle, point) };
 
     // Assert
     EXPECT_THAT(result, fcad::test_utils::IsCoordinate(expectedPoint));
@@ -66,22 +67,22 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values(
         CircleNearestPointParams
         {
-            .point = Coordinate{ 1, 2 },
-            .expectedPoint = Coordinate{ 4, 2 }
+            .point = fcad::geo::Coordinate{ 1, 2 },
+            .expectedPoint = fcad::geo::Coordinate{ 4, 2 }
         },
         CircleNearestPointParams
         {
-            .point = Coordinate{ 1, 5 },
-            .expectedPoint = Coordinate{ 1, 5 }
+            .point = fcad::geo::Coordinate{ 1, 5 },
+            .expectedPoint = fcad::geo::Coordinate{ 1, 5 }
         },
         CircleNearestPointParams
         {
-            .point = Coordinate{ 1, 3},
-            .expectedPoint = Coordinate{ 1, 5 }
+            .point = fcad::geo::Coordinate{ 1, 3},
+            .expectedPoint = fcad::geo::Coordinate{ 1, 5 }
         },CircleNearestPointParams
         {
-            .point = Coordinate{ 1, 10},
-            .expectedPoint = Coordinate{ 1, 5 }
+            .point = fcad::geo::Coordinate{ 1, 10},
+            .expectedPoint = fcad::geo::Coordinate{ 1, 5 }
         }
     )
 );
@@ -89,10 +90,10 @@ INSTANTIATE_TEST_SUITE_P(
 
 struct CircleFromPointsParams
 {
-    Coordinate first;
-    Coordinate second;
-    Coordinate third;
-    std::optional<Circle> expectedCircle;
+    fcad::geo::Coordinate first;
+    fcad::geo::Coordinate second;
+    fcad::geo::Coordinate third;
+    std::optional<fcad::geo::Circle> expectedCircle;
     std::string testCase;
 };
 
@@ -106,7 +107,7 @@ TEST_P(CircleFromPointsTest, FromPoints)
     const auto& [first, second, third, expectedCircle, _]{ GetParam() };
 
     // Act
-    const std::optional<Circle> maybeCircle{ circleFromPoints(first, second, third) };
+    const std::optional<fcad::geo::Circle> maybeCircle{ circleFromPoints(first, second, third) };
 
     // Assert
     EXPECT_THAT(maybeCircle, fcad::test_utils::IsCircle(expectedCircle));
@@ -156,9 +157,9 @@ INSTANTIATE_TEST_SUITE_P(
             .first = { 3.0, 2.0 },
             .second = { 1.0, 4.0 },
             .third = { 5.0, 4.0 },
-            .expectedCircle = Circle{
+            .expectedCircle = fcad::geo::Circle{
                 .center = { 3.0, 4.0 },
-                .radius = Radius{ 2.0 }
+                .radius = fcad::geo::Radius{ 2.0 }
             },
             .testCase = "valid_circle"
         }

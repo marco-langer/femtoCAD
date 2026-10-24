@@ -1,46 +1,48 @@
-#include "core/Arc.hpp"
+#include "geo/Arc.hpp"
 
 #include <algorithm>
 #include <optional>
 
+namespace fcad::geo {
+
 namespace {
 
-// TODO consider to generalize this
-// (maybe with some small vector (boost::small_vector) lookup cache?)
-class TrigonometryCache
-{
-public:
-    explicit TrigonometryCache(Radians angle)
-        : m_angle{ angle }
-    {}
-
-    double sin()
+    // TODO consider to generalize this
+    // (maybe with some small vector (boost::small_vector) lookup cache?)
+    class TrigonometryCache
     {
-        if (m_sin.has_value()) {
+    public:
+        explicit TrigonometryCache(Radians angle)
+            : m_angle{ angle }
+        {}
+
+        double sin()
+        {
+            if (m_sin.has_value()) {
+                return m_sin.value();
+            }
+
+            m_sin = ::sin(m_angle);
+
             return m_sin.value();
         }
 
-        m_sin = ::sin(m_angle);
+        double cos()
+        {
+            if (m_cos.has_value()) {
+                return m_cos.value();
+            }
 
-        return m_sin.value();
-    }
+            m_cos = ::cos(m_angle);
 
-    double cos()
-    {
-        if (m_cos.has_value()) {
             return m_cos.value();
         }
 
-        m_cos = ::cos(m_angle);
-
-        return m_cos.value();
-    }
-
-private:
-    Radians m_angle;
-    std::optional<double> m_sin;
-    std::optional<double> m_cos;
-};
+    private:
+        Radians m_angle;
+        std::optional<double> m_sin;
+        std::optional<double> m_cos;
+    };
 
 }   // namespace
 
@@ -76,3 +78,5 @@ BoundingBox boundingBox(const Arc& arc)
         },
     };
 }
+
+}   // namespace fcad::geo

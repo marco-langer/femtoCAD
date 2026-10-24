@@ -1,4 +1,6 @@
-#include "core/BoundingBox.hpp"
+#include "geo/BoundingBox.hpp"
+
+namespace fcad::geo {
 
 BoundingBox united(const BoundingBox& first, const BoundingBox& second)
 {
@@ -35,3 +37,5 @@ bool contains(const BoundingBox& boundingBox, const Coordinate& point)
     return boundingBox.min.x <= point.x && boundingBox.max.x >= point.x
         && boundingBox.min.y <= point.y && boundingBox.max.y >= point.y;
 }
+
+}   // namespace fcad::geo

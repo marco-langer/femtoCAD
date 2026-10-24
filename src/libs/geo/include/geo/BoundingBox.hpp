@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Coordinate.hpp"
+#include "geo/Coordinate.hpp"
 
 #include <concepts>
 #include <optional>
+
+namespace fcad::geo {
 
 struct BoundingBox final
 {
@@ -44,3 +46,5 @@ std::optional<BoundingBox> united(
 }
 
 bool contains(const BoundingBox& boundingBox, const Coordinate& point);
+
+}   // namespace fcad::geo

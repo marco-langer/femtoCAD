@@ -7,21 +7,21 @@
 
 namespace fcad::test_utils {
 
-testing::Matcher<Arc> IsArc(const Arc& expected, double maxError)
+testing::Matcher<geo::Arc> IsArc(const geo::Arc& expected, double maxError)
 {
     return testing::AllOf(
-        testing::Field("center", &Arc::center, IsCoordinate(expected.center, maxError)),
-        testing::Field("startAngle", &Arc::startAngle, expected.startAngle),
-        testing::Field("endAngle", &Arc::endAngle, expected.endAngle),
-        testing::Field("radius", &Arc::radius, IsRadius(expected.radius, maxError))
+        testing::Field("center", &geo::Arc::center, IsCoordinate(expected.center, maxError)),
+        testing::Field("startAngle", &geo::Arc::startAngle, expected.startAngle),
+        testing::Field("endAngle", &geo::Arc::endAngle, expected.endAngle),
+        testing::Field("radius", &geo::Arc::radius, IsRadius(expected.radius, maxError))
     );
 }
 
-testing::Matcher<Arcs> AreArcs(const Arcs& expected, double maxError)
+testing::Matcher<geo::Arcs> AreArcs(const geo::Arcs& expected, double maxError)
 {
-    std::vector<testing::Matcher<Arc>> elementMatchers;
+    std::vector<testing::Matcher<geo::Arc>> elementMatchers;
     elementMatchers.reserve(expected.size());
-    for (const Arc& expectedArc : expected) {
+    for (const geo::Arc& expectedArc : expected) {
         elementMatchers.push_back(IsArc(expectedArc, maxError));
     }
 

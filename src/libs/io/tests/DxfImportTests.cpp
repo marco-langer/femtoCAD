@@ -1,9 +1,9 @@
 #include "io/DxfImport.hpp"
 
-#include "core/Arc.hpp"
-#include "core/Circle.hpp"
-#include "core/Line.hpp"
 #include "domain/Layer.hpp"
+#include "geo/Arc.hpp"
+#include "geo/Circle.hpp"
+#include "geo/Line.hpp"
 
 #include "matchers/LayerMatcher.hpp"
 
@@ -36,13 +36,13 @@ TEST(DxfImportTest, ImportExample)
 
     fcad::domain::Layer& linesLayer{ expectedLayers.emplace_back("Lines") };
     linesLayer.lines.push_back(
-        Line{
+        fcad::geo::Line{
             .start = { 100.0, 100.0 },
             .end = { 350.0, 400.0 },
         }
     );
     linesLayer.lines.push_back(
-        Line{
+        fcad::geo::Line{
             .start = { 150.0, 130.0 },
             .end = { 250.0, 130.0 },
         }
@@ -50,19 +50,19 @@ TEST(DxfImportTest, ImportExample)
 
     fcad::domain::Layer& circlesLayer{ expectedLayers.emplace_back("Circles") };
     circlesLayer.circles.push_back(
-        Circle{
+        fcad::geo::Circle{
             .center = { 50.4, 65.0 },
-            .radius = Radius{ 2.5 },
+            .radius = fcad::geo::Radius{ 2.5 },
         }
     );
 
     fcad::domain::Layer& arcsLayer{ expectedLayers.emplace_back("Arcs") };
     arcsLayer.arcs.push_back(
-        Arc{
+        fcad::geo::Arc{
             .center = { 0.0, 2.0 },
             .startAngle = Radians::fromDegrees(0.0),
             .endAngle = Radians::fromDegrees(180.0),
-            .radius = Radius{ 0.5 },
+            .radius = fcad::geo::Radius{ 0.5 },
         }
     );
 

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+namespace fcad::geo {
+
 struct Coordinate final
 {
     double x{};
@@ -52,3 +54,5 @@ inline Vector2d operator/(const Vector2d& vector, double scalar)
 
     return Vector2d{ .x = vector.x / scalar, .y = vector.y / scalar };
 }
+
+}   // namespace fcad::geo

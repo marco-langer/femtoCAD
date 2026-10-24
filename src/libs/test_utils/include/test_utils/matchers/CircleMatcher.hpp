@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Circle.hpp"
+#include "geo/Circle.hpp"
 
 #include <gmock/gmock.h>
 
@@ -8,11 +8,11 @@
 
 namespace fcad::test_utils {
 
-testing::Matcher<Circle> IsCircle(const Circle& expected, double maxError = 1.0e-5);
+testing::Matcher<geo::Circle> IsCircle(const geo::Circle& expected, double maxError = 1.0e-5);
 
-testing::Matcher<const std::optional<Circle>&>
-IsCircle(const std::optional<Circle>& expected, double maxError = 1.0e-5);
+testing::Matcher<const std::optional<geo::Circle>&>
+IsCircle(const std::optional<geo::Circle>& expected, double maxError = 1.0e-5);
 
-testing::Matcher<Circles> AreCircles(const Circles& expected, double maxError = 1.0e-5);
+testing::Matcher<geo::Circles> AreCircles(const geo::Circles& expected, double maxError = 1.0e-5);
 
 }   // namespace fcad::test_utils
