@@ -4,6 +4,8 @@
 
 #include <optional>
 
+namespace fcad::app {
+
 struct Settings final
 {
     std::optional<QString> lastDxfImportPath;
@@ -12,3 +14,5 @@ struct Settings final
 Settings loadSettings();
 
 void saveSettings(const Settings& settings);
+
+}   // namespace fcad::app

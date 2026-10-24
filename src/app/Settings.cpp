@@ -2,6 +2,8 @@
 
 #include <QSettings>
 
+namespace fcad::app {
+
 Settings loadSettings()
 {
     Settings settings;
@@ -24,3 +26,5 @@ void saveSettings(const Settings& settings)
         qsettings.setValue("lastDxfImport", settings.lastDxfImportPath.value());
     }
 }
+
+}   // namespace fcad::app

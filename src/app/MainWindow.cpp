@@ -11,16 +11,17 @@
 
 #include "SceneView.hpp"
 
-MainWindow::MainWindow(fcad::domain::Workspace& workspace, Settings& settings)
+namespace fcad::app {
+
+MainWindow::MainWindow(domain::Workspace& workspace, Settings& settings)
     : m_workspace{ workspace }
     , m_settings{ settings }
 {
     createActions();
 
-    fcad::domain::Layer layer{ "Layer 1" };
+    domain::Layer layer{ "Layer 1" };
     layer.lines.push_back(
-        fcad::geo::Line{ .start = fcad::geo::Coordinate{ 50.0, 50.0 },
-                         .end = fcad::geo::Coordinate{ 200.0, 200.0 } }
+        geo::Line{ .start = geo::Coordinate{ 50.0, 50.0 }, .end = geo::Coordinate{ 200.0, 200.0 } }
     );
     m_workspace.addLayer(layer);
 
@@ -91,7 +92,7 @@ void MainWindow::updateWindowTitle(const QString& filePath)
 void MainWindow::onNewProject()
 {
     m_workspace.clear();
-    m_workspace.addLayer(fcad::domain::Layer{ "Layer 1" });
+    m_workspace.addLayer(domain::Layer{ "Layer 1" });
     m_sceneView->updateWorkspace();
 }
 
@@ -112,7 +113,7 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    std::ignore = fcad::io::importDxf(m_workspace, filePath)
+    std::ignore = io::importDxf(m_workspace, filePath)
                       .transform([this, &filePath]() {
                           m_settings.lastDxfImportPath = filePath;
                           m_sceneView->updateWorkspace();
@@ -124,3 +125,5 @@ void MainWindow::onImportDxf()
 }
 
 void MainWindow::onClose() { close(); }
+
+}   // namespace fcad::app
