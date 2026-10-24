@@ -1,5 +1,4 @@
 add_library(femtoCAD-core STATIC
-    include/core/io/DxfImport.hpp
     include/core/primitives/NonNegative.hpp
     include/core/primitives/Radius.hpp
     include/core/units/Angle.hpp
@@ -12,7 +11,6 @@ add_library(femtoCAD-core STATIC
     include/core/Layer.hpp
     include/core/Line.hpp
     include/core/Workspace.hpp
-    io/DxfImport.cpp
     Arc.cpp
     BoundingBox.cpp
     Circle.cpp
@@ -28,8 +26,6 @@ target_link_libraries(femtoCAD-core
         femtoCAD::fmt
         femtoCAD::ms-gsl
     PRIVATE
-        femtoCAD::opendxf
-        femtoCAD::tl-expected
         femtoCAD::qt-core
         femtoCAD::warnings
 )

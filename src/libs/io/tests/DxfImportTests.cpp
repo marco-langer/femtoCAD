@@ -1,11 +1,11 @@
-#include "core/io/DxfImport.hpp"
+#include "io/DxfImport.hpp"
 
 #include "core/Arc.hpp"
 #include "core/Circle.hpp"
 #include "core/Layer.hpp"
 #include "core/Line.hpp"
 
-#include "Matchers/LayerMatcher.hpp"
+#include "matchers/LayerMatcher.hpp"
 
 #include <QFile>
 
@@ -20,7 +20,7 @@ TEST(DxfImportTest, ImportExample)
     Workspace workspace;
 
     // Act
-    tl::expected<void, QString> importResult{ importDxf(workspace, filePath) };
+    tl::expected<void, QString> importResult{ fcad::io::importDxf(workspace, filePath) };
 
     // Assert
     if (!importResult.has_value()) {
