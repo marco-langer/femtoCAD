@@ -18,8 +18,9 @@ MainWindow::MainWindow(Workspace& workspace, Settings& settings)
     createActions();
 
     Layer layer{ "Layer 1" };
-    layer.lines.push_back(Line{ .start = Coordinate{ 50.0, 50.0 },
-                                .end = Coordinate{ 200.0, 200.0 } });
+    layer.lines.push_back(
+        Line{ .start = Coordinate{ 50.0, 50.0 }, .end = Coordinate{ 200.0, 200.0 } }
+    );
     m_workspace.addLayer(layer);
 
     m_sceneView = new SceneView{ m_workspace };
