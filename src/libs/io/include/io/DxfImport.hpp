@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Workspace.hpp"
+#include "domain/Workspace.hpp"
 
 #include <tl/expected.hpp>
 
@@ -8,6 +8,6 @@
 
 namespace fcad::io {
 
-tl::expected<void, QString> importDxf(Workspace& workspace, const QString& filePath);
+tl::expected<void, QString> importDxf(domain::Workspace& workspace, const QString& filePath);
 
 }   // namespace fcad::io

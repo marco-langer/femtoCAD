@@ -2,9 +2,9 @@
 
 #include "core/Arc.hpp"
 #include "core/Circle.hpp"
-#include "core/Layer.hpp"
 #include "core/Line.hpp"
 #include "core/utility/VectorExtensions.hpp"
+#include "domain/Layer.hpp"
 
 #include <opendxf/entities.hpp>
 #include <opendxf/ireadstream.hpp>
@@ -30,9 +30,9 @@ namespace {
         return Coordinate{ .x = coordinate3d.x, .y = coordinate3d.y };
     }
 
-    Layer toLayer(const odxf::Layer& dxfLayer)
+    domain::Layer toLayer(const odxf::Layer& dxfLayer)
     {
-        Layer layer{ QString::fromStdString(dxfLayer.name) };
+        domain::Layer layer{ QString::fromStdString(dxfLayer.name) };
         layer.visible = ((dxfLayer.flags & odxf::Layer::Flags::Frozen) == 0);
 
         return layer;
@@ -81,7 +81,7 @@ namespace {
     class ReadStream final : public odxf::IReadStream
     {
     public:
-        std::vector<Layer> getLayers() && { return std::move(m_layers); }
+        std::vector<domain::Layer> getLayers() && { return std::move(m_layers); }
 
     private:
         void layer(const odxf::Layer& layer) override
@@ -125,11 +125,11 @@ namespace {
             }
         }
 
-        Layers m_layers;
+        domain::Layers m_layers;
         std::vector<std::string> m_layerNames;
     };
 
-    void updateWorkspace(Workspace& workspace, ReadStream& stream)
+    void updateWorkspace(domain::Workspace& workspace, ReadStream& stream)
     {
         workspace.clear();
         workspace.addLayers(std::move(stream).getLayers());
@@ -152,7 +152,7 @@ namespace {
 
 }   // namespace
 
-tl::expected<void, QString> importDxf(Workspace& workspace, const QString& filePath)
+tl::expected<void, QString> importDxf(domain::Workspace& workspace, const QString& filePath)
 {
     ReadStream stream;
 

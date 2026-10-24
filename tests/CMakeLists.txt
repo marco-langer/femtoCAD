@@ -8,7 +8,6 @@ add_executable(femtoCAD-core-tests
     ArcTests.cpp
     CircleTests.cpp
     InfiniteLineTests.cpp
-    LayerTests.cpp
     LineTests.cpp
     NonNegativeTests.cpp
 )
@@ -23,7 +22,6 @@ target_link_libraries(femtoCAD-core-tests
     PRIVATE
         femtoCAD-core
         femtoCAD-test_utils
-        femtoCAD::qt-core
         femtoCAD::warnings
         GTest::gmock_main
 )

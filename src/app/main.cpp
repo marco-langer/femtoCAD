@@ -1,6 +1,6 @@
 #include "MainWindow.hpp"
 #include "Settings.hpp"
-#include "core/Workspace.hpp"
+#include "domain/Workspace.hpp"
 
 #include <QApplication>
 
@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 {
     QApplication app{ argc, argv };
 
-    Workspace workspace;
+    fcad::domain::Workspace workspace;
     Settings settings{ loadSettings() };
 
     MainWindow mainWindow{ workspace, settings };

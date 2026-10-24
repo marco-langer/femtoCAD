@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/BoundingBox.hpp"
-#include "core/Workspace.hpp"
+#include "domain/Workspace.hpp"
 
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
@@ -23,7 +23,7 @@ signals:
     void mousePositionChanged(const QPointF&);
 
 public:
-    SceneView(Workspace& workspace);
+    SceneView(fcad::domain::Workspace& workspace);
 
     QSize sizeHint() const override;
 
@@ -53,7 +53,7 @@ private:
         int instanceCount{ 0 };
     };
 
-    Workspace& m_workspace;
+    fcad::domain::Workspace& m_workspace;
     std::unique_ptr<QOpenGLShaderProgram> m_program;
     Geometry m_lines;
 

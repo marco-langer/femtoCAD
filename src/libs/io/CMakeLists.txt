@@ -5,7 +5,7 @@ add_library(femtoCAD-io STATIC
 
 target_link_libraries(femtoCAD-io
     PUBLIC
-        femtoCAD-core
+        femtoCAD-domain
         femtoCAD::qt-core
         femtoCAD::tl-expected
     PRIVATE

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "BoundingBox.hpp"
-#include "Layer.hpp"
+#include "core/BoundingBox.hpp"
+#include "domain/Layer.hpp"
 
 #include <optional>
 #include <vector>
+
+namespace fcad::domain {
 
 class Workspace final
 {
@@ -20,3 +22,5 @@ private:
 };
 
 std::optional<BoundingBox> boundingBox(const Workspace& workspace);
+
+}   // namespace fcad::domain

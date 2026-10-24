@@ -1,8 +1,10 @@
-#include "core/Workspace.hpp"
+#include "domain/Workspace.hpp"
 
 #include "core/utility/VectorExtensions.hpp"
 
 #include <ranges>
+
+namespace fcad::domain {
 
 void Workspace::clear() { m_layers.clear(); }
 
@@ -22,3 +24,5 @@ std::optional<BoundingBox> boundingBox(const Workspace& workspace)
 
     return bb;
 }
+
+}   // namespace fcad::domain

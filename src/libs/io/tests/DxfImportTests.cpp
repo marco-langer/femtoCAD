@@ -2,8 +2,8 @@
 
 #include "core/Arc.hpp"
 #include "core/Circle.hpp"
-#include "core/Layer.hpp"
 #include "core/Line.hpp"
+#include "domain/Layer.hpp"
 
 #include "matchers/LayerMatcher.hpp"
 
@@ -17,7 +17,7 @@ TEST(DxfImportTest, ImportExample)
     const QString filePath{ TEST_DATA_DIR "example.dxf" };
     ASSERT_TRUE(QFile::exists(filePath));
 
-    Workspace workspace;
+    fcad::domain::Workspace workspace;
 
     // Act
     tl::expected<void, QString> importResult{ fcad::io::importDxf(workspace, filePath) };
@@ -27,14 +27,14 @@ TEST(DxfImportTest, ImportExample)
         FAIL() << importResult.error().toStdString();
     }
 
-    const Layers& layers{ workspace.layers() };
+    const fcad::domain::Layers& layers{ workspace.layers() };
 
-    Layers expectedLayers;
+    fcad::domain::Layers expectedLayers;
 
-    Layer& testLayer{ expectedLayers.emplace_back("Test Layer") };
+    fcad::domain::Layer& testLayer{ expectedLayers.emplace_back("Test Layer") };
     testLayer.visible = false;
 
-    Layer& linesLayer{ expectedLayers.emplace_back("Lines") };
+    fcad::domain::Layer& linesLayer{ expectedLayers.emplace_back("Lines") };
     linesLayer.lines.push_back(
         Line{
             .start = { 100.0, 100.0 },
@@ -48,7 +48,7 @@ TEST(DxfImportTest, ImportExample)
         }
     );
 
-    Layer& circlesLayer{ expectedLayers.emplace_back("Circles") };
+    fcad::domain::Layer& circlesLayer{ expectedLayers.emplace_back("Circles") };
     circlesLayer.circles.push_back(
         Circle{
             .center = { 50.4, 65.0 },
@@ -56,7 +56,7 @@ TEST(DxfImportTest, ImportExample)
         }
     );
 
-    Layer& arcsLayer{ expectedLayers.emplace_back("Arcs") };
+    fcad::domain::Layer& arcsLayer{ expectedLayers.emplace_back("Arcs") };
     arcsLayer.arcs.push_back(
         Arc{
             .center = { 0.0, 2.0 },
