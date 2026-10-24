@@ -2,12 +2,12 @@
 
 #include "domain/Document.hpp"
 
-#include <tl/expected.hpp>
+#include <expected>
 
 #include <QString>
 
 namespace fcad::io {
 
-tl::expected<domain::Document, QString> importDxf(const QString& filePath);
+std::expected<domain::Document, QString> importDxf(const QString& filePath);
 
 }   // namespace fcad::io

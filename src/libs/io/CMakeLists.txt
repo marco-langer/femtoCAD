@@ -7,7 +7,6 @@ target_link_libraries(femtoCAD-io
     PUBLIC
         femtoCAD-domain
         femtoCAD::qt-core
-        femtoCAD::tl-expected
     PRIVATE
         femtoCAD::opendxf
         femtoCAD::warnings

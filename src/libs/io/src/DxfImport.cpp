@@ -157,13 +157,13 @@ namespace {
 
 }   // namespace
 
-tl::expected<domain::Document, QString> importDxf(const QString& filePath)
+std::expected<domain::Document, QString> importDxf(const QString& filePath)
 {
     ReadStream stream;
 
     return odxf::read(stream, toStdFilePath(filePath))
         .transform([&stream] { return toDocument(std::move(stream)); })
-        .map_error([](const odxf::Error& error) { return toErrorMessage(error); });
+        .transform_error([](const odxf::Error& error) { return toErrorMessage(error); });
 }
 
 }   // namespace fcad::io
