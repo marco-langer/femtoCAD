@@ -1,14 +1,15 @@
 #include "io/DxfImport.hpp"
 
 #include "core/VectorExtensions.hpp"
-#include "domain/Document.hpp"
 #include "domain/Layer.hpp"
+#include "domain/LengthUnit.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
 #include "geo/Line.hpp"
 #include "io/DxfImportError.hpp"
 
 #include <opendxf/entities.hpp>
+#include <opendxf/header.hpp>
 #include <opendxf/ireadstream.hpp>
 #include <opendxf/layer.hpp>
 #include <opendxf/read.hpp>
@@ -16,11 +17,73 @@
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace fcad::io {
 
 namespace {
+
+    // Values of the $INSUNITS header variable.
+    enum class DxfUnit {
+        Unitless = 0,
+        Inches = 1,
+        Feet = 2,
+        Miles = 3,
+        Millimeters = 4,
+        Centimeters = 5,
+        Meters = 6,
+        Kilometers = 7,
+        Microinches = 8,
+        Mils = 9,
+        Yards = 10,
+        Angstroms = 11,
+        Nanometers = 12,
+        Microns = 13,
+        Decimeters = 14,
+        Decameters = 15,
+        Hectometers = 16,
+        Gigameters = 17,
+        AstronomicalUnits = 18,
+        LightYears = 19,
+        Parsecs = 20,
+        UsSurveyFeet = 21,
+        UsSurveyInches = 22,
+        UsSurveyYards = 23,
+        UsSurveyMiles = 24,
+    };
+
+    std::optional<domain::LengthUnit> toLengthUnit(int dxfUnit)
+    {
+        switch (static_cast<DxfUnit>(dxfUnit)) {
+        case DxfUnit::Inches: return domain::LengthUnit::Inch;
+        case DxfUnit::Feet: return domain::LengthUnit::Foot;
+        case DxfUnit::Miles: return domain::LengthUnit::Mile;
+        case DxfUnit::Millimeters: return domain::LengthUnit::Millimeter;
+        case DxfUnit::Centimeters: return domain::LengthUnit::Centimeter;
+        case DxfUnit::Meters: return domain::LengthUnit::Meter;
+        case DxfUnit::Kilometers: return domain::LengthUnit::Kilometer;
+        case DxfUnit::Yards: return domain::LengthUnit::Yard;
+        case DxfUnit::Microns: return domain::LengthUnit::Micrometer;
+        case DxfUnit::Decimeters: return domain::LengthUnit::Decimeter;
+        default: return std::nullopt;
+        }
+    }
+
+    std::optional<domain::LengthUnit> toLengthUnit(const odxf::Header& header)
+    {
+        const auto entry{ header.entries.find("$INSUNITS") };
+        if (entry == header.entries.end()) {
+            return std::nullopt;
+        }
+
+        const int* dxfUnit{ std::get_if<int>(&entry->second) };
+        if (dxfUnit == nullptr) {
+            return std::nullopt;
+        }
+
+        return toLengthUnit(*dxfUnit);
+    }
 
     std::filesystem::path toStdFilePath(const QString& filePath)
     {
@@ -84,8 +147,11 @@ namespace {
     {
     public:
         std::vector<domain::Layer> getLayers() && { return std::move(m_layers); }
+        std::optional<domain::LengthUnit> unit() const { return m_unit; }
 
     private:
+        void header(const odxf::Header& header) override { m_unit = toLengthUnit(header); }
+
         void layer(const odxf::Layer& layer) override
         {
             m_layers.push_back(toLayer(layer));
@@ -131,14 +197,14 @@ namespace {
 
         domain::Layers m_layers;
         std::vector<std::string> m_layerNames;
+        std::optional<domain::LengthUnit> m_unit;
     };
 
-    domain::Document toDocument(ReadStream&& stream)
+    ImportedDxf toImportedDxf(ReadStream&& stream)
     {
-        domain::Document document;
-        document.addLayers(std::move(stream).getLayers());
+        const std::optional<domain::LengthUnit> unit{ stream.unit() };
 
-        return document;
+        return ImportedDxf{ .layers = std::move(stream).getLayers(), .unit = unit };
     }
 
     QString toErrorMessage(const odxf::Error& error)
@@ -173,12 +239,12 @@ namespace {
 
 }   // namespace
 
-core::Result<domain::Document> importDxf(const QString& filePath)
+core::Result<ImportedDxf> importDxf(const QString& filePath)
 {
     ReadStream stream;
 
     return odxf::read(stream, toStdFilePath(filePath))
-        .transform([&stream] { return toDocument(std::move(stream)); })
+        .transform([&stream] { return toImportedDxf(std::move(stream)); })
         .transform_error([](const odxf::Error& error) { return toError(error); });
 }
 
