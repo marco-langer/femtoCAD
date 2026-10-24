@@ -13,6 +13,8 @@ constexpr BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
 constexpr double viewMargin = 0.05;
 // Extent shown when the scene has neither width nor height (e.g. a single point).
 constexpr double minimumViewExtent = 1.0;
+// Floats per vertex in the vertex buffers (x, y).
+constexpr int componentsPerVertex = 2;
 
 SceneView::SceneView(Workspace& workspace)
     : m_workspace{ workspace }
@@ -49,7 +51,7 @@ void SceneView::updateWorkspace()
     m_lines.vbo.allocate(vertices.data(), gsl::narrow<int>(vertices.size() * sizeof(float)));
 
     m_program->enableAttributeArray("position");
-    m_program->setAttributeBuffer("position", GL_FLOAT, 0, m_lines.vertexCount);
+    m_program->setAttributeBuffer("position", GL_FLOAT, 0, componentsPerVertex);
 
     m_lines.vbo.release();
     m_lines.vao.release();
