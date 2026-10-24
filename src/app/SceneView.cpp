@@ -16,8 +16,10 @@ constexpr BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
 constexpr double viewMargin = 0.05;
 // Extent shown when the scene has neither width nor height (e.g. a single point).
 constexpr double minimumViewExtent = 1.0;
-// Floats per vertex in the vertex buffers (x, y).
+// Floats per point in the vertex buffers (x, y).
 constexpr int componentsPerVertex = 2;
+// Line width in logical pixels, independent of the zoom.
+constexpr double lineWidth = 1.5;
 // Zoom factor per mouse wheel notch.
 constexpr double zoomStepFactor = 1.2;
 // Zoom limits relative to the fitted view, to stay within float precision.
@@ -46,7 +48,7 @@ void SceneView::uploadGeometry()
 
     std::vector<float> vertices;
 
-    m_lines.vertexCount = 0;
+    m_lines.instanceCount = 0;
     for (const Layer& layer : m_workspace.layers()) {
         if (layer.visible) {
             for (const Line& line : layer.lines) {
@@ -54,7 +56,7 @@ void SceneView::uploadGeometry()
                 vertices.push_back(gsl::narrow_cast<float>(line.start.y));
                 vertices.push_back(gsl::narrow_cast<float>(line.end.x));
                 vertices.push_back(gsl::narrow_cast<float>(line.end.y));
-                m_lines.vertexCount += 2;
+                ++m_lines.instanceCount;
             }
         }
     }
@@ -65,8 +67,18 @@ void SceneView::uploadGeometry()
 
     m_lines.vbo.allocate(vertices.data(), gsl::narrow<int>(vertices.size() * sizeof(float)));
 
-    m_program->enableAttributeArray("position");
-    m_program->setAttributeBuffer("position", GL_FLOAT, 0, componentsPerVertex);
+    // Per line: start point, then end point.
+    constexpr int stride{ 2 * componentsPerVertex * sizeof(float) };
+    const int startLocation{ m_program->attributeLocation("a_start") };
+    const int endLocation{ m_program->attributeLocation("a_end") };
+    m_program->enableAttributeArray(startLocation);
+    m_program->enableAttributeArray(endLocation);
+    m_program->setAttributeBuffer(startLocation, GL_FLOAT, 0, componentsPerVertex, stride);
+    m_program->setAttributeBuffer(
+        endLocation, GL_FLOAT, componentsPerVertex * sizeof(float), componentsPerVertex, stride
+    );
+    glVertexAttribDivisor(gsl::narrow_cast<GLuint>(startLocation), 1);
+    glVertexAttribDivisor(gsl::narrow_cast<GLuint>(endLocation), 1);
 
     m_lines.vbo.release();
     m_lines.vao.release();
@@ -80,26 +92,12 @@ void SceneView::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    static const char* vertexShaderSource =
-        R"(#version 330 core
-        layout(location = 0) in vec2 position;
-        uniform mat4 u_mvp;
-
-        void main() {
-            gl_Position = u_mvp * vec4(position, 0.0, 1.0);
-        })";
-
-    static const char* fragmentShaderSource =
-        R"(#version 330 core
-        out vec4 fragColor;
-        void main() {
-            fragColor = vec4(1.0, 0.0, 0.0, 1.0);  // Red color
-        })";
-
     m_program = std::make_unique<QOpenGLShaderProgram>();
-    m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
-    m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
-    m_program->link();
+    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/line.vert");
+    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/line.frag");
+    if (!m_program->link()) {
+        qWarning() << "Linking the line shader failed:" << m_program->log();
+    }
 
     m_lines.vao.create();
     m_lines.vbo.create();
@@ -131,14 +129,23 @@ void SceneView::paintGL()
     glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const QMatrix4x4 mvp{ viewProjection() };
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    const qreal pixelRatio{ devicePixelRatio() };
 
     m_program->bind();
-    m_program->setUniformValue("u_mvp", mvp);
+    m_program->setUniformValue("u_viewProjection", viewProjection());
+    m_program->setUniformValue(
+        "u_viewportSize",
+        QVector2D{ gsl::narrow_cast<float>(width() * pixelRatio),
+                   gsl::narrow_cast<float>(height() * pixelRatio) }
+    );
+    m_program->setUniformValue("u_lineWidth", gsl::narrow_cast<float>(lineWidth * pixelRatio));
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_lines.vao);
 
-    glDrawArrays(m_lines.primitiveType, 0, m_lines.vertexCount);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_lines.instanceCount);
 
     m_program->release();
 }

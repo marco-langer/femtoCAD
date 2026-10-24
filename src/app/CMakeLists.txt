@@ -14,6 +14,14 @@ set_target_properties(femtoCAD PROPERTIES
     CXX_EXTENSIONS NO
 )
 
+qt_add_resources(femtoCAD shaders
+    PREFIX /shaders
+    BASE ${PROJECT_SOURCE_DIR}/shaders
+    FILES
+        ${PROJECT_SOURCE_DIR}/shaders/line.frag
+        ${PROJECT_SOURCE_DIR}/shaders/line.vert
+)
+
 target_link_libraries(femtoCAD
     PRIVATE
         femtoCAD-core
