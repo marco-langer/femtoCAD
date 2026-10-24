@@ -33,5 +33,5 @@ The rules below apply to Claude in addition.
 - Commits that haven't landed on `main` yet may be amended or reworked. Never rewrite `main`.
 - Never push and never merge. The user does both.
 - End commit messages with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
-- The user opens PRs. When asked, draft the description following CONTRIBUTING.md and end it with
+- The user opens PRs. When asked, draft the description using the PR template and end it with
   `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
