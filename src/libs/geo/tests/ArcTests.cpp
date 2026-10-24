@@ -2,7 +2,7 @@
 
 #include "test_utils/matchers/BoundingBoxMatcher.hpp"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 struct ArcBoundingBoxParams final
