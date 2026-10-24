@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core/Arc.hpp"
-#include "core/BoundingBox.hpp"
-#include "core/Circle.hpp"
-#include "core/Line.hpp"
+#include "geo/Arc.hpp"
+#include "geo/BoundingBox.hpp"
+#include "geo/Circle.hpp"
+#include "geo/Line.hpp"
 
 #include <QString>
 
@@ -20,13 +20,13 @@ struct Layer final
 
     QString name;
     bool visible{ true };
-    Arcs arcs;
-    std::vector<Line> lines;
-    Circles circles;
+    geo::Arcs arcs;
+    std::vector<geo::Line> lines;
+    geo::Circles circles;
 };
 
 using Layers = std::vector<Layer>;
 
-std::optional<BoundingBox> boundingBox(const Layer& layer);
+std::optional<geo::BoundingBox> boundingBox(const Layer& layer);
 
 }   // namespace fcad::domain

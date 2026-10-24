@@ -19,7 +19,8 @@ MainWindow::MainWindow(fcad::domain::Workspace& workspace, Settings& settings)
 
     fcad::domain::Layer layer{ "Layer 1" };
     layer.lines.push_back(
-        Line{ .start = Coordinate{ 50.0, 50.0 }, .end = Coordinate{ 200.0, 200.0 } }
+        fcad::geo::Line{ .start = fcad::geo::Coordinate{ 50.0, 50.0 },
+                         .end = fcad::geo::Coordinate{ 200.0, 200.0 } }
     );
     m_workspace.addLayer(layer);
 

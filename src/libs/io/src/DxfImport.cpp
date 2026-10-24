@@ -1,10 +1,10 @@
 #include "io/DxfImport.hpp"
 
-#include "core/Arc.hpp"
-#include "core/Circle.hpp"
-#include "core/Line.hpp"
 #include "core/utility/VectorExtensions.hpp"
 #include "domain/Layer.hpp"
+#include "geo/Arc.hpp"
+#include "geo/Circle.hpp"
+#include "geo/Line.hpp"
 
 #include <opendxf/entities.hpp>
 #include <opendxf/ireadstream.hpp>
@@ -25,9 +25,9 @@ namespace {
         return reinterpret_cast<const char8_t*>(filePath.toUtf8().constData());
     }
 
-    Coordinate toCoordinate(const odxf::Coordinate3d& coordinate3d)
+    geo::Coordinate toCoordinate(const odxf::Coordinate3d& coordinate3d)
     {
-        return Coordinate{ .x = coordinate3d.x, .y = coordinate3d.y };
+        return geo::Coordinate{ .x = coordinate3d.x, .y = coordinate3d.y };
     }
 
     domain::Layer toLayer(const odxf::Layer& dxfLayer)
@@ -38,22 +38,22 @@ namespace {
         return layer;
     }
 
-    Line toLine(const odxf::Line& dxfLine)
+    geo::Line toLine(const odxf::Line& dxfLine)
     {
-        return Line{
+        return geo::Line{
             .start = toCoordinate(dxfLine.start),
             .end = toCoordinate(dxfLine.end),
         };
     }
 
-    std::optional<Circle> toCircle(const odxf::Circle& dxfCircle)
+    std::optional<geo::Circle> toCircle(const odxf::Circle& dxfCircle)
     {
-        const std::optional<Radius> radius{ Radius::fromValue(dxfCircle.radius) };
+        const std::optional<geo::Radius> radius{ geo::Radius::fromValue(dxfCircle.radius) };
         if (!radius.has_value()) {
             return std::nullopt;
         }
 
-        Circle circle;
+        geo::Circle circle;
 
         circle.center = toCoordinate(dxfCircle.center);
         circle.radius = radius.value();
@@ -61,14 +61,14 @@ namespace {
         return circle;
     }
 
-    std::optional<Arc> toArc(const odxf::Arc& dxfArc)
+    std::optional<geo::Arc> toArc(const odxf::Arc& dxfArc)
     {
-        const std::optional<Radius> radius{ Radius::fromValue(dxfArc.radius) };
+        const std::optional<geo::Radius> radius{ geo::Radius::fromValue(dxfArc.radius) };
         if (!radius.has_value()) {
             return std::nullopt;
         }
 
-        Arc arc;
+        geo::Arc arc;
 
         arc.center = toCoordinate(dxfArc.center);
         arc.startAngle = Radians::fromDegrees(dxfArc.startAngle);
@@ -95,7 +95,7 @@ namespace {
             const std::optional<std::size_t> layerIndex{ indexOf(m_layerNames, arc.layer) };
 
             if (layerIndex.has_value()) {
-                const std::optional<Arc> maybeArc{ toArc(arc) };
+                const std::optional<geo::Arc> maybeArc{ toArc(arc) };
 
                 if (maybeArc.has_value()) {
                     m_layers.at(layerIndex.value()).arcs.push_back(maybeArc.value());
@@ -117,7 +117,7 @@ namespace {
             const std::optional<std::size_t> layerIndex{ indexOf(m_layerNames, circle.layer) };
 
             if (layerIndex.has_value()) {
-                const std::optional<Circle> maybeCircle{ toCircle(circle) };
+                const std::optional<geo::Circle> maybeCircle{ toCircle(circle) };
 
                 if (maybeCircle.has_value()) {
                     m_layers.at(layerIndex.value()).circles.push_back(maybeCircle.value());

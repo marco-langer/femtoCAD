@@ -1,4 +1,6 @@
-#include "core/InfiniteLine.hpp"
+#include "geo/InfiniteLine.hpp"
+
+namespace fcad::geo {
 
 std::optional<Coordinate> intersection(const InfiniteLine& first, const InfiniteLine& second)
 {
@@ -18,3 +20,5 @@ std::optional<Coordinate> intersection(const InfiniteLine& first, const Infinite
 
     return first.point + s * first.direction;
 }
+
+}   // namespace fcad::geo

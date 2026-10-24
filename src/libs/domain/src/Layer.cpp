@@ -8,13 +8,13 @@ namespace fcad::domain {
 namespace {
 
     template <typename T>
-    std::optional<BoundingBox> boundingBox(const std::vector<T>& geometries)
+    std::optional<geo::BoundingBox> boundingBox(const std::vector<T>& geometries)
     {
         if (geometries.empty()) {
             return std::nullopt;
         }
 
-        BoundingBox bb{ boundingBox(geometries.front()) };
+        geo::BoundingBox bb{ boundingBox(geometries.front()) };
 
         for (const T& geometry : geometries | std::views::drop(1)) {
             bb = united(bb, boundingBox(geometry));
@@ -25,7 +25,7 @@ namespace {
 
 }   // namespace
 
-std::optional<BoundingBox> boundingBox(const Layer& layer)
+std::optional<geo::BoundingBox> boundingBox(const Layer& layer)
 {
     return united(boundingBox(layer.arcs), boundingBox(layer.lines), boundingBox(layer.circles));
 };

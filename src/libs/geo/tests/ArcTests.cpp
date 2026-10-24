@@ -1,4 +1,4 @@
-#include "core/Arc.hpp"
+#include "geo/Arc.hpp"
 
 #include "test_utils/matchers/BoundingBoxMatcher.hpp"
 
@@ -9,7 +9,7 @@ struct ArcBoundingBoxParams final
 {
     Radians startAngle;
     Radians endAngle;
-    BoundingBox expectedBoundingBox;
+    fcad::geo::BoundingBox expectedBoundingBox;
 };
 
 struct ArcBoundingBoxFixture : public testing::TestWithParam<ArcBoundingBoxParams>
@@ -21,15 +21,15 @@ TEST_P(ArcBoundingBoxFixture, boundingBox)
     // Arrange
     const auto& [startAngle, endAngle, expectedBoundingBox]{ GetParam() };
 
-    const Arc arc{
+    const fcad::geo::Arc arc{
         .center = { 1.0, 1.0 },
         .startAngle = startAngle,
         .endAngle = endAngle,
-        .radius = Radius{ 1.0 },
+        .radius = fcad::geo::Radius{ 1.0 },
     };
 
     // Act
-    const BoundingBox arcBoundingBox{ boundingBox(arc) };
+    const fcad::geo::BoundingBox arcBoundingBox{ boundingBox(arc) };
 
     // Assert
     EXPECT_THAT(arcBoundingBox, fcad::test_utils::IsBoundingBox(expectedBoundingBox));

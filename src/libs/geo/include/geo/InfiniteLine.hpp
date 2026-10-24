@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Coordinate.hpp"
+#include "geo/Coordinate.hpp"
 
 #include <optional>
+
+namespace fcad::geo {
 
 struct InfiniteLine final
 {
@@ -11,3 +13,5 @@ struct InfiniteLine final
 };
 
 std::optional<Coordinate> intersection(const InfiniteLine& first, const InfiniteLine& second);
+
+}   // namespace fcad::geo

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/BoundingBox.hpp"
 #include "domain/Workspace.hpp"
+#include "geo/BoundingBox.hpp"
 
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
@@ -57,9 +57,9 @@ private:
     std::unique_ptr<QOpenGLShaderProgram> m_program;
     Geometry m_lines;
 
-    BoundingBox m_sceneBounds;
+    fcad::geo::BoundingBox m_sceneBounds;
     // World point at the widget's centre.
-    Coordinate m_viewCenter;
+    fcad::geo::Coordinate m_viewCenter;
     // World units per logical pixel; 0 until the view has been fitted.
     double m_viewScale{ 0.0 };
     // m_viewScale after the last fit, the reference for the zoom limits.

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "BoundingBox.hpp"
-#include "Coordinate.hpp"
-#include "InfiniteLine.hpp"
+#include "geo/BoundingBox.hpp"
+#include "geo/Coordinate.hpp"
+#include "geo/InfiniteLine.hpp"
 
 #include <optional>
+
+namespace fcad::geo {
 
 struct Line final
 {
@@ -17,3 +19,5 @@ BoundingBox boundingBox(const Line& line);
 Coordinate mid(const Line& line);
 
 std::optional<InfiniteLine> perpBisector(const Line& line);
+
+}   // namespace fcad::geo

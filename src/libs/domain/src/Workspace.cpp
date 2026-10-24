@@ -14,9 +14,9 @@ void Workspace::addLayer(Layer layer) { m_layers.push_back(std::move(layer)); }
 
 void Workspace::addLayers(Layers&& layers) { appendRange(m_layers, std::move(layers)); }
 
-std::optional<BoundingBox> boundingBox(const Workspace& workspace)
+std::optional<geo::BoundingBox> boundingBox(const Workspace& workspace)
 {
-    std::optional<BoundingBox> bb;
+    std::optional<geo::BoundingBox> bb;
 
     for (const Layer& layer : workspace.layers() | std::views::filter(&Layer::visible)) {
         bb = united(bb, boundingBox(layer));

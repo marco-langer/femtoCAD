@@ -1,11 +1,13 @@
 #pragma once
 
-#include "BoundingBox.hpp"
-#include "Coordinate.hpp"
-#include "primitives/Radius.hpp"
+#include "geo/BoundingBox.hpp"
+#include "geo/Coordinate.hpp"
+#include "geo/Radius.hpp"
 
 #include <optional>
 #include <vector>
+
+namespace fcad::geo {
 
 struct Circle final
 {
@@ -21,3 +23,5 @@ Coordinate nearestPoint(const Circle& circle, const Coordinate& position);
 
 std::optional<Circle>
 circleFromPoints(const Coordinate& first, const Coordinate& second, const Coordinate& third);
+
+}   // namespace fcad::geo

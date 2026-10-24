@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/Coordinate.hpp"
+#include "geo/Coordinate.hpp"
 
 #include <gmock/gmock.h>
 
@@ -8,9 +8,10 @@
 
 namespace fcad::test_utils {
 
-testing::Matcher<Coordinate> IsCoordinate(const Coordinate& coordinate, double maxError = 1.0e-5);
+testing::Matcher<geo::Coordinate>
+IsCoordinate(const geo::Coordinate& coordinate, double maxError = 1.0e-5);
 
-testing::Matcher<const std::optional<Coordinate>&>
-IsCoordinate(const std::optional<Coordinate>& expected, double maxError = 1.0e-5);
+testing::Matcher<const std::optional<geo::Coordinate>&>
+IsCoordinate(const std::optional<geo::Coordinate>& expected, double maxError = 1.0e-5);
 
 }   // namespace fcad::test_utils

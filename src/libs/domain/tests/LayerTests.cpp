@@ -1,6 +1,6 @@
-#include "core/BoundingBox.hpp"
-#include "core/Coordinate.hpp"
 #include "domain/Layer.hpp"
+#include "geo/BoundingBox.hpp"
+#include "geo/Coordinate.hpp"
 
 #include "test_utils/matchers/BoundingBoxMatcher.hpp"
 
@@ -12,7 +12,7 @@ TEST(LayerTest, boundingBox_Empty)
     const fcad::domain::Layer layer{ "Layer Name" };
 
     // Act
-    const std::optional<BoundingBox> bb{ boundingBox(layer) };
+    const std::optional<fcad::geo::BoundingBox> bb{ boundingBox(layer) };
 
     // Assert
     EXPECT_FALSE(bb.has_value());
@@ -24,35 +24,35 @@ TEST(LayerTest, boundingBox)
     fcad::domain::Layer layer{ "Layer Name" };
 
     layer.lines.push_back(
-        Line{
-            .start = Coordinate{ .x = 1.0, .y = 4.0 },
-            .end = Coordinate{ .x = 3.0, .y = 2.0 },
+        fcad::geo::Line{
+            .start = fcad::geo::Coordinate{ .x = 1.0, .y = 4.0 },
+            .end = fcad::geo::Coordinate{ .x = 3.0, .y = 2.0 },
         }
     );
     layer.circles.push_back(
-        Circle{
+        fcad::geo::Circle{
             .center = { 2.0, 3.7 },
-            .radius = Radius{ 0.5 },
+            .radius = fcad::geo::Radius{ 0.5 },
         }
     );
     layer.arcs.push_back(
-        Arc{
+        fcad::geo::Arc{
             .center = { 3.0, 1.0 },
             .startAngle = Radians::zero,
             .endAngle = Radians::pi,
-            .radius = Radius{ 0.5 },
+            .radius = fcad::geo::Radius{ 0.5 },
         }
     );
 
     // Act
-    const std::optional<BoundingBox> bb{ boundingBox(layer) };
+    const std::optional<fcad::geo::BoundingBox> bb{ boundingBox(layer) };
 
     // Assert
     ASSERT_TRUE(bb.has_value());
 
-    const BoundingBox expectedBb{
-        .min = Coordinate{ .x = 1.0, .y = 1.0 },
-        .max = Coordinate{ .x = 3.5, .y = 4.2 },
+    const fcad::geo::BoundingBox expectedBb{
+        .min = fcad::geo::Coordinate{ .x = 1.0, .y = 1.0 },
+        .max = fcad::geo::Coordinate{ .x = 3.5, .y = 4.2 },
     };
 
     EXPECT_THAT(bb.value(), fcad::test_utils::IsBoundingBox(expectedBb));

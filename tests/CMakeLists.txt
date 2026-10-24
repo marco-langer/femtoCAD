@@ -5,10 +5,6 @@ include(GoogleTest)
 
 add_executable(femtoCAD-core-tests
     AngleTests.cpp
-    ArcTests.cpp
-    CircleTests.cpp
-    InfiniteLineTests.cpp
-    LineTests.cpp
     NonNegativeTests.cpp
 )
 
@@ -21,7 +17,6 @@ set_target_properties(femtoCAD-core-tests PROPERTIES
 target_link_libraries(femtoCAD-core-tests
     PRIVATE
         femtoCAD-core
-        femtoCAD-test_utils
         femtoCAD::warnings
         GTest::gmock_main
 )

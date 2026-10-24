@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/BoundingBox.hpp"
 #include "domain/Layer.hpp"
+#include "geo/BoundingBox.hpp"
 
 #include <optional>
 #include <vector>
@@ -21,6 +21,6 @@ private:
     Layers m_layers;
 };
 
-std::optional<BoundingBox> boundingBox(const Workspace& workspace);
+std::optional<geo::BoundingBox> boundingBox(const Workspace& workspace);
 
 }   // namespace fcad::domain
