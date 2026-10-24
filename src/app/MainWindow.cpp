@@ -1,6 +1,6 @@
 #include "MainWindow.hpp"
 
-#include "core/io/DxfImport.hpp"
+#include "io/DxfImport.hpp"
 
 #include <QAction>
 #include <QFileDialog>
@@ -111,7 +111,7 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    std::ignore = importDxf(m_workspace, filePath)
+    std::ignore = fcad::io::importDxf(m_workspace, filePath)
                       .transform([this, &filePath]() {
                           m_settings.lastDxfImportPath = filePath;
                           m_sceneView->updateWorkspace();
