@@ -9,15 +9,15 @@ int main(int argc, char** argv)
     QApplication app{ argc, argv };
 
     fcad::domain::Workspace workspace;
-    Settings settings{ loadSettings() };
+    fcad::app::Settings settings{ fcad::app::loadSettings() };
 
-    MainWindow mainWindow{ workspace, settings };
+    fcad::app::MainWindow mainWindow{ workspace, settings };
     mainWindow.show();
 
     const int appResult{ app.exec() };
 
     if (appResult == 0) {
-        saveSettings(settings);
+        fcad::app::saveSettings(settings);
     }
 
     return appResult;

@@ -13,6 +13,8 @@
 
 #include <memory>
 
+namespace fcad::app {
+
 class SceneView final
     : public QOpenGLWidget
     , protected QOpenGLExtraFunctions
@@ -23,7 +25,7 @@ signals:
     void mousePositionChanged(const QPointF&);
 
 public:
-    SceneView(fcad::domain::Workspace& workspace);
+    SceneView(domain::Workspace& workspace);
 
     QSize sizeHint() const override;
 
@@ -53,16 +55,18 @@ private:
         int instanceCount{ 0 };
     };
 
-    fcad::domain::Workspace& m_workspace;
+    domain::Workspace& m_workspace;
     std::unique_ptr<QOpenGLShaderProgram> m_program;
     Geometry m_lines;
 
-    fcad::geo::BoundingBox m_sceneBounds;
+    geo::BoundingBox m_sceneBounds;
     // World point at the widget's centre.
-    fcad::geo::Coordinate m_viewCenter;
+    geo::Coordinate m_viewCenter;
     // World units per logical pixel; 0 until the view has been fitted.
     double m_viewScale{ 0.0 };
     // m_viewScale after the last fit, the reference for the zoom limits.
     double m_fittedViewScale{ 0.0 };
     QPointF m_lastMousePos;
 };
+
+}   // namespace fcad::app
