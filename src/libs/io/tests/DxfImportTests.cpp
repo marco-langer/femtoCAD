@@ -60,8 +60,8 @@ TEST(DxfImportTest, ImportExample)
     arcsLayer.arcs.push_back(
         fcad::geo::Arc{
             .center = { 0.0, 2.0 },
-            .startAngle = Radians::fromDegrees(0.0),
-            .endAngle = Radians::fromDegrees(180.0),
+            .startAngle = fcad::core::Radians::fromDegrees(0.0),
+            .endAngle = fcad::core::Radians::fromDegrees(180.0),
             .radius = fcad::geo::Radius{ 0.5 },
         }
     );

@@ -1,4 +1,4 @@
-#include "core/primitives/NonNegative.hpp"
+#include "core/NonNegative.hpp"
 
 #include <gtest/gtest.h>
 
@@ -8,7 +8,7 @@
 
 namespace {
 
-using SUTNonNegative = NonNegative<double, struct SUTTag>;
+using SUTNonNegative = fcad::core::NonNegative<double, struct SUTTag>;
 
 }   // namespace
 

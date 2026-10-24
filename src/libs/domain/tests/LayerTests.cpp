@@ -38,8 +38,8 @@ TEST(LayerTest, boundingBox)
     layer.arcs.push_back(
         fcad::geo::Arc{
             .center = { 3.0, 1.0 },
-            .startAngle = Radians::zero,
-            .endAngle = Radians::pi,
+            .startAngle = fcad::core::Radians::zero,
+            .endAngle = fcad::core::Radians::pi,
             .radius = fcad::geo::Radius{ 0.5 },
         }
     );

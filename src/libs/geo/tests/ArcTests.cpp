@@ -7,8 +7,8 @@
 
 struct ArcBoundingBoxParams final
 {
-    Radians startAngle;
-    Radians endAngle;
+    fcad::core::Radians startAngle;
+    fcad::core::Radians endAngle;
     fcad::geo::BoundingBox expectedBoundingBox;
 };
 
@@ -41,184 +41,184 @@ INSTANTIATE_TEST_SUITE_P(
     ArcBoundingBoxFixture,
     testing::Values(
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(0.0),
-            .endAngle = Radians::fromDegrees(90.0),
+            .startAngle = fcad::core::Radians::fromDegrees(0.0),
+            .endAngle = fcad::core::Radians::fromDegrees(90.0),
             .expectedBoundingBox = {
                 .min = { 1.0, 1.0 },
                 .max = { 2.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(0.0),
-            .endAngle = Radians::fromDegrees(180.0),
+            .startAngle = fcad::core::Radians::fromDegrees(0.0),
+            .endAngle = fcad::core::Radians::fromDegrees(180.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 1.0 },
                 .max = { 2.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(0.0),
-            .endAngle = Radians::fromDegrees(270.0),
+            .startAngle = fcad::core::Radians::fromDegrees(0.0),
+            .endAngle = fcad::core::Radians::fromDegrees(270.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 2.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(0.0),
-            .endAngle = Radians::fromDegrees(360.0),
+            .startAngle = fcad::core::Radians::fromDegrees(0.0),
+            .endAngle = fcad::core::Radians::fromDegrees(360.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 2.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(0.0),
-            .endAngle = Radians::fromDegrees(0.0),
+            .startAngle = fcad::core::Radians::fromDegrees(0.0),
+            .endAngle = fcad::core::Radians::fromDegrees(0.0),
             .expectedBoundingBox = {
                 .min = { 2.0, 1.0 },
                 .max = { 2.0, 1.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(90.0),
-            .endAngle = Radians::fromDegrees(180.0),
+            .startAngle = fcad::core::Radians::fromDegrees(90.0),
+            .endAngle = fcad::core::Radians::fromDegrees(180.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 1.0 },
                 .max = { 1.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(90.0),
-            .endAngle = Radians::fromDegrees(270.0),
+            .startAngle = fcad::core::Radians::fromDegrees(90.0),
+            .endAngle = fcad::core::Radians::fromDegrees(270.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 1.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(90.0),
-            .endAngle = Radians::fromDegrees(360.0),
+            .startAngle = fcad::core::Radians::fromDegrees(90.0),
+            .endAngle = fcad::core::Radians::fromDegrees(360.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 2.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(90.0),
-            .endAngle = Radians::fromDegrees(90.0),
+            .startAngle = fcad::core::Radians::fromDegrees(90.0),
+            .endAngle = fcad::core::Radians::fromDegrees(90.0),
             .expectedBoundingBox = {
                 .min = { 1.0, 2.0 },
                 .max = { 1.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(180.0),
-            .endAngle = Radians::fromDegrees(270.0),
+            .startAngle = fcad::core::Radians::fromDegrees(180.0),
+            .endAngle = fcad::core::Radians::fromDegrees(270.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 1.0, 1.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(180.0),
-            .endAngle = Radians::fromDegrees(360.0),
+            .startAngle = fcad::core::Radians::fromDegrees(180.0),
+            .endAngle = fcad::core::Radians::fromDegrees(360.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 2.0, 1.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(180.0),
-            .endAngle = Radians::fromDegrees(90.0),
+            .startAngle = fcad::core::Radians::fromDegrees(180.0),
+            .endAngle = fcad::core::Radians::fromDegrees(90.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 2.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(180.0),
-            .endAngle = Radians::fromDegrees(180.0),
+            .startAngle = fcad::core::Radians::fromDegrees(180.0),
+            .endAngle = fcad::core::Radians::fromDegrees(180.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 1.0 },
                 .max = { 0.0, 1.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(270.0),
-            .endAngle = Radians::fromDegrees(360.0),
+            .startAngle = fcad::core::Radians::fromDegrees(270.0),
+            .endAngle = fcad::core::Radians::fromDegrees(360.0),
             .expectedBoundingBox = {
                 .min = { 1.0, 0.0 },
                 .max = { 2.0, 1.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(270.0),
-            .endAngle = Radians::fromDegrees(90.0),
+            .startAngle = fcad::core::Radians::fromDegrees(270.0),
+            .endAngle = fcad::core::Radians::fromDegrees(90.0),
             .expectedBoundingBox = {
                 .min = { 1.0, 0.0 },
                 .max = { 2.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(270.0),
-            .endAngle = Radians::fromDegrees(180.0),
+            .startAngle = fcad::core::Radians::fromDegrees(270.0),
+            .endAngle = fcad::core::Radians::fromDegrees(180.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 2.0, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(270.0),
-            .endAngle = Radians::fromDegrees(270.0),
+            .startAngle = fcad::core::Radians::fromDegrees(270.0),
+            .endAngle = fcad::core::Radians::fromDegrees(270.0),
             .expectedBoundingBox = {
                 .min = { 1.0, 0.0 },
                 .max = { 1.0, 0.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(30.0),
-            .endAngle = Radians::fromDegrees(60.0),
+            .startAngle = fcad::core::Radians::fromDegrees(30.0),
+            .endAngle = fcad::core::Radians::fromDegrees(60.0),
             .expectedBoundingBox = {
                 .min = { 1.5, 1.5 },
                 .max = { 1.866025404, 1.866025404 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(30.0),
-            .endAngle = Radians::fromDegrees(120.0),
+            .startAngle = fcad::core::Radians::fromDegrees(30.0),
+            .endAngle = fcad::core::Radians::fromDegrees(120.0),
             .expectedBoundingBox = {
                 .min = { 0.5, 1.5 },
                 .max = { 1.866025404, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(60.0),
-            .endAngle = Radians::fromDegrees(150.0),
+            .startAngle = fcad::core::Radians::fromDegrees(60.0),
+            .endAngle = fcad::core::Radians::fromDegrees(150.0),
             .expectedBoundingBox = {
                 .min = { 1.0 - 0.866025404, 1.5 },
                 .max = { 1.5, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(60.0),
-            .endAngle = Radians::fromDegrees(210.0),
+            .startAngle = fcad::core::Radians::fromDegrees(60.0),
+            .endAngle = fcad::core::Radians::fromDegrees(210.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.5 },
                 .max = { 1.5, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(60.0),
-            .endAngle = Radians::fromDegrees(330.0),
+            .startAngle = fcad::core::Radians::fromDegrees(60.0),
+            .endAngle = fcad::core::Radians::fromDegrees(330.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 1.866025404, 2.0 },
             },
         },
         ArcBoundingBoxParams{
-            .startAngle = Radians::fromDegrees(30.0),
-            .endAngle = Radians::fromDegrees(300.0),
+            .startAngle = fcad::core::Radians::fromDegrees(30.0),
+            .endAngle = fcad::core::Radians::fromDegrees(300.0),
             .expectedBoundingBox = {
                 .min = { 0.0, 0.0 },
                 .max = { 1.866025404, 2.0 },
@@ -228,8 +228,8 @@ INSTANTIATE_TEST_SUITE_P(
     [](const testing::TestParamInfo<ArcBoundingBoxParams>& paramInfo) {
         return fmt::format(
             "{}_{}",
-            Degrees{ paramInfo.param.startAngle }.value(),
-            Degrees{ paramInfo.param.endAngle }.value()
+            fcad::core::Degrees{ paramInfo.param.startAngle }.value(),
+            fcad::core::Degrees{ paramInfo.param.endAngle }.value()
         );
     }
 );

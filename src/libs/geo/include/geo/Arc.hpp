@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/units/Angle.hpp"
+#include "core/Angle.hpp"
 #include "geo/BoundingBox.hpp"
 #include "geo/Coordinate.hpp"
 #include "geo/Radius.hpp"
@@ -12,8 +12,8 @@ namespace fcad::geo {
 struct Arc final
 {
     Coordinate center;
-    Radians startAngle;
-    Radians endAngle;
+    core::Radians startAngle;
+    core::Radians endAngle;
     Radius radius;
 };
 

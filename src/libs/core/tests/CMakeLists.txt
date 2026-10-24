@@ -1,8 +1,3 @@
-find_package(GTest CONFIG REQUIRED)
-message(STATUS "Using GTest v.${GTest_VERSION}")
-
-include(GoogleTest)
-
 add_executable(femtoCAD-core-tests
     AngleTests.cpp
     NonNegativeTests.cpp

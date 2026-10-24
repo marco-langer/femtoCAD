@@ -5,6 +5,8 @@
 #include <optional>
 #include <vector>
 
+namespace fcad::core {
+
 // TODO remove in C++23
 template <typename T, typename R>
 void appendRange(std::vector<T>& vec, R&& range)
@@ -24,3 +26,5 @@ std::optional<std::size_t> indexOf(const std::vector<T>& vec, const T& element)
     return pos == vec.cend() ? std::optional<std::size_t>{}
                              : std::ranges::distance(vec.cbegin(), pos);
 }
+
+}   // namespace fcad::core
