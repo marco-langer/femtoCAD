@@ -16,7 +16,8 @@ each library are `build/<preset>/src/libs/<library>/tests/femtoCAD-<library>-tes
 - `src/libs/` — the libraries, layered as `core ← geo ← domain ← io` (ADR 0002). A library may
   only depend on libraries to its left. Each one is the CMake target `femtoCAD-<library>` in the
   namespace `fcad::<library>`:
-  - `core` — domain-agnostic building blocks: `Angle`, `NonNegative`, vector utilities.
+  - `core` — domain-agnostic building blocks: `Angle`, `NonNegative`, the error types `Error` and
+    `Result` (ADR 0003), vector utilities.
   - `geo` — geometric value types (`Coordinate`, `Line`, `Circle`, `Arc`, `Radius`, ...) and
     geometric algorithms.
   - `domain` — the CAD model: `Layer`, `Document`, `Workspace`.
