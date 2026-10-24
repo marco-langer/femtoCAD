@@ -9,7 +9,6 @@ add_library(femtoCAD-core INTERFACE
 target_link_libraries(femtoCAD-core
     INTERFACE
         femtoCAD::cxx_standard
-        femtoCAD::fmt
         femtoCAD::ms-gsl
         femtoCAD::qt-core
 )

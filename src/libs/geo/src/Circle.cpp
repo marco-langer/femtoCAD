@@ -45,9 +45,12 @@ circleFromPoints(const Coordinate& first, const Coordinate& second, const Coordi
     }
 
     const Coordinate& center{ maybeIntersection.value() };
-    const double radius{ norm(center - first) };
+    const std::optional<Radius> maybeRadius{ Radius::fromValue(norm(center - first)) };
+    if (!maybeRadius.has_value()) {
+        return std::nullopt;
+    }
 
-    return Circle{ .center = center, .radius = Radius{ radius } };
+    return Circle{ .center = center, .radius = maybeRadius.value() };
 }
 
 }   // namespace fcad::geo
