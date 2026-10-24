@@ -78,9 +78,10 @@ e.g. `fix/dxf-arc-negative-radius`.
 |------------|----------------------------------|--------------------------------------------------------------|
 | `feature/` | New functionality                | Anything needed                                              |
 | `fix/`     | Bug fixes                        | Anything needed                                              |
+| `refactor/` | Restructuring without behavior change | Production code, tests, build files and the docs they affect; no behavior changes |
 | `tests/`   | New or improved tests            | Tests only (`src/libs/*/tests/`, `src/libs/test_utils/`, test CMake). **No production code.** |
 | `docs/`    | Documentation                    | `docs/`, `CLAUDE.md`, `CONTRIBUTING.md`, `README.md`, `CHANGELOG.md` only |
-| `chore/`   | Build, CMake, CI, dependencies, reformatting | Build/tooling files; no behaviour changes        |
+| `chore/`   | Build, CMake, CI, dependencies, reformatting | Build/tooling files; no behavior changes        |
 
 ## Git
 
