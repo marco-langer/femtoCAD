@@ -72,9 +72,7 @@ void SceneView::uploadGeometry()
     m_lines.vao.release();
     m_program->release();
 
-    m_zoom = 1.0F;
-    m_pan = QPointF{};
-    updateTransform();
+    resetZoom();
 
     update();
     resetViewToSceneBounds();
@@ -158,6 +156,18 @@ void SceneView::wheelEvent(QWheelEvent* event)
 
 void SceneView::mousePressEvent(QMouseEvent* /* event */) {}
 
+void SceneView::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    if (event->button() != Qt::MiddleButton) {
+        QOpenGLWidget::mouseDoubleClickEvent(event);
+        return;
+    }
+
+    resetZoom();
+    update();
+    emit mousePositionChanged(mapToWorld(event->position()));
+}
+
 void SceneView::mouseMoveEvent(QMouseEvent* event)
 {
     emit mousePositionChanged(mapToWorld(event->position()));
@@ -178,6 +188,13 @@ QPointF SceneView::mapToWorld(const QPointF& widgetPosition) const
     const QVector4D world{ (m_projMatrix * m_viewMatrix).inverted() * ndc };
 
     return QPointF{ static_cast<double>(world.x()), static_cast<double>(world.y()) };
+}
+
+void SceneView::resetZoom()
+{
+    m_zoom = 1.0F;
+    m_pan = QPointF{};
+    updateTransform();
 }
 
 void SceneView::updateTransform()
