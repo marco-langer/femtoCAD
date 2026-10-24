@@ -1,6 +1,8 @@
 add_library(femtoCAD-core INTERFACE
     include/core/Angle.hpp
+    include/core/Error.hpp
     include/core/NonNegative.hpp
+    include/core/Result.hpp
     include/core/VectorExtensions.hpp
 )
 
@@ -9,6 +11,7 @@ target_link_libraries(femtoCAD-core
         femtoCAD::cxx_standard
         femtoCAD::fmt
         femtoCAD::ms-gsl
+        femtoCAD::qt-core
 )
 
 target_include_directories(femtoCAD-core INTERFACE include)
