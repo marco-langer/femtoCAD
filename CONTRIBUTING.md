@@ -8,19 +8,33 @@ Requires `VCPKG_ROOT` to point at a vcpkg checkout (see `README.md`).
     cmake --build --preset release
     ctest --preset release
 
-Binaries land in `build/<preset>/`. The app is `build/<preset>/src/app/femtoCAD`, the tests are
-`build/<preset>/tests/femtoCAD-core-tests`.
+Binaries land in `build/<preset>/`. The app is `build/<preset>/src/app/femtoCAD`, the tests of
+each library are `build/<preset>/src/libs/<library>/tests/femtoCAD-<library>-tests`.
 
 ## Layout
 
-- `src/core/` — static library `femtoCAD-core`: geometry model, workspace, DXF import. Public
-  headers in `src/core/include/core/`, included as `"core/..."`. Depends on QtCore only, never on
-  QtGui/QtWidgets.
-- `src/app/` — the `femtoCAD` executable: `MainWindow`, `SceneView` (QOpenGLWidget), `Settings`.
-- `tests/` — GoogleTest/GoogleMock tests for core. `tests/Matchers/` holds custom gmock matchers
-  (`IsCircle`, `AreLines`, ...) with floating-point tolerance. Test data in `tests/TestData/`.
+- `src/libs/` — the libraries, layered as `core ← geo ← domain ← io` (ADR 0002). A library may
+  only depend on libraries to its left. Each one is the CMake target `femtoCAD-<library>` in the
+  namespace `fcad::<library>`:
+  - `core` — domain-agnostic building blocks: `Angle`, `NonNegative`, vector utilities.
+  - `geo` — geometric value types (`Coordinate`, `Line`, `Circle`, `Arc`, `Radius`, ...) and
+    geometric algorithms.
+  - `domain` — the CAD model: `Layer`, `Workspace`.
+  - `io` — import and export, today the DXF import. Only `io` uses opendxf.
+
+  The libraries depend on QtCore at most, never on QtGui/QtWidgets. Each library has the folders:
+  - `include/<library>/` — public headers, included as `"<library>/..."`.
+  - `src/` — implementation and private headers.
+  - `tests/` — the GoogleTest/GoogleMock executable `femtoCAD-<library>-tests`, with the test
+    helpers and test data only it uses.
+- `src/libs/test_utils/` — test code that several test executables share, such as the gmock
+  matchers (`IsCircle`, `AreLines`, ...) with floating-point tolerance. Only test executables link
+  it.
+- `src/app/` — the `femtoCAD` executable in the namespace `fcad::app`: `MainWindow`, `SceneView`
+  (QOpenGLWidget), `Settings`.
 - `cmake/dependencies/` — one file per dependency, each exposing a `femtoCAD::<name>` interface
   target. Link against those aliases, not the raw package targets.
+- `docs/` — documentation. `docs/adr/` holds the architecture decision records (ADRs).
 
 New source files must be added explicitly to the relevant `CMakeLists.txt` (no globbing),
 headers included.
@@ -64,7 +78,7 @@ e.g. `fix/dxf-arc-negative-radius`.
 |------------|----------------------------------|--------------------------------------------------------------|
 | `feature/` | New functionality                | Anything needed                                              |
 | `fix/`     | Bug fixes                        | Anything needed                                              |
-| `tests/`   | New or improved tests            | Tests only (`tests/`, test CMake). **No production code.**   |
+| `tests/`   | New or improved tests            | Tests only (`src/libs/*/tests/`, `src/libs/test_utils/`, test CMake). **No production code.** |
 | `docs/`    | Documentation                    | `docs/`, `CLAUDE.md`, `CONTRIBUTING.md`, `README.md`, `CHANGELOG.md` only |
 | `chore/`   | Build, CMake, CI, dependencies, reformatting | Build/tooling files; no behaviour changes        |
 
