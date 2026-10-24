@@ -1,0 +1,45 @@
+#version 330 core
+
+// One instance per line. The quad's corners come from gl_VertexID (triangle
+// strip, 4 vertices), so there is no per-vertex buffer.
+layout(location = 0) in vec2 a_start;
+layout(location = 1) in vec2 a_end;
+
+uniform mat4 u_viewProjection;
+uniform vec2 u_viewportSize;  // device pixels
+uniform float u_lineWidth;    // device pixels
+
+// Everything in device pixels, for the distance calculation in line.frag.
+out vec2 v_position;
+flat out vec2 v_start;
+flat out vec2 v_end;
+
+vec2 toPixels(vec2 world)
+{
+    vec4 clip = u_viewProjection * vec4(world, 0.0, 1.0);
+    return (clip.xy * 0.5 + 0.5) * u_viewportSize;
+}
+
+void main()
+{
+    vec2 start = toPixels(a_start);
+    vec2 end = toPixels(a_end);
+
+    vec2 direction = end - start;
+    float len = length(direction);
+    vec2 along = len > 0.0 ? direction / len : vec2(1.0, 0.0);
+    vec2 across = vec2(-along.y, along.x);
+
+    // Half the line width plus one pixel for the soft edge, around the segment
+    // and past its ends for the round caps.
+    float extent = u_lineWidth * 0.5 + 1.0;
+
+    float endFactor = float(gl_VertexID / 2);
+    float side = (gl_VertexID % 2 == 0) ? -1.0 : 1.0;
+    vec2 position = mix(start - along * extent, end + along * extent, endFactor) + across * side * extent;
+
+    v_position = position;
+    v_start = start;
+    v_end = end;
+    gl_Position = vec4(position / u_viewportSize * 2.0 - 1.0, 0.0, 1.0);
+}

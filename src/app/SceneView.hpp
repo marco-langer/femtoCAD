@@ -5,7 +5,7 @@
 
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
-#include <QOpenGLFunctions>
+#include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLWidget>
@@ -15,7 +15,7 @@
 
 class SceneView final
     : public QOpenGLWidget
-    , protected QOpenGLFunctions
+    , protected QOpenGLExtraFunctions
 {
     Q_OBJECT
 
@@ -48,19 +48,14 @@ private:
 
     struct Geometry
     {
-        explicit Geometry(GLenum type)
-            : primitiveType{ type }
-        {}
-
         QOpenGLVertexArrayObject vao;
         QOpenGLBuffer vbo{ QOpenGLBuffer::VertexBuffer };
-        int vertexCount{ 0 };
-        const GLenum primitiveType;
+        int instanceCount{ 0 };
     };
 
     Workspace& m_workspace;
     std::unique_ptr<QOpenGLShaderProgram> m_program;
-    Geometry m_lines{ GL_LINES };
+    Geometry m_lines;
 
     BoundingBox m_sceneBounds;
     // World point at the widget's centre.
