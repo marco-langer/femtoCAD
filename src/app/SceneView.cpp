@@ -72,10 +72,8 @@ void SceneView::uploadGeometry()
     m_lines.vao.release();
     m_program->release();
 
-    resetZoom();
-
+    fitViewToScene();
     update();
-    resetViewToSceneBounds();
 }
 
 void SceneView::initializeGL()
@@ -111,14 +109,29 @@ void SceneView::initializeGL()
     uploadGeometry();
 }
 
-void SceneView::resizeGL(int /* width */, int /* height */) { resetViewToSceneBounds(); }
+void SceneView::resizeGL(int /* width */, int /* height */)
+{
+    const qreal pixelRatio{ devicePixelRatio() };
+    glViewport(
+        0,
+        0,
+        gsl::narrow_cast<int>(width() * pixelRatio),
+        gsl::narrow_cast<int>(height() * pixelRatio)
+    );
+
+    // Keep centre and scale, so the drawing keeps its size. Only fit if that
+    // couldn't happen yet because the widget had no size.
+    if (m_viewScale == 0.0) {
+        fitViewToScene();
+    }
+}
 
 void SceneView::paintGL()
 {
     glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const QMatrix4x4 mvp{ m_projMatrix * m_viewMatrix };
+    const QMatrix4x4 mvp{ viewProjection() };
 
     m_program->bind();
     m_program->setUniformValue("u_mvp", mvp);
@@ -133,23 +146,24 @@ void SceneView::paintGL()
 void SceneView::wheelEvent(QWheelEvent* event)
 {
     const double notches{ event->angleDelta().y() / 120.0 };
-    if (notches == 0.0) {
+    if (notches == 0.0 || m_viewScale == 0.0) {
         return;
     }
 
-    // Keep the world point under the cursor fixed: with view = zoom * world + pan,
-    // its view position must stay the same after changing the zoom.
+    const double newScale{ std::clamp(
+        m_viewScale / std::pow(zoomStepFactor, notches),
+        m_fittedViewScale / maximumZoom,
+        m_fittedViewScale / minimumZoom
+    ) };
+
+    // Keep the world point under the cursor fixed by scaling its offset from the
+    // view centre.
     const QPointF world{ mapToWorld(event->position()) };
-    const double oldZoom{ static_cast<double>(m_zoom) };
-    const QPointF view{ oldZoom * world + m_pan };
+    const double ratio{ newScale / m_viewScale };
+    m_viewCenter = Coordinate{ .x = world.x() - (world.x() - m_viewCenter.x) * ratio,
+                               .y = world.y() - (world.y() - m_viewCenter.y) * ratio };
+    m_viewScale = newScale;
 
-    const double newZoom{
-        std::clamp(oldZoom * std::pow(zoomStepFactor, notches), minimumZoom, maximumZoom)
-    };
-    m_zoom = gsl::narrow_cast<float>(newZoom);
-    m_pan = view - newZoom * world;
-
-    updateTransform();
     update();
     event->accept();
 }
@@ -163,7 +177,7 @@ void SceneView::mouseDoubleClickEvent(QMouseEvent* event)
         return;
     }
 
-    resetZoom();
+    fitViewToScene();
     update();
     emit mousePositionChanged(mapToWorld(event->position()));
 }
@@ -175,50 +189,37 @@ void SceneView::mouseMoveEvent(QMouseEvent* event)
 
 QPointF SceneView::mapToWorld(const QPointF& widgetPosition) const
 {
-    const QSize widgetSize{ size() };
+    // Widget y points down, world y up.
+    return QPointF{ m_viewCenter.x + (widgetPosition.x() - width() / 2.0) * m_viewScale,
+                    m_viewCenter.y - (widgetPosition.y() - height() / 2.0) * m_viewScale };
+}
 
-    // Map widget pixels (y down) to normalized device coordinates (y up) and back
-    // through the inverse of the transformation used for rendering.
-    const QVector4D ndc{
-        gsl::narrow_cast<float>(2.0 * widgetPosition.x() / widgetSize.width() - 1.0),
-        gsl::narrow_cast<float>(1.0 - 2.0 * widgetPosition.y() / widgetSize.height()),
-        0.0F,
+QMatrix4x4 SceneView::viewProjection() const
+{
+    const double halfWidth{ width() * m_viewScale / 2.0 };
+    const double halfHeight{ height() * m_viewScale / 2.0 };
+
+    QMatrix4x4 projection;
+    projection.ortho(
+        gsl::narrow_cast<float>(m_viewCenter.x - halfWidth),
+        gsl::narrow_cast<float>(m_viewCenter.x + halfWidth),
+        gsl::narrow_cast<float>(m_viewCenter.y - halfHeight),
+        gsl::narrow_cast<float>(m_viewCenter.y + halfHeight),
+        -1.0F,
         1.0F
-    };
-    const QVector4D world{ (m_projMatrix * m_viewMatrix).inverted() * ndc };
-
-    return QPointF{ static_cast<double>(world.x()), static_cast<double>(world.y()) };
+    );
+    return projection;
 }
 
-void SceneView::resetZoom()
-{
-    m_zoom = 1.0F;
-    m_pan = QPointF{};
-    updateTransform();
-}
-
-void SceneView::updateTransform()
-{
-    m_viewMatrix.setToIdentity();
-    m_viewMatrix.translate(gsl::narrow_cast<float>(m_pan.x()), gsl::narrow_cast<float>(m_pan.y()));
-    m_viewMatrix.scale(m_zoom, m_zoom);
-}
-
-void SceneView::resetViewToSceneBounds()
+void SceneView::fitViewToScene()
 {
     const int widgetWidth{ width() };
     const int widgetHeight{ height() };
     if (widgetWidth <= 0 || widgetHeight <= 0) {
+        // Nothing to fit to yet; resizeGL() fits once the widget has a size.
+        m_viewScale = 0.0;
         return;
     }
-
-    const qreal pixelRatio{ devicePixelRatio() };
-    glViewport(
-        0,
-        0,
-        gsl::narrow_cast<int>(widgetWidth * pixelRatio),
-        gsl::narrow_cast<int>(widgetHeight * pixelRatio)
-    );
 
     double bbWidth{ getWidth(m_sceneBounds) };
     double bbHeight{ getHeight(m_sceneBounds) };
@@ -227,28 +228,11 @@ void SceneView::resetViewToSceneBounds()
         bbHeight = minimumViewExtent;
     }
 
-    // Fit the limiting dimension and extend the other one to the widget's aspect
-    // ratio. Cross-multiplying avoids dividing by a zero extent.
-    double viewWidth{};
-    double viewHeight{};
-    if (bbWidth * widgetHeight >= bbHeight * widgetWidth) {
-        viewWidth = bbWidth * (1.0 + 2.0 * viewMargin);
-        viewHeight = viewWidth * widgetHeight / widgetWidth;
-    } else {
-        viewHeight = bbHeight * (1.0 + 2.0 * viewMargin);
-        viewWidth = viewHeight * widgetWidth / widgetHeight;
-    }
-
-    const Coordinate center{ .x = (m_sceneBounds.min.x + m_sceneBounds.max.x) / 2.0,
-                             .y = (m_sceneBounds.min.y + m_sceneBounds.max.y) / 2.0 };
-
-    m_projMatrix.setToIdentity();
-    m_projMatrix.ortho(
-        gsl::narrow_cast<float>(center.x - viewWidth / 2.0),
-        gsl::narrow_cast<float>(center.x + viewWidth / 2.0),
-        gsl::narrow_cast<float>(center.y - viewHeight / 2.0),
-        gsl::narrow_cast<float>(center.y + viewHeight / 2.0),
-        -1.0F,
-        1.0F
-    );
+    // The limiting dimension needs the most world units per pixel.
+    const double marginFactor{ 1.0 + 2.0 * viewMargin };
+    m_viewScale =
+        std::max(bbWidth * marginFactor / widgetWidth, bbHeight * marginFactor / widgetHeight);
+    m_fittedViewScale = m_viewScale;
+    m_viewCenter = Coordinate{ .x = (m_sceneBounds.min.x + m_sceneBounds.max.x) / 2.0,
+                               .y = (m_sceneBounds.min.y + m_sceneBounds.max.y) / 2.0 };
 }
