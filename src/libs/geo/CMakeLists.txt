@@ -23,10 +23,4 @@ target_link_libraries(femtoCAD-geo
 
 target_include_directories(femtoCAD-geo PUBLIC include)
 
-set_target_properties(femtoCAD-geo PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
-
 add_subdirectory(tests)

@@ -1,0 +1,4 @@
+add_library(_femtoCAD_cxx_standard INTERFACE)
+add_library(femtoCAD::cxx_standard ALIAS _femtoCAD_cxx_standard)
+
+target_compile_features(_femtoCAD_cxx_standard INTERFACE cxx_std_20)

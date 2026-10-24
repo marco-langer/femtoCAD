@@ -8,12 +8,6 @@ add_executable(femtoCAD
     Settings.hpp
 )
 
-set_target_properties(femtoCAD PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
-
 qt_add_resources(femtoCAD shaders
     PREFIX /shaders
     BASE ${PROJECT_SOURCE_DIR}/shaders
