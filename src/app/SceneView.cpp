@@ -29,7 +29,7 @@ constexpr double zoomStepFactor = 1.2;
 constexpr double minimumZoom = 0.01;
 constexpr double maximumZoom = 10000.0;
 
-SceneView::SceneView(const domain::Document& document)
+SceneView::SceneView(const std::optional<domain::Document>& document)
     : m_document{ document }
 {
     setMouseTracking(true);
@@ -46,23 +46,28 @@ void SceneView::updateDocument()
 
 void SceneView::uploadGeometry()
 {
-    const geo::BoundingBox sceneBounds{ domain::boundingBox(m_document).value_or(defaultBounds) };
-    m_sceneBounds = sceneBounds;
-
+    std::optional<geo::BoundingBox> documentBounds;
     std::vector<float> vertices;
 
     m_lines.instanceCount = 0;
-    for (const domain::Layer& layer : m_document.layers()) {
-        if (layer.visible) {
-            for (const geo::Line& line : layer.lines) {
-                vertices.push_back(gsl::narrow_cast<float>(line.start.x));
-                vertices.push_back(gsl::narrow_cast<float>(line.start.y));
-                vertices.push_back(gsl::narrow_cast<float>(line.end.x));
-                vertices.push_back(gsl::narrow_cast<float>(line.end.y));
-                ++m_lines.instanceCount;
+    if (m_document.has_value()) {
+        const domain::Document& document{ m_document.value() };
+        documentBounds = domain::boundingBox(document);
+
+        for (const domain::Layer& layer : document.layers()) {
+            if (layer.visible) {
+                for (const geo::Line& line : layer.lines) {
+                    vertices.push_back(gsl::narrow_cast<float>(line.start.x));
+                    vertices.push_back(gsl::narrow_cast<float>(line.start.y));
+                    vertices.push_back(gsl::narrow_cast<float>(line.end.x));
+                    vertices.push_back(gsl::narrow_cast<float>(line.end.y));
+                    ++m_lines.instanceCount;
+                }
             }
         }
     }
+
+    m_sceneBounds = documentBounds.value_or(defaultBounds);
 
     // QOpenGLBuffer takes the size as int. Draw nothing rather than truncate the buffer.
     if (!std::in_range<int>(vertices.size() * sizeof(float))) {
