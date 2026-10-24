@@ -9,6 +9,10 @@
 constexpr int windowWeight = 1076;
 constexpr int windowHeight = 768;
 constexpr BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
+// Empty space around the fitted scene, as a fraction of its extent, per side.
+constexpr double viewMargin = 0.05;
+// Extent shown when the scene has neither width nor height (e.g. a single point).
+constexpr double minimumViewExtent = 1.0;
 
 SceneView::SceneView(Workspace& workspace)
     : m_workspace{ workspace }
@@ -166,23 +170,48 @@ void SceneView::updateTransform()
 
 void SceneView::resetViewToSceneBounds()
 {
-    const Coordinate& min{ m_sceneBounds.min };
-    const double bbWidth{ getWidth(m_sceneBounds) };
-    const double bbHeight{ getHeight(m_sceneBounds) };
+    const int widgetWidth{ width() };
+    const int widgetHeight{ height() };
+    if (widgetWidth <= 0 || widgetHeight <= 0) {
+        return;
+    }
 
+    const qreal pixelRatio{ devicePixelRatio() };
     glViewport(
-        gsl::narrow_cast<int>(min.x),
-        gsl::narrow_cast<int>(min.y),
-        gsl::narrow_cast<int>(bbWidth),
-        gsl::narrow_cast<int>(bbHeight)
+        0,
+        0,
+        gsl::narrow_cast<int>(widgetWidth * pixelRatio),
+        gsl::narrow_cast<int>(widgetHeight * pixelRatio)
     );
+
+    double bbWidth{ getWidth(m_sceneBounds) };
+    double bbHeight{ getHeight(m_sceneBounds) };
+    if (bbWidth == 0.0 && bbHeight == 0.0) {
+        bbWidth = minimumViewExtent;
+        bbHeight = minimumViewExtent;
+    }
+
+    // Fit the limiting dimension and extend the other one to the widget's aspect
+    // ratio. Cross-multiplying avoids dividing by a zero extent.
+    double viewWidth{};
+    double viewHeight{};
+    if (bbWidth * widgetHeight >= bbHeight * widgetWidth) {
+        viewWidth = bbWidth * (1.0 + 2.0 * viewMargin);
+        viewHeight = viewWidth * widgetHeight / widgetWidth;
+    } else {
+        viewHeight = bbHeight * (1.0 + 2.0 * viewMargin);
+        viewWidth = viewHeight * widgetWidth / widgetHeight;
+    }
+
+    const Coordinate center{ .x = (m_sceneBounds.min.x + m_sceneBounds.max.x) / 2.0,
+                             .y = (m_sceneBounds.min.y + m_sceneBounds.max.y) / 2.0 };
 
     m_projMatrix.setToIdentity();
     m_projMatrix.ortho(
-        gsl::narrow_cast<float>(min.x),
-        gsl::narrow_cast<float>(min.x + bbWidth),
-        gsl::narrow_cast<float>(min.y + bbHeight),
-        gsl::narrow_cast<float>(min.y),
+        gsl::narrow_cast<float>(center.x - viewWidth / 2.0),
+        gsl::narrow_cast<float>(center.x + viewWidth / 2.0),
+        gsl::narrow_cast<float>(center.y + viewHeight / 2.0),
+        gsl::narrow_cast<float>(center.y - viewHeight / 2.0),
         -1.0F,
         1.0F
     );
