@@ -19,7 +19,7 @@ std::optional<geo::BoundingBox> boundingBox(const Workspace& workspace)
     std::optional<geo::BoundingBox> bb;
 
     for (const Layer& layer : workspace.layers() | std::views::filter(&Layer::visible)) {
-        bb = united(bb, boundingBox(layer));
+        bb = geo::united(bb, boundingBox(layer));
     }
 
     return bb;

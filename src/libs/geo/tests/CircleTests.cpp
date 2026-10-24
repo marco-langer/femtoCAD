@@ -24,7 +24,7 @@ TEST(CircleTest, boundingBox)
     };
 
     // Act
-    const fcad::geo::BoundingBox bb{ boundingBox(circle) };
+    const fcad::geo::BoundingBox bb{ fcad::geo::boundingBox(circle) };
 
     // Assert
     const fcad::geo::BoundingBox expectedBoundingBox{
@@ -54,7 +54,7 @@ TEST_P(CircleNearestPointFixture, NearestPoint)
                                     .radius = fcad::geo::Radius{ 3.0 } };
 
     // Act
-    const fcad::geo::Coordinate result{ nearestPoint(circle, point) };
+    const fcad::geo::Coordinate result{ fcad::geo::nearestPoint(circle, point) };
 
     // Assert
     EXPECT_THAT(result, fcad::test_utils::IsCoordinate(expectedPoint));
@@ -107,7 +107,9 @@ TEST_P(CircleFromPointsTest, FromPoints)
     const auto& [first, second, third, expectedCircle, _]{ GetParam() };
 
     // Act
-    const std::optional<fcad::geo::Circle> maybeCircle{ circleFromPoints(first, second, third) };
+    const std::optional<fcad::geo::Circle> maybeCircle{
+        fcad::geo::circleFromPoints(first, second, third)
+    };
 
     // Assert
     EXPECT_THAT(maybeCircle, fcad::test_utils::IsCircle(expectedCircle));
