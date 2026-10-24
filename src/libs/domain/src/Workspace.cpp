@@ -1,6 +1,6 @@
 #include "domain/Workspace.hpp"
 
-#include "core/utility/VectorExtensions.hpp"
+#include "core/VectorExtensions.hpp"
 
 #include <ranges>
 
@@ -12,7 +12,7 @@ const Layers& Workspace::layers() const& { return m_layers; }
 
 void Workspace::addLayer(Layer layer) { m_layers.push_back(std::move(layer)); }
 
-void Workspace::addLayers(Layers&& layers) { appendRange(m_layers, std::move(layers)); }
+void Workspace::addLayers(Layers&& layers) { core::appendRange(m_layers, std::move(layers)); }
 
 std::optional<geo::BoundingBox> boundingBox(const Workspace& workspace)
 {

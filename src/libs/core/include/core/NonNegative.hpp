@@ -8,6 +8,8 @@
 #include <optional>
 #include <stdexcept>
 
+namespace fcad::core {
+
 template <std::floating_point F, typename Tag>
 class NonNegative final
 {
@@ -44,3 +46,5 @@ public:
 private:
     F m_value{};
 };
+
+}   // namespace fcad::core

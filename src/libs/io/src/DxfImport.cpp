@@ -1,6 +1,6 @@
 #include "io/DxfImport.hpp"
 
-#include "core/utility/VectorExtensions.hpp"
+#include "core/VectorExtensions.hpp"
 #include "domain/Layer.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
@@ -71,8 +71,8 @@ namespace {
         geo::Arc arc;
 
         arc.center = toCoordinate(dxfArc.center);
-        arc.startAngle = Radians::fromDegrees(dxfArc.startAngle);
-        arc.endAngle = Radians::fromDegrees(dxfArc.endAngle);
+        arc.startAngle = core::Radians::fromDegrees(dxfArc.startAngle);
+        arc.endAngle = core::Radians::fromDegrees(dxfArc.endAngle);
         arc.radius = radius.value();
 
         return arc;
@@ -92,7 +92,7 @@ namespace {
 
         void arc(const odxf::Arc& arc) override
         {
-            const std::optional<std::size_t> layerIndex{ indexOf(m_layerNames, arc.layer) };
+            const std::optional<std::size_t> layerIndex{ core::indexOf(m_layerNames, arc.layer) };
 
             if (layerIndex.has_value()) {
                 const std::optional<geo::Arc> maybeArc{ toArc(arc) };
@@ -105,7 +105,7 @@ namespace {
 
         void line(const odxf::Line& line) override
         {
-            const std::optional<std::size_t> layerIndex{ indexOf(m_layerNames, line.layer) };
+            const std::optional<std::size_t> layerIndex{ core::indexOf(m_layerNames, line.layer) };
 
             if (layerIndex.has_value()) {
                 m_layers.at(layerIndex.value()).lines.push_back(toLine(line));
@@ -114,7 +114,9 @@ namespace {
 
         void circle(const odxf::Circle& circle) override
         {
-            const std::optional<std::size_t> layerIndex{ indexOf(m_layerNames, circle.layer) };
+            const std::optional<std::size_t> layerIndex{
+                core::indexOf(m_layerNames, circle.layer)
+            };
 
             if (layerIndex.has_value()) {
                 const std::optional<geo::Circle> maybeCircle{ toCircle(circle) };

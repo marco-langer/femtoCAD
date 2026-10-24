@@ -7,6 +7,8 @@
 #include <concepts>
 #include <numbers>
 
+namespace fcad::core {
+
 enum class AngleUnit { Radian, Degree };
 
 template <AngleUnit Unit, std::floating_point F>
@@ -96,3 +98,5 @@ using Radians = Angle<AngleUnit::Radian>;
 [[nodiscard]] inline double sin(Radians angle) { return std::sin(angle.value()); }
 
 [[nodiscard]] inline double cos(Radians angle) { return std::cos(angle.value()); }
+
+}   // namespace fcad::core

@@ -1,7 +1,7 @@
 add_library(femtoCAD-core INTERFACE
-    include/core/primitives/NonNegative.hpp
-    include/core/units/Angle.hpp
-    include/core/utility/VectorExtensions.hpp
+    include/core/Angle.hpp
+    include/core/NonNegative.hpp
+    include/core/VectorExtensions.hpp
 )
 
 target_link_libraries(femtoCAD-core
@@ -11,3 +11,5 @@ target_link_libraries(femtoCAD-core
 )
 
 target_include_directories(femtoCAD-core INTERFACE include)
+
+add_subdirectory(tests)
