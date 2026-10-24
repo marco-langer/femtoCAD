@@ -1,26 +1,18 @@
 #pragma once
 
-#include "domain/Layer.hpp"
-#include "geo/BoundingBox.hpp"
-
-#include <optional>
-#include <vector>
+#include "domain/Document.hpp"
 
 namespace fcad::domain {
 
 class Workspace final
 {
 public:
-    void clear();
-
-    const Layers& layers() const&;
-    void addLayer(Layer layer);
-    void addLayers(Layers&& layers);
+    const Document& document() const&;
+    // Move-assigns, so references to document() stay valid.
+    void setDocument(Document document);
 
 private:
-    Layers m_layers;
+    Document m_document;
 };
-
-std::optional<geo::BoundingBox> boundingBox(const Workspace& workspace);
 
 }   // namespace fcad::domain

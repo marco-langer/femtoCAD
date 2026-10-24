@@ -23,9 +23,11 @@ MainWindow::MainWindow(domain::Workspace& workspace, Settings& settings)
     layer.lines.push_back(
         geo::Line{ .start = geo::Coordinate{ 50.0, 50.0 }, .end = geo::Coordinate{ 200.0, 200.0 } }
     );
-    m_workspace.addLayer(layer);
+    domain::Document document;
+    document.addLayer(layer);
+    m_workspace.setDocument(std::move(document));
 
-    m_sceneView = new SceneView{ m_workspace };
+    m_sceneView = new SceneView{ m_workspace.document() };
 
     setStatusBar(new QStatusBar{});
 
@@ -91,9 +93,10 @@ void MainWindow::updateWindowTitle(const QString& filePath)
 
 void MainWindow::onNewProject()
 {
-    m_workspace.clear();
-    m_workspace.addLayer(domain::Layer{ "Layer 1" });
-    m_sceneView->updateWorkspace();
+    domain::Document document;
+    document.addLayer(domain::Layer{ "Layer 1" });
+    m_workspace.setDocument(std::move(document));
+    m_sceneView->updateDocument();
 }
 
 void MainWindow::onImportDxf()
@@ -113,10 +116,11 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    std::ignore = io::importDxf(m_workspace, filePath)
-                      .transform([this, &filePath]() {
+    std::ignore = io::importDxf(filePath)
+                      .transform([this, &filePath](domain::Document document) {
+                          m_workspace.setDocument(std::move(document));
                           m_settings.lastDxfImportPath = filePath;
-                          m_sceneView->updateWorkspace();
+                          m_sceneView->updateDocument();
                           updateWindowTitle(filePath);
                       })
                       .map_error([this](const QString& errorMessage) -> void {

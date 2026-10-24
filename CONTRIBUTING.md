@@ -19,7 +19,7 @@ each library are `build/<preset>/src/libs/<library>/tests/femtoCAD-<library>-tes
   - `core` — domain-agnostic building blocks: `Angle`, `NonNegative`, vector utilities.
   - `geo` — geometric value types (`Coordinate`, `Line`, `Circle`, `Arc`, `Radius`, ...) and
     geometric algorithms.
-  - `domain` — the CAD model: `Layer`, `Workspace`.
+  - `domain` — the CAD model: `Layer`, `Document`, `Workspace`.
   - `io` — import and export, today the DXF import. Only `io` uses opendxf.
 
   The libraries depend on QtCore at most, never on QtGui/QtWidgets. Each library has the folders:

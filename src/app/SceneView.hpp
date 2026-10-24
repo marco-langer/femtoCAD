@@ -1,6 +1,6 @@
 #pragma once
 
-#include "domain/Workspace.hpp"
+#include "domain/Document.hpp"
 #include "geo/BoundingBox.hpp"
 
 #include <QMatrix4x4>
@@ -25,11 +25,11 @@ signals:
     void mousePositionChanged(const QPointF&);
 
 public:
-    SceneView(domain::Workspace& workspace);
+    SceneView(const domain::Document& document);
 
     QSize sizeHint() const override;
 
-    void updateWorkspace();
+    void updateDocument();
 
 protected:
     void initializeGL() override;
@@ -55,7 +55,7 @@ private:
         int instanceCount{ 0 };
     };
 
-    domain::Workspace& m_workspace;
+    const domain::Document& m_document;
     std::unique_ptr<QOpenGLShaderProgram> m_program;
     Geometry m_lines;
 

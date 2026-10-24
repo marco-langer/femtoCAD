@@ -28,15 +28,15 @@ constexpr double zoomStepFactor = 1.2;
 constexpr double minimumZoom = 0.01;
 constexpr double maximumZoom = 10000.0;
 
-SceneView::SceneView(domain::Workspace& workspace)
-    : m_workspace{ workspace }
+SceneView::SceneView(const domain::Document& document)
+    : m_document{ document }
 {
     setMouseTracking(true);
 }
 
 QSize SceneView::sizeHint() const { return QSize{ windowWeight, windowHeight }; }
 
-void SceneView::updateWorkspace()
+void SceneView::updateDocument()
 {
     makeCurrent();
     uploadGeometry();
@@ -45,13 +45,13 @@ void SceneView::updateWorkspace()
 
 void SceneView::uploadGeometry()
 {
-    const geo::BoundingBox sceneBounds{ domain::boundingBox(m_workspace).value_or(defaultBounds) };
+    const geo::BoundingBox sceneBounds{ domain::boundingBox(m_document).value_or(defaultBounds) };
     m_sceneBounds = sceneBounds;
 
     std::vector<float> vertices;
 
     m_lines.instanceCount = 0;
-    for (const domain::Layer& layer : m_workspace.layers()) {
+    for (const domain::Layer& layer : m_document.layers()) {
         if (layer.visible) {
             for (const geo::Line& line : layer.lines) {
                 vertices.push_back(gsl::narrow_cast<float>(line.start.x));
