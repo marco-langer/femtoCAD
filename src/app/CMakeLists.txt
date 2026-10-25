@@ -1,4 +1,6 @@
 add_executable(femtoCAD
+    features/io/dxf/LengthUnitDialog.cpp
+    features/io/dxf/LengthUnitDialog.hpp
     main.cpp
     MainWindow.cpp
     MainWindow.hpp
@@ -7,6 +9,9 @@ add_executable(femtoCAD
     Settings.cpp
     Settings.hpp
 )
+
+# Includes are relative to src/app, e.g. "features/io/dxf/LengthUnitDialog.hpp".
+target_include_directories(femtoCAD PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 qt_add_resources(femtoCAD shaders
     PREFIX /shaders

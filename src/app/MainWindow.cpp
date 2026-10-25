@@ -1,5 +1,6 @@
 #include "MainWindow.hpp"
 
+#include "domain/LengthUnit.hpp"
 #include "io/DxfImport.hpp"
 
 #include <QAction>
@@ -9,7 +10,10 @@
 #include <QStatusBar>
 #include <QToolBar>
 
+#include <optional>
+
 #include "SceneView.hpp"
+#include "features/io/dxf/LengthUnitDialog.hpp"
 
 namespace fcad::app {
 
@@ -85,7 +89,7 @@ void MainWindow::updateWindowTitle(const QString& filePath)
 
 void MainWindow::onNewProject()
 {
-    domain::Document document;
+    domain::Document document{ m_settings.defaultUnit };
     document.addLayer(domain::Layer{ "Layer 1" });
     m_workspace.setDocument(std::move(document));
     m_sceneView->updateDocument();
@@ -94,8 +98,8 @@ void MainWindow::onNewProject()
 void MainWindow::onImportDxf()
 {
     QString dirName{ QDir::homePath() };
-    if (m_settings.lastDxfImportPath.has_value()) {
-        QFileInfo fileInfo{ m_settings.lastDxfImportPath.value() };
+    if (m_settings.dxfImport.lastImportPath.has_value()) {
+        QFileInfo fileInfo{ m_settings.dxfImport.lastImportPath.value() };
         if (fileInfo.exists()) {
             dirName = fileInfo.absolutePath();
         }
@@ -114,10 +118,19 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    domain::Document document;
-    document.addLayers(std::move(importResult.value().layers));
+    io::ImportedDxf& importedDxf{ importResult.value() };
+
+    const std::optional<domain::LengthUnit> unit{ importedDxf.unit.has_value()
+                                                      ? importedDxf.unit
+                                                      : askForDxfUnit(m_settings.dxfImport, this) };
+    if (!unit.has_value()) {
+        return;
+    }
+
+    domain::Document document{ unit.value() };
+    document.addLayers(std::move(importedDxf.layers));
     m_workspace.setDocument(std::move(document));
-    m_settings.lastDxfImportPath = filePath;
+    m_settings.dxfImport.lastImportPath = filePath;
     m_sceneView->updateDocument();
     updateWindowTitle(filePath);
 }
