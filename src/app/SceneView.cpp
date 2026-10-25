@@ -278,7 +278,7 @@ void SceneView::uploadGeometry()
         documentBounds = domain::boundingBox(document);
 
         Patterns patterns{ toPatterns(document.linetypes()) };
-        const float linetypeScale{ gsl::narrow_cast<float>(document.linetypeScale().value()) };
+        const double documentLinetypeScale{ document.linetypeScale().value() };
 
         for (const domain::Layer& layer : document.layers()) {
             if (layer.isVisible()) {
@@ -289,7 +289,12 @@ void SceneView::uploadGeometry()
                         domain::resolved(entity.lineweight(), layer.lineweight()),
                         m_defaultLineweightWidth
                     ) };
-                    const PatternRange pattern{ patterns.range(layer.linetype()) };
+                    const PatternRange pattern{
+                        patterns.range(domain::resolved(entity.linetype(), layer.linetype()))
+                    };
+                    const float linetypeScale{ gsl::narrow_cast<float>(
+                        documentLinetypeScale * entity.linetypeScale().value()
+                    ) };
                     vertices.push_back(gsl::narrow_cast<float>(line.start.x));
                     vertices.push_back(gsl::narrow_cast<float>(line.start.y));
                     vertices.push_back(gsl::narrow_cast<float>(line.end.x));
