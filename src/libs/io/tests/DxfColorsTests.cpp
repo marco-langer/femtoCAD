@@ -2,6 +2,8 @@
 
 #include "domain/Color.hpp"
 
+#include <QStringList>
+
 #include <gtest/gtest.h>
 
 #include <limits>
@@ -54,4 +56,75 @@ TEST(DxfColorsTest, ToColorTrueColorUsesLow24Bits)
 
     EXPECT_EQ(fcad::io::toColor(5, 0x7F3050A0), expected);
     EXPECT_EQ(fcad::io::toColor(5, -1), white);
+}
+
+TEST(DxfColorsTest, ToEntityColor)
+{
+    const fcad::domain::EntityColor byLayer{ fcad::domain::ByLayer{} };
+    const fcad::domain::EntityColor adaptive{ fcad::domain::Adaptive{} };
+    const fcad::domain::EntityColor red{ fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 } };
+    const fcad::domain::EntityColor trueColor{ fcad::domain::Rgb{
+        .r = 0x30, .g = 0x50, .b = 0xA0 } };
+
+    EXPECT_EQ(fcad::io::toEntityColor(256, std::nullopt), byLayer);
+    EXPECT_EQ(fcad::io::toEntityColor(1, std::nullopt), red);
+    EXPECT_EQ(fcad::io::toEntityColor(7, std::nullopt), adaptive);
+    EXPECT_EQ(fcad::io::toEntityColor(256, 0x3050A0), trueColor);
+}
+
+TEST(DxfColorsTest, ToEntityColorUnsupported)
+{
+    const fcad::domain::EntityColor byLayer{ fcad::domain::ByLayer{} };
+    const fcad::domain::EntityColor trueColor{ fcad::domain::Rgb{
+        .r = 0x30, .g = 0x50, .b = 0xA0 } };
+
+    // ByBlock
+    EXPECT_EQ(
+        fcad::io::toEntityColor(0, std::nullopt),
+        fcad::domain::EntityColor{ fcad::domain::Adaptive{} }
+    );
+    EXPECT_EQ(fcad::io::toEntityColor(0, 0x3050A0), trueColor);
+    // ByEntity
+    EXPECT_EQ(fcad::io::toEntityColor(257, std::nullopt), byLayer);
+    EXPECT_EQ(fcad::io::toEntityColor(257, 0x3050A0), trueColor);
+}
+
+TEST(DxfColorsTest, ToEntityColorInvalidIndexIsByLayer)
+{
+    const fcad::domain::EntityColor byLayer{ fcad::domain::ByLayer{} };
+
+    EXPECT_EQ(fcad::io::toEntityColor(-1, std::nullopt), byLayer);
+    EXPECT_EQ(fcad::io::toEntityColor(258, std::nullopt), byLayer);
+    EXPECT_EQ(fcad::io::toEntityColor(std::numeric_limits<int>::min(), std::nullopt), byLayer);
+}
+
+TEST(DxfColorsTest, UnsupportedColorWarningsNone)
+{
+    EXPECT_TRUE(fcad::io::unsupportedColorWarnings(0, 0).isEmpty());
+}
+
+TEST(DxfColorsTest, UnsupportedColorWarningsSingular)
+{
+    const QStringList warnings{ fcad::io::unsupportedColorWarnings(1, 1) };
+
+    ASSERT_EQ(warnings.size(), 2);
+    EXPECT_TRUE(warnings.at(0).startsWith(u"1 entity uses the color ByBlock"));
+    EXPECT_TRUE(warnings.at(1).startsWith(u"1 entity uses the color ByEntity"));
+}
+
+TEST(DxfColorsTest, UnsupportedColorWarningsPlural)
+{
+    const QStringList warnings{ fcad::io::unsupportedColorWarnings(3, 2) };
+
+    ASSERT_EQ(warnings.size(), 2);
+    EXPECT_TRUE(warnings.at(0).startsWith(u"3 entities use the color ByBlock"));
+    EXPECT_TRUE(warnings.at(1).startsWith(u"2 entities use the color ByEntity"));
+}
+
+TEST(DxfColorsTest, UnsupportedColorWarningsOnlyByEntity)
+{
+    const QStringList warnings{ fcad::io::unsupportedColorWarnings(0, 2) };
+
+    ASSERT_EQ(warnings.size(), 1);
+    EXPECT_TRUE(warnings.at(0).startsWith(u"2 entities use the color ByEntity"));
 }

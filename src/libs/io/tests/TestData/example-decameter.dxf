@@ -104,8 +104,6 @@ LINE
 AcDbLine
 8
 Lines
-62
-0
 10
 100.000000
 20
@@ -124,8 +122,6 @@ LINE
 AcDbLine
 8
 Lines
-62
-0
 10
 150.000000
 20
@@ -144,8 +140,6 @@ CIRCLE
 AcDbCircle
 8
 Circles
-62
-0
 10
 50.400000
 20
@@ -160,8 +154,6 @@ ARC
 AcDbCircle
 8
 Arcs
-62
-0
 10
 0.000000
 20

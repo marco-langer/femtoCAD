@@ -7,6 +7,7 @@
 #include "geo/Circle.hpp"
 #include "io/DxfImportError.hpp"
 
+#include "DxfColors.hpp"
 #include "DxfEntities.hpp"
 #include "DxfUnits.hpp"
 
@@ -19,6 +20,7 @@
 
 #include <QStringList>
 
+#include <cstddef>
 #include <expected>
 #include <filesystem>
 #include <optional>
@@ -39,7 +41,13 @@ namespace {
     public:
         std::vector<domain::Layer> getLayers() && { return std::move(m_layers); }
         std::optional<domain::LengthUnit> unit() const { return m_unit; }
-        QStringList getWarnings() && { return std::move(m_warnings); }
+        QStringList getWarnings() &&
+        {
+            QStringList warnings{ std::move(m_warnings) };
+            warnings.append(unsupportedColorWarnings(m_byBlockCount, m_byEntityCount));
+
+            return warnings;
+        }
 
     private:
         // The HEADER section comes before the entities, so m_scale is set before it's used.
@@ -92,7 +100,7 @@ namespace {
                 const std::optional<geo::Arc> maybeArc{ toArc(arc, m_scale) };
 
                 if (maybeArc.has_value()) {
-                    m_layers.at(layerIndex.value()).add(domain::Arc{ maybeArc.value() });
+                    add(layerIndex.value(), domain::Arc{ maybeArc.value() }, arc);
                 }
             }
         }
@@ -102,7 +110,7 @@ namespace {
             const std::optional<std::size_t> layerIndex{ core::indexOf(m_layerNames, line.layer) };
 
             if (layerIndex.has_value()) {
-                m_layers.at(layerIndex.value()).add(domain::Line{ toLine(line, m_scale) });
+                add(layerIndex.value(), domain::Line{ toLine(line, m_scale) }, line);
             }
         }
 
@@ -116,10 +124,26 @@ namespace {
                 const std::optional<geo::Circle> maybeCircle{ toCircle(circle, m_scale) };
 
                 if (maybeCircle.has_value()) {
-                    m_layers.at(layerIndex.value()).add(domain::Circle{ maybeCircle.value() });
+                    add(layerIndex.value(), domain::Circle{ maybeCircle.value() }, circle);
                 }
             }
         }
+
+        template <typename Entity>
+        void add(std::size_t layerIndex, Entity entity, const odxf::Entity& dxfEntity)
+        {
+            if (!dxfEntity.trueColor.has_value()) {
+                if (dxfEntity.color == byBlockIndex) {
+                    ++m_byBlockCount;
+                } else if (dxfEntity.color == byEntityIndex) {
+                    ++m_byEntityCount;
+                }
+            }
+
+            entity.setColor(toEntityColor(dxfEntity.color, dxfEntity.trueColor));
+            m_layers.at(layerIndex).add(std::move(entity));
+        }
+
 
         domain::Layers m_layers;
         std::vector<std::string> m_layerNames;
@@ -127,6 +151,9 @@ namespace {
         // Converts the file's values into m_unit.
         double m_scale{ 1.0 };
         QStringList m_warnings;
+        // Entities whose color is ByBlock or ByEntity, for the warnings.
+        int m_byBlockCount{ 0 };
+        int m_byEntityCount{ 0 };
     };
 
     ImportedDxf toImportedDxf(ReadStream&& stream)
