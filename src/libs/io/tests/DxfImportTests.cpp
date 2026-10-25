@@ -4,6 +4,7 @@
 #include "domain/Entity.hpp"
 #include "domain/Layer.hpp"
 #include "domain/LengthUnit.hpp"
+#include "domain/Linetype.hpp"
 #include "domain/Lineweight.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
@@ -17,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <optional>
 #include <utility>
 
@@ -89,6 +91,17 @@ fcad::domain::Layers exampleLayers(double scale, ExampleProperties properties)
     return layers;
 }
 
+// The name of the linetype an imported layer refers to.
+QString linetypeName(const fcad::io::ImportedDxf& imported, fcad::domain::LinetypeId id)
+{
+    const auto it{ std::ranges::find(imported.linetypes, id, &fcad::domain::Linetype::id) };
+    if (it == imported.linetypes.end()) {
+        return QStringLiteral(u"<unknown id>");
+    }
+
+    return it->name().value();
+}
+
 }   // namespace
 
 TEST(DxfImportTest, ImportExample)
@@ -105,17 +118,52 @@ TEST(DxfImportTest, ImportExample)
         FAIL() << importResult.error().message.toStdString();
     }
 
-    EXPECT_THAT(
-        importResult.value().layers, AreLayers(exampleLayers(1.0, ExampleProperties::Mixed))
-    );
+    const fcad::io::ImportedDxf& imported{ importResult.value() };
 
-    const QStringList& warnings{ importResult.value().warnings };
-    ASSERT_EQ(warnings.size(), 5);
+    EXPECT_THAT(imported.layers, AreLayers(exampleLayers(1.0, ExampleProperties::Mixed)));
+
+    // CONTINUOUS is built in, GAS contains a text, and BAD<NAME> and the second "dashed" are
+    // invalid, so only two linetypes are added to Continuous.
+    ASSERT_EQ(imported.linetypes.size(), 3);
+    auto linetype{ imported.linetypes.begin() };
+    EXPECT_EQ(linetype->id(), fcad::domain::continuousLinetypeId());
+    ++linetype;
+    EXPECT_EQ(linetype->name().value(), u"DASHED");
+    EXPECT_EQ(
+        linetype->pattern().elements(),
+        (fcad::domain::PatternElements{
+            fcad::domain::Dash{ fcad::domain::PatternLength{ 0.5 } },
+            fcad::domain::Gap{ fcad::domain::PatternLength{ 0.25 } },
+        })
+    );
+    ++linetype;
+    EXPECT_EQ(linetype->name().value(), u"DOTTED");
+    EXPECT_EQ(
+        linetype->pattern().elements(),
+        (fcad::domain::PatternElements{
+            fcad::domain::Dot{},
+            fcad::domain::Gap{ fcad::domain::PatternLength{ 0.25 } },
+        })
+    );
+    EXPECT_EQ(imported.linetypeScale, fcad::domain::LinetypeScale{ 2.0 });
+
+    // The layers refer to GAS, DASHED, "dotted" and an unknown linetype.
+    ASSERT_EQ(imported.layers.size(), 4);
+    EXPECT_EQ(linetypeName(imported, imported.layers.at(0).linetype()), u"Continuous");
+    EXPECT_EQ(linetypeName(imported, imported.layers.at(1).linetype()), u"DASHED");
+    EXPECT_EQ(linetypeName(imported, imported.layers.at(2).linetype()), u"DOTTED");
+    EXPECT_EQ(linetypeName(imported, imported.layers.at(3).linetype()), u"Continuous");
+
+    const QStringList& warnings{ imported.warnings };
+    ASSERT_EQ(warnings.size(), 8);
     EXPECT_TRUE(warnings.at(0).startsWith(u"1 entity uses the color ByBlock"));
     EXPECT_TRUE(warnings.at(1).startsWith(u"1 entity uses the color ByEntity"));
     EXPECT_TRUE(warnings.at(2).startsWith(u"1 layer has an invalid lineweight"));
     EXPECT_TRUE(warnings.at(3).startsWith(u"1 entity uses the lineweight ByBlock"));
     EXPECT_TRUE(warnings.at(4).startsWith(u"1 entity has an invalid lineweight"));
+    EXPECT_TRUE(warnings.at(5).startsWith(u"1 linetype contains texts or shapes"));
+    EXPECT_TRUE(warnings.at(6).startsWith(u"2 linetypes have an invalid or duplicate name"));
+    EXPECT_TRUE(warnings.at(7).startsWith(u"1 layer uses an unknown linetype"));
 }
 
 TEST(DxfImportTest, ImportWithoutUnit)
