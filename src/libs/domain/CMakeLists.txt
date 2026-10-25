@@ -1,4 +1,5 @@
 add_library(femtoCAD-domain STATIC
+    include/domain/Color.hpp
     include/domain/Document.hpp
     include/domain/Layer.hpp
     include/domain/LengthUnit.hpp

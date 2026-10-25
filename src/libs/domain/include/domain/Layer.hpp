@@ -1,5 +1,6 @@
 #pragma once
 
+#include "domain/Color.hpp"
 #include "geo/Arc.hpp"
 #include "geo/BoundingBox.hpp"
 #include "geo/Circle.hpp"
@@ -20,6 +21,7 @@ struct Layer final
 
     QString name;
     bool visible{ true };
+    Color color{ Adaptive{} };
     geo::Arcs arcs;
     std::vector<geo::Line> lines;
     geo::Circles circles;
