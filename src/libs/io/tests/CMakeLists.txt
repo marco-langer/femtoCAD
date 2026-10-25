@@ -2,6 +2,7 @@ add_executable(femtoCAD-io-tests
     DxfColorsTests.cpp
     DxfEntitiesTests.cpp
     DxfImportTests.cpp
+    DxfLineweightsTests.cpp
     DxfUnitsTests.cpp
     matchers/LayerMatcher.cpp
     matchers/LayerMatcher.hpp

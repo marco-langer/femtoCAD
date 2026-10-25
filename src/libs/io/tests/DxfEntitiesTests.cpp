@@ -3,6 +3,7 @@
 #include "core/Angle.hpp"
 #include "domain/Color.hpp"
 #include "domain/Layer.hpp"
+#include "domain/Lineweight.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
 #include "geo/Line.hpp"
@@ -31,6 +32,21 @@ TEST(DxfEntitiesTest, ToLayer)
     EXPECT_EQ(layer.name(), "Walls");
     EXPECT_TRUE(layer.isVisible());
     EXPECT_EQ(layer.color(), fcad::domain::Color{ fcad::domain::Adaptive{} });
+    EXPECT_EQ(
+        layer.lineweight(), fcad::domain::LayerLineweight{ fcad::domain::DefaultLineweight{} }
+    );
+}
+
+TEST(DxfEntitiesTest, ToLayerLineweight)
+{
+    // Arrange
+    const odxf::Layer dxfLayer{ .name = "Walls", .lineweight = 50 };
+
+    // Act
+    const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
+
+    // Assert
+    EXPECT_EQ(layer.lineweight(), fcad::domain::LayerLineweight{ fcad::domain::Lineweight{ 50 } });
 }
 
 TEST(DxfEntitiesTest, ToLayerColor)
