@@ -238,6 +238,10 @@ LINE
 AcDbLine
 8
 Lines
+6
+dotted
+48
+3.0
 62
 1
 370
@@ -260,6 +264,8 @@ LINE
 AcDbLine
 8
 Lines
+6
+ByLayer
 62
 5
 420
@@ -284,6 +290,8 @@ CIRCLE
 AcDbCircle
 8
 Circles
+6
+BYBLOCK
 62
 0
 370
@@ -302,6 +310,10 @@ ARC
 AcDbCircle
 8
 Arcs
+6
+NOPE
+48
+-1.0
 62
 257
 370

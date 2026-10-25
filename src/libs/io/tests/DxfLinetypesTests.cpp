@@ -97,6 +97,19 @@ TEST(DxfLinetypesTest, IsComplex)
     );
 }
 
+TEST(DxfLinetypesTest, IsByLayerAndIsByBlock)
+{
+    EXPECT_TRUE(fcad::io::isByLayer("BYLAYER"));
+    EXPECT_TRUE(fcad::io::isByLayer("ByLayer"));
+    EXPECT_FALSE(fcad::io::isByLayer("BYBLOCK"));
+    EXPECT_FALSE(fcad::io::isByLayer("BYLAYER2"));
+
+    EXPECT_TRUE(fcad::io::isByBlock("BYBLOCK"));
+    EXPECT_TRUE(fcad::io::isByBlock("byblock"));
+    EXPECT_FALSE(fcad::io::isByBlock("BYLAYER"));
+    EXPECT_FALSE(fcad::io::isByBlock(""));
+}
+
 TEST(DxfLinetypesTest, AddAndFind)
 {
     // Arrange
@@ -200,23 +213,43 @@ TEST(DxfLinetypesTest, LinetypeWarningsNone)
 TEST(DxfLinetypesTest, LinetypeWarningsSingular)
 {
     const QStringList warnings{ fcad::io::linetypeWarnings(
-        { .complexLinetypes = 1, .invalidLinetypes = 1, .unknownLayerLinetypes = 1 }
+        {
+            .complexLinetypes = 1,
+            .invalidLinetypes = 1,
+            .unknownLayerLinetypes = 1,
+            .byBlockEntities = 1,
+            .unknownEntityLinetypes = 1,
+            .invalidEntityScales = 1,
+        }
     ) };
 
-    ASSERT_EQ(warnings.size(), 3);
+    ASSERT_EQ(warnings.size(), 6);
     EXPECT_TRUE(warnings.at(0).startsWith(u"1 linetype contains texts or shapes"));
     EXPECT_TRUE(warnings.at(1).startsWith(u"1 linetype has an invalid or duplicate name"));
     EXPECT_TRUE(warnings.at(2).startsWith(u"1 layer uses an unknown linetype"));
+    EXPECT_TRUE(warnings.at(3).startsWith(u"1 entity uses the linetype ByBlock"));
+    EXPECT_TRUE(warnings.at(4).startsWith(u"1 entity uses an unknown linetype"));
+    EXPECT_TRUE(warnings.at(5).startsWith(u"1 entity has an invalid linetype scale"));
 }
 
 TEST(DxfLinetypesTest, LinetypeWarningsPlural)
 {
     const QStringList warnings{ fcad::io::linetypeWarnings(
-        { .complexLinetypes = 2, .invalidLinetypes = 3, .unknownLayerLinetypes = 4 }
+        {
+            .complexLinetypes = 2,
+            .invalidLinetypes = 3,
+            .unknownLayerLinetypes = 4,
+            .byBlockEntities = 5,
+            .unknownEntityLinetypes = 6,
+            .invalidEntityScales = 7,
+        }
     ) };
 
-    ASSERT_EQ(warnings.size(), 3);
+    ASSERT_EQ(warnings.size(), 6);
     EXPECT_TRUE(warnings.at(0).startsWith(u"2 linetypes contain texts or shapes"));
     EXPECT_TRUE(warnings.at(1).startsWith(u"3 linetypes have an invalid or duplicate name"));
     EXPECT_TRUE(warnings.at(2).startsWith(u"4 layers use an unknown linetype"));
+    EXPECT_TRUE(warnings.at(3).startsWith(u"5 entities use the linetype ByBlock"));
+    EXPECT_TRUE(warnings.at(4).startsWith(u"6 entities use an unknown linetype"));
+    EXPECT_TRUE(warnings.at(5).startsWith(u"7 entities have an invalid linetype scale"));
 }

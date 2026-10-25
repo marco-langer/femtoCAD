@@ -25,12 +25,19 @@ toDashPattern(const odxf::LineTypeElements& elements, double scale);
 /** Whether the linetype embeds texts or shapes, which femtoCAD doesn't support. */
 bool isComplex(const odxf::LineType& dxfLinetype);
 
+/** Whether an entity's linetype name (group code 6) is BYLAYER or BYBLOCK, in any case. */
+bool isByLayer(const std::string& name);
+bool isByBlock(const std::string& name);
+
 /** The numbers of linetypes and references that were replaced, for the import warnings. */
 struct LinetypeCounts final
 {
     int complexLinetypes{ 0 };
     int invalidLinetypes{ 0 };
     int unknownLayerLinetypes{ 0 };
+    int byBlockEntities{ 0 };
+    int unknownEntityLinetypes{ 0 };
+    int invalidEntityScales{ 0 };
 };
 
 /** Import warnings about the replaced linetypes and references, one per kind. */

@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <optional>
 #include <utility>
+#include <variant>
 
 namespace {
 
@@ -64,6 +65,9 @@ fcad::domain::Layers exampleLayers(double scale, ExampleProperties properties)
         // ByBlock and an invalid lineweight, which become the default.
         byBlockCircle.setLineweight(fcad::domain::DefaultLineweight{});
         byEntityArc.setLineweight(fcad::domain::DefaultLineweight{});
+
+        indexColorLine.setLinetypeScale(fcad::domain::LinetypeScale{ 3.0 });
+        // The arc's linetype scale is invalid and becomes 1.0.
     }
 
     fcad::domain::Layers layers;
@@ -100,6 +104,17 @@ QString linetypeName(const fcad::io::ImportedDxf& imported, fcad::domain::Linety
     }
 
     return it->name().value();
+}
+
+// The name of the linetype an imported entity refers to, or "ByLayer".
+QString
+linetypeName(const fcad::io::ImportedDxf& imported, const fcad::domain::EntityLinetype& linetype)
+{
+    if (std::holds_alternative<fcad::domain::ByLayer>(linetype)) {
+        return QStringLiteral(u"ByLayer");
+    }
+
+    return linetypeName(imported, std::get<fcad::domain::LinetypeId>(linetype));
 }
 
 }   // namespace
@@ -154,8 +169,22 @@ TEST(DxfImportTest, ImportExample)
     EXPECT_EQ(linetypeName(imported, imported.layers.at(2).linetype()), u"DOTTED");
     EXPECT_EQ(linetypeName(imported, imported.layers.at(3).linetype()), u"Continuous");
 
+    // The entities refer to "dotted", ByLayer, ByBlock and an unknown linetype.
+    const fcad::domain::Lines& lines{ imported.layers.at(1).lines() };
+    ASSERT_EQ(lines.size(), 2);
+    EXPECT_EQ(linetypeName(imported, lines.at(0).linetype()), u"DOTTED");
+    EXPECT_EQ(linetypeName(imported, lines.at(1).linetype()), u"ByLayer");
+    ASSERT_EQ(imported.layers.at(2).circles().size(), 1);
+    EXPECT_EQ(
+        linetypeName(imported, imported.layers.at(2).circles().front().linetype()), u"Continuous"
+    );
+    ASSERT_EQ(imported.layers.at(3).arcs().size(), 1);
+    EXPECT_EQ(
+        linetypeName(imported, imported.layers.at(3).arcs().front().linetype()), u"Continuous"
+    );
+
     const QStringList& warnings{ imported.warnings };
-    ASSERT_EQ(warnings.size(), 8);
+    ASSERT_EQ(warnings.size(), 11);
     EXPECT_TRUE(warnings.at(0).startsWith(u"1 entity uses the color ByBlock"));
     EXPECT_TRUE(warnings.at(1).startsWith(u"1 entity uses the color ByEntity"));
     EXPECT_TRUE(warnings.at(2).startsWith(u"1 layer has an invalid lineweight"));
@@ -164,6 +193,9 @@ TEST(DxfImportTest, ImportExample)
     EXPECT_TRUE(warnings.at(5).startsWith(u"1 linetype contains texts or shapes"));
     EXPECT_TRUE(warnings.at(6).startsWith(u"2 linetypes have an invalid or duplicate name"));
     EXPECT_TRUE(warnings.at(7).startsWith(u"1 layer uses an unknown linetype"));
+    EXPECT_TRUE(warnings.at(8).startsWith(u"1 entity uses the linetype ByBlock"));
+    EXPECT_TRUE(warnings.at(9).startsWith(u"1 entity uses an unknown linetype"));
+    EXPECT_TRUE(warnings.at(10).startsWith(u"1 entity has an invalid linetype scale"));
 }
 
 TEST(DxfImportTest, ImportWithoutUnit)

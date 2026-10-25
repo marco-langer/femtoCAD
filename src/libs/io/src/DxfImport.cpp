@@ -179,6 +179,32 @@ namespace {
         }
 
         template <typename Entity>
+        void setLinetype(Entity& entity, const odxf::Entity& dxfEntity)
+        {
+            if (isByBlock(dxfEntity.lineType)) {
+                ++m_linetypeCounts.byBlockEntities;
+                entity.setLinetype(domain::continuousLinetypeId());
+            } else if (!isByLayer(dxfEntity.lineType)) {
+                const std::optional<domain::LinetypeId> linetype{
+                    m_linetypes.find(dxfEntity.lineType)
+                };
+                if (!linetype.has_value()) {
+                    ++m_linetypeCounts.unknownEntityLinetypes;
+                }
+                entity.setLinetype(linetype.value_or(domain::continuousLinetypeId()));
+            }
+
+            const std::optional<domain::LinetypeScale> scale{
+                domain::LinetypeScale::fromValue(dxfEntity.lineTypeScale)
+            };
+            if (scale.has_value()) {
+                entity.setLinetypeScale(scale.value());
+            } else {
+                ++m_linetypeCounts.invalidEntityScales;
+            }
+        }
+
+        template <typename Entity>
         void add(std::size_t layerIndex, Entity entity, const odxf::Entity& dxfEntity)
         {
             if (!dxfEntity.trueColor.has_value()) {
@@ -197,6 +223,7 @@ namespace {
 
             entity.setColor(toEntityColor(dxfEntity.color, dxfEntity.trueColor));
             entity.setLineweight(toEntityLineweight(dxfEntity.lineweight));
+            setLinetype(entity, dxfEntity);
             m_layers.at(layerIndex).add(std::move(entity));
         }
 
