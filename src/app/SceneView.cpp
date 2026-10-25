@@ -38,8 +38,8 @@ constexpr double viewMargin = 0.05;
 // Extent shown when the scene has neither width nor height (e.g. a single point).
 constexpr double minimumViewExtent = 1.0;
 // Background gradient, from the top to the bottom edge of the view.
-constexpr QColor backgroundTopColor{ 0x2C, 0x31, 0x3A };
-constexpr QColor backgroundBottomColor{ 0x16, 0x19, 0x1D };
+constexpr QColor backgroundTopColor{ 0x23, 0x27, 0x2E };
+constexpr QColor backgroundBottomColor{ 0x11, 0x13, 0x16 };
 // Axes through the world origin, behind the drawing. Width in logical pixels.
 constexpr QColor xAxisColor{ 0xB8, 0x4A, 0x4A };
 constexpr QColor yAxisColor{ 0x4A, 0x9A, 0x55 };
