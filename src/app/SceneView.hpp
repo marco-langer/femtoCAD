@@ -57,7 +57,7 @@ private:
     };
 
     const std::optional<domain::Document>& m_document;
-    std::unique_ptr<QOpenGLShaderProgram> m_program;
+    std::unique_ptr<QOpenGLShaderProgram> m_lineProgram;
     Geometry m_lines;
 
     geo::BoundingBox m_sceneBounds;
