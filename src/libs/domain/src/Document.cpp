@@ -20,7 +20,7 @@ std::optional<geo::BoundingBox> boundingBox(const Document& document)
 {
     std::optional<geo::BoundingBox> bb;
 
-    for (const Layer& layer : document.layers() | std::views::filter(&Layer::visible)) {
+    for (const Layer& layer : document.layers() | std::views::filter(&Layer::isVisible)) {
         bb = geo::united(bb, boundingBox(layer));
     }
 

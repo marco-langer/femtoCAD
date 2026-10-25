@@ -23,25 +23,25 @@ TEST(LayerTest, boundingBox)
     // Arrange
     fcad::domain::Layer layer{ "Layer Name" };
 
-    layer.lines.emplace_back(
-        fcad::geo::Line{
+    layer.add(
+        fcad::domain::Line{ fcad::geo::Line{
             .start = fcad::geo::Coordinate{ .x = 1.0, .y = 4.0 },
             .end = fcad::geo::Coordinate{ .x = 3.0, .y = 2.0 },
-        }
+        } }
     );
-    layer.circles.emplace_back(
-        fcad::geo::Circle{
+    layer.add(
+        fcad::domain::Circle{ fcad::geo::Circle{
             .center = { 2.0, 3.7 },
             .radius = fcad::geo::Radius{ 0.5 },
-        }
+        } }
     );
-    layer.arcs.emplace_back(
-        fcad::geo::Arc{
+    layer.add(
+        fcad::domain::Arc{ fcad::geo::Arc{
             .center = { 3.0, 1.0 },
             .startAngle = fcad::core::Radians::zero,
             .endAngle = fcad::core::Radians::pi,
             .radius = fcad::geo::Radius{ 0.5 },
-        }
+        } }
     );
 
     // Act

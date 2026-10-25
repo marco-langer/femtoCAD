@@ -11,18 +11,41 @@
 
 namespace fcad::domain {
 
-struct Layer final
+class Layer final
 {
-    explicit Layer(QString layerName)
-        : name{ std::move(layerName) }
-    {}
+public:
+    explicit Layer(QString name);
+    Layer(const Layer&) = delete;
+    Layer(Layer&&) = default;
+    ~Layer() = default;
 
-    QString name;
-    bool visible{ true };
-    Color color{ Adaptive{} };
-    Arcs arcs;
-    Lines lines;
-    Circles circles;
+    Layer& operator=(const Layer&) = delete;
+    Layer& operator=(Layer&&) = default;
+
+    const QString& name() const;
+    void setName(QString name);
+
+    bool isVisible() const;
+    void setVisible(bool visible);
+
+    const Color& color() const;
+    void setColor(Color color);
+
+    const Arcs& arcs() const;
+    const Circles& circles() const;
+    const Lines& lines() const;
+
+    void add(Arc arc);
+    void add(Circle circle);
+    void add(Line line);
+
+private:
+    QString m_name;
+    bool m_visible{ true };
+    Color m_color{ Adaptive{} };
+    Arcs m_arcs;
+    Circles m_circles;
+    Lines m_lines;
 };
 
 using Layers = std::vector<Layer>;

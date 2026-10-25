@@ -23,38 +23,38 @@ fcad::domain::Layers exampleLayers(double scale)
     fcad::domain::Layers layers;
 
     fcad::domain::Layer& testLayer{ layers.emplace_back("Test Layer") };
-    testLayer.visible = false;
+    testLayer.setVisible(false);
 
     fcad::domain::Layer& linesLayer{ layers.emplace_back("Lines") };
-    linesLayer.lines.emplace_back(
-        fcad::geo::Line{
+    linesLayer.add(
+        fcad::domain::Line{ fcad::geo::Line{
             .start = { 100.0 * scale, 100.0 * scale },
             .end = { 350.0 * scale, 400.0 * scale },
-        }
+        } }
     );
-    linesLayer.lines.emplace_back(
-        fcad::geo::Line{
+    linesLayer.add(
+        fcad::domain::Line{ fcad::geo::Line{
             .start = { 150.0 * scale, 130.0 * scale },
             .end = { 250.0 * scale, 130.0 * scale },
-        }
+        } }
     );
 
     fcad::domain::Layer& circlesLayer{ layers.emplace_back("Circles") };
-    circlesLayer.circles.emplace_back(
-        fcad::geo::Circle{
+    circlesLayer.add(
+        fcad::domain::Circle{ fcad::geo::Circle{
             .center = { 50.4 * scale, 65.0 * scale },
             .radius = fcad::geo::Radius::fromValue(2.5 * scale).value(),
-        }
+        } }
     );
 
     fcad::domain::Layer& arcsLayer{ layers.emplace_back("Arcs") };
-    arcsLayer.arcs.emplace_back(
-        fcad::geo::Arc{
+    arcsLayer.add(
+        fcad::domain::Arc{ fcad::geo::Arc{
             .center = { 0.0 * scale, 2.0 * scale },
             .startAngle = fcad::core::Radians::fromDegrees(0.0),
             .endAngle = fcad::core::Radians::fromDegrees(180.0),
             .radius = fcad::geo::Radius::fromValue(0.5 * scale).value(),
-        }
+        } }
     );
 
     return layers;

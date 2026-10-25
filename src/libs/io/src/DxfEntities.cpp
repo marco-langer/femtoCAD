@@ -21,8 +21,8 @@ domain::Layer toLayer(const odxf::Layer& dxfLayer)
     const int colorIndex{ (dxfLayer.color >= -255 && isOff) ? -dxfLayer.color : dxfLayer.color };
     const bool isFrozen{ (dxfLayer.flags & odxf::Layer::Flags::Frozen) != 0 };
 
-    layer.visible = !isFrozen && !isOff;
-    layer.color = toColor(colorIndex, dxfLayer.trueColor);
+    layer.setVisible(!isFrozen && !isOff);
+    layer.setColor(toColor(colorIndex, dxfLayer.trueColor));
 
     return layer;
 }

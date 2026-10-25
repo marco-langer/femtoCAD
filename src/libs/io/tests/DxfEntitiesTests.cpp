@@ -28,9 +28,9 @@ TEST(DxfEntitiesTest, ToLayer)
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
 
     // Assert
-    EXPECT_EQ(layer.name, "Walls");
-    EXPECT_TRUE(layer.visible);
-    EXPECT_EQ(layer.color, fcad::domain::Color{ fcad::domain::Adaptive{} });
+    EXPECT_EQ(layer.name(), "Walls");
+    EXPECT_TRUE(layer.isVisible());
+    EXPECT_EQ(layer.color(), fcad::domain::Color{ fcad::domain::Adaptive{} });
 }
 
 TEST(DxfEntitiesTest, ToLayerColor)
@@ -43,8 +43,8 @@ TEST(DxfEntitiesTest, ToLayerColor)
 
     // Assert
     const fcad::domain::Color expectedColor{ fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 } };
-    EXPECT_TRUE(layer.visible);
-    EXPECT_EQ(layer.color, expectedColor);
+    EXPECT_TRUE(layer.isVisible());
+    EXPECT_EQ(layer.color(), expectedColor);
 }
 
 TEST(DxfEntitiesTest, ToLayerTrueColor)
@@ -57,7 +57,7 @@ TEST(DxfEntitiesTest, ToLayerTrueColor)
 
     // Assert
     const fcad::domain::Color expectedColor{ fcad::domain::Rgb{ .r = 0x30, .g = 0x50, .b = 0xA0 } };
-    EXPECT_EQ(layer.color, expectedColor);
+    EXPECT_EQ(layer.color(), expectedColor);
 }
 
 TEST(DxfEntitiesTest, ToLayerOff)
@@ -70,8 +70,8 @@ TEST(DxfEntitiesTest, ToLayerOff)
 
     // Assert
     const fcad::domain::Color expectedColor{ fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 } };
-    EXPECT_FALSE(layer.visible);
-    EXPECT_EQ(layer.color, expectedColor);
+    EXPECT_FALSE(layer.isVisible());
+    EXPECT_EQ(layer.color(), expectedColor);
 }
 
 TEST(DxfEntitiesTest, ToLayerOffWithInvalidColor)
@@ -83,8 +83,8 @@ TEST(DxfEntitiesTest, ToLayerOffWithInvalidColor)
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
 
     // Assert
-    EXPECT_FALSE(layer.visible);
-    EXPECT_EQ(layer.color, fcad::domain::Color{ fcad::domain::Adaptive{} });
+    EXPECT_FALSE(layer.isVisible());
+    EXPECT_EQ(layer.color(), fcad::domain::Color{ fcad::domain::Adaptive{} });
 }
 
 TEST(DxfEntitiesTest, ToLayerFrozen)
@@ -96,7 +96,7 @@ TEST(DxfEntitiesTest, ToLayerFrozen)
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
 
     // Assert
-    EXPECT_FALSE(layer.visible);
+    EXPECT_FALSE(layer.isVisible());
 }
 
 TEST(DxfEntitiesTest, ToLineScaled)
