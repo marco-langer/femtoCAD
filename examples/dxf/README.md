@@ -8,11 +8,15 @@ tests use their own files in `src/libs/io/tests/TestData/`.
 A copy of the import tests' example file. It has no length unit, so the import asks for one.
 
 - Layer "Test Layer" is frozen and empty.
-- Layer "Lines": a red line (color index 1) and a line in the true color `#3050A0`.
-- Layer "Circles": a circle with the color ByBlock, drawn in white or black. The import warns
-  about it.
-- Layer "Arcs": an arc with the color ByEntity, drawn in its layer's color. The import warns about
-  it.
+- Layer "Lines" (lineweight 0.50 mm): a red line (color index 1) 0.35 mm wide and a line in the
+  true color `#3050A0` with the default lineweight.
+- Layer "Circles" (lineweight 300, clamped to 2.11 mm): a circle with the color and the lineweight
+  ByBlock. The color is drawn in white or black, the lineweight is the default one.
+- Layer "Arcs" (an invalid lineweight, -5): an arc with the color ByEntity, drawn in its layer's
+  color, and an invalid lineweight (-7).
+
+The import warns about the ByBlock and ByEntity colors, the invalid layer lineweight, the ByBlock
+lineweight and the invalid entity lineweight.
 
 ## layer-colors.dxf
 
@@ -35,3 +39,33 @@ Nine horizontal lines on a green layer (3), each with its own entity color. From
 9. 257: ByEntity, green
 
 The import shows two warnings: two entities use ByBlock, one uses ByEntity.
+
+## lineweights.dxf
+
+Horizontal lines, all white or black, to compare lineweights with View > Show Lineweights on. The
+default lineweight is 0.25 mm. From top to bottom, first one line per layer, each with the
+lineweight ByLayer:
+
+1. layer without a lineweight: the default
+2. layer with 0.70 mm
+3. layer with Default (-3): the default
+4. layer with 300: clamped to 2.11 mm
+5. layer with an invalid lineweight (-5): the default
+
+Then, after a gap, twelve lines on the 0.70 mm layer, each with its own lineweight:
+
+1. no lineweight: ByLayer, 0.70 mm
+2. -1: ByLayer, 0.70 mm
+3. 0: the thinnest, one pixel
+4. 0.13 mm
+5. 0.25 mm
+6. 0.35 mm
+7. 0.50 mm
+8. 1.00 mm
+9. 2.11 mm
+10. -3: the default
+11. -2: ByBlock, the default
+12. -7: invalid, the default
+
+The import shows three warnings: one layer has an invalid lineweight, one entity uses ByBlock and
+one entity has an invalid lineweight.
