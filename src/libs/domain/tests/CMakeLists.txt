@@ -1,4 +1,5 @@
 add_executable(femtoCAD-domain-tests
+    EntityTests.cpp
     LayerTests.cpp
 )
 
