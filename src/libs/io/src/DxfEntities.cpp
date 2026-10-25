@@ -1,5 +1,7 @@
 #include "DxfEntities.hpp"
 
+#include "DxfColors.hpp"
+
 #include "core/Angle.hpp"
 
 namespace fcad::io {
@@ -12,7 +14,15 @@ geo::Coordinate toCoordinate(const odxf::Coordinate3d& coordinate3d, double scal
 domain::Layer toLayer(const odxf::Layer& dxfLayer)
 {
     domain::Layer layer{ QString::fromStdString(dxfLayer.name) };
-    layer.visible = ((dxfLayer.flags & odxf::Layer::Flags::Frozen) == 0);
+
+    // A negative color index means the layer is off. Values below -255 aren't colors anyway, and
+    // leaving them negative avoids overflowing on the most negative int.
+    const bool isOff{ dxfLayer.color < 0 };
+    const int colorIndex{ (dxfLayer.color >= -255 && isOff) ? -dxfLayer.color : dxfLayer.color };
+    const bool isFrozen{ (dxfLayer.flags & odxf::Layer::Flags::Frozen) != 0 };
+
+    layer.visible = !isFrozen && !isOff;
+    layer.color = toColor(colorIndex, dxfLayer.trueColor);
 
     return layer;
 }

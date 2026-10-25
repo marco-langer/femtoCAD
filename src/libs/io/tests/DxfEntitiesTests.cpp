@@ -1,6 +1,7 @@
 #include "DxfEntities.hpp"
 
 #include "core/Angle.hpp"
+#include "domain/Color.hpp"
 #include "domain/Layer.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
@@ -15,6 +16,7 @@
 
 #include <gtest/gtest.h>
 
+#include <limits>
 #include <optional>
 
 TEST(DxfEntitiesTest, ToLayer)
@@ -28,6 +30,61 @@ TEST(DxfEntitiesTest, ToLayer)
     // Assert
     EXPECT_EQ(layer.name, "Walls");
     EXPECT_TRUE(layer.visible);
+    EXPECT_EQ(layer.color, fcad::domain::Color{ fcad::domain::Adaptive{} });
+}
+
+TEST(DxfEntitiesTest, ToLayerColor)
+{
+    // Arrange
+    const odxf::Layer dxfLayer{ .name = "Walls", .color = 1 };
+
+    // Act
+    const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
+
+    // Assert
+    const fcad::domain::Color expectedColor{ fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 } };
+    EXPECT_TRUE(layer.visible);
+    EXPECT_EQ(layer.color, expectedColor);
+}
+
+TEST(DxfEntitiesTest, ToLayerTrueColor)
+{
+    // Arrange
+    const odxf::Layer dxfLayer{ .name = "Walls", .color = 1, .trueColor = 0x3050A0 };
+
+    // Act
+    const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
+
+    // Assert
+    const fcad::domain::Color expectedColor{ fcad::domain::Rgb{ .r = 0x30, .g = 0x50, .b = 0xA0 } };
+    EXPECT_EQ(layer.color, expectedColor);
+}
+
+TEST(DxfEntitiesTest, ToLayerOff)
+{
+    // Arrange
+    const odxf::Layer dxfLayer{ .name = "Walls", .color = -1 };
+
+    // Act
+    const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
+
+    // Assert
+    const fcad::domain::Color expectedColor{ fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 } };
+    EXPECT_FALSE(layer.visible);
+    EXPECT_EQ(layer.color, expectedColor);
+}
+
+TEST(DxfEntitiesTest, ToLayerOffWithInvalidColor)
+{
+    // Arrange
+    const odxf::Layer dxfLayer{ .name = "Walls", .color = std::numeric_limits<int>::min() };
+
+    // Act
+    const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
+
+    // Assert
+    EXPECT_FALSE(layer.visible);
+    EXPECT_EQ(layer.color, fcad::domain::Color{ fcad::domain::Adaptive{} });
 }
 
 TEST(DxfEntitiesTest, ToLayerFrozen)
