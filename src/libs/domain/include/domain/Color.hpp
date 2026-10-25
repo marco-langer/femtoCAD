@@ -24,7 +24,7 @@ struct Adaptive final
 
 using Color = std::variant<Rgb, Adaptive>;
 
-// The color of the entity's layer.
+// The entity's layer's value, e.g. its color.
 struct ByLayer final
 {
     bool operator==(const ByLayer&) const = default;

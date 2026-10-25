@@ -65,13 +65,22 @@ TEST(EntityTest, colorIsByLayerByDefault)
     EXPECT_EQ(line.color(), fcad::domain::EntityColor{ fcad::domain::ByLayer{} });
 }
 
+TEST(EntityTest, lineweightIsByLayerByDefault)
+{
+    const fcad::domain::Line line{ someLine };
+
+    EXPECT_EQ(line.lineweight(), fcad::domain::EntityLineweight{ fcad::domain::ByLayer{} });
+}
+
 TEST(EntityTest, cloneHasANewIdAndTheSameContent)
 {
     // Arrange
     const fcad::domain::EntityColor color{ fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 } };
+    const fcad::domain::EntityLineweight lineweight{ fcad::domain::Lineweight{ 35 } };
 
     fcad::domain::Line line{ someLine };
     line.setColor(color);
+    line.setLineweight(lineweight);
 
     // Act
     const fcad::domain::Line clone{ line.clone() };
@@ -80,6 +89,7 @@ TEST(EntityTest, cloneHasANewIdAndTheSameContent)
     EXPECT_NE(clone.id(), line.id());
     EXPECT_THAT(clone.geometry(), fcad::test_utils::IsLine(someLine));
     EXPECT_EQ(clone.color(), color);
+    EXPECT_EQ(clone.lineweight(), lineweight);
 }
 
 TEST(EntityTest, setGeometryKeepsTheId)

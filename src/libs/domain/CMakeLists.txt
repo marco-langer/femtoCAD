@@ -9,6 +9,7 @@ add_library(femtoCAD-domain STATIC
     src/Color.cpp
     src/Document.cpp
     src/Layer.cpp
+    src/Lineweight.cpp
     src/Workspace.cpp
 )
 

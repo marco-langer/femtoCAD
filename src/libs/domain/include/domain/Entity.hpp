@@ -2,6 +2,7 @@
 
 #include "core/StrongUuid.hpp"
 #include "domain/Color.hpp"
+#include "domain/Lineweight.hpp"
 #include "geo/Arc.hpp"
 #include "geo/BoundingBox.hpp"
 #include "geo/Circle.hpp"
@@ -36,6 +37,7 @@ public:
     {
         Entity entity{ m_geometry };
         entity.m_color = m_color;
+        entity.m_lineweight = m_lineweight;
 
         return entity;
     }
@@ -48,10 +50,14 @@ public:
     const EntityColor& color() const { return m_color; }
     void setColor(EntityColor color) { m_color = color; }
 
+    const EntityLineweight& lineweight() const { return m_lineweight; }
+    void setLineweight(EntityLineweight lineweight) { m_lineweight = lineweight; }
+
 private:
     EntityId m_id;
     Geometry m_geometry;
     EntityColor m_color{ ByLayer{} };
+    EntityLineweight m_lineweight{ ByLayer{} };
 };
 
 using Arc = Entity<geo::Arc>;
