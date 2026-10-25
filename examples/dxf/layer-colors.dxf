@@ -1,0 +1,200 @@
+  0
+SECTION
+  2
+HEADER
+  9
+$INSUNITS
+ 70
+4
+  0
+ENDSEC
+  0
+SECTION
+  2
+TABLES
+  0
+TABLE
+  2
+LAYER
+ 70
+8
+  0
+LAYER
+  2
+Red (1)
+ 70
+0
+ 62
+1
+  0
+LAYER
+  2
+Green (3)
+ 70
+0
+ 62
+3
+  0
+LAYER
+  2
+Blue (5)
+ 70
+0
+ 62
+5
+  0
+LAYER
+  2
+Adaptive (7)
+ 70
+0
+ 62
+7
+  0
+LAYER
+  2
+Dark red (12)
+ 70
+0
+ 62
+12
+  0
+LAYER
+  2
+True color orange
+ 70
+0
+ 62
+5
+420
+16744448
+  0
+LAYER
+  2
+Off (-1), hidden
+ 70
+0
+ 62
+-1
+  0
+LAYER
+  2
+Frozen, hidden
+ 70
+1
+ 62
+3
+  0
+ENDTAB
+  0
+ENDSEC
+  0
+SECTION
+  2
+BLOCKS
+  0
+ENDSEC
+  0
+SECTION
+  2
+ENTITIES
+  0
+LINE
+  8
+Red (1)
+ 10
+0.0
+ 20
+0.0
+ 11
+10.0
+ 21
+0.0
+  0
+LINE
+  8
+Green (3)
+ 10
+0.0
+ 20
+-1.0
+ 11
+10.0
+ 21
+-1.0
+  0
+LINE
+  8
+Blue (5)
+ 10
+0.0
+ 20
+-2.0
+ 11
+10.0
+ 21
+-2.0
+  0
+LINE
+  8
+Adaptive (7)
+ 10
+0.0
+ 20
+-3.0
+ 11
+10.0
+ 21
+-3.0
+  0
+LINE
+  8
+Dark red (12)
+ 10
+0.0
+ 20
+-4.0
+ 11
+10.0
+ 21
+-4.0
+  0
+LINE
+  8
+True color orange
+ 10
+0.0
+ 20
+-5.0
+ 11
+10.0
+ 21
+-5.0
+  0
+LINE
+  8
+Off (-1), hidden
+ 10
+0.0
+ 20
+-6.0
+ 11
+10.0
+ 21
+-6.0
+  0
+LINE
+  8
+Frozen, hidden
+ 10
+0.0
+ 20
+-7.0
+ 11
+10.0
+ 21
+-7.0
+  0
+ENDSEC
+  0
+EOF
