@@ -24,6 +24,7 @@ MainWindow::MainWindow(domain::Workspace& workspace, Settings& settings)
     createActions();
 
     m_sceneView = new SceneView{ m_workspace.document() };
+    m_sceneView->setAxesVisible(m_settings.view.showAxes);
 
     setStatusBar(new QStatusBar{});
 
@@ -63,6 +64,11 @@ void MainWindow::createActions()
     quitAction->setShortcut(QKeySequence{ Qt::CTRL | Qt::Key_Q });
     connect(quitAction, &QAction::triggered, this, &MainWindow::onClose);
 
+    auto* showAxesAction{ new QAction{ "Show Axes" } };
+    showAxesAction->setCheckable(true);
+    showAxesAction->setChecked(m_settings.view.showAxes);
+    connect(showAxesAction, &QAction::toggled, this, &MainWindow::onShowAxesToggled);
+
     QMenu* fileMenu{ menuBar()->addMenu("&File") };
     fileMenu->addAction(newAction);
     fileMenu->addAction(saveAction);
@@ -75,6 +81,9 @@ void MainWindow::createActions()
 
     fileMenu->addSeparator();
     fileMenu->addAction(quitAction);
+
+    QMenu* viewMenu{ menuBar()->addMenu("&View") };
+    viewMenu->addAction(showAxesAction);
 }
 
 void MainWindow::updateWindowTitle(const QString& filePath)
@@ -93,6 +102,12 @@ void MainWindow::onNewProject()
     document.addLayer(domain::Layer{ "Layer 1" });
     m_workspace.setDocument(std::move(document));
     m_sceneView->updateDocument();
+}
+
+void MainWindow::onShowAxesToggled(bool visible)
+{
+    m_settings.view.showAxes = visible;
+    m_sceneView->setAxesVisible(visible);
 }
 
 void MainWindow::onImportDxf()

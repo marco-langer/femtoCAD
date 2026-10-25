@@ -17,11 +17,18 @@ struct DxfImportSettings final
     bool useFallbackUnit{ false };
 };
 
+struct ViewSettings final
+{
+    // Draw the x and y axes through the origin.
+    bool showAxes{ true };
+};
+
 struct Settings final
 {
     // The unit of new documents.
     domain::LengthUnit defaultUnit{ domain::LengthUnit::Millimeter };
     DxfImportSettings dxfImport;
+    ViewSettings view;
 };
 
 Settings loadSettings();

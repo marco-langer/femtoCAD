@@ -31,6 +31,7 @@ public:
     QSize sizeHint() const override;
 
     void updateDocument();
+    void setAxesVisible(bool visible);
 
 protected:
     void initializeGL() override;
@@ -73,6 +74,7 @@ private:
     // m_viewScale after the last fit, the reference for the zoom limits.
     double m_fittedViewScale{ 0.0 };
     QPointF m_lastMousePos;
+    bool m_axesVisible{ true };
 };
 
 }   // namespace fcad::app

@@ -17,6 +17,7 @@ public:
 private slots:
     void onNewProject();
     void onImportDxf();
+    void onShowAxesToggled(bool visible);
     void onClose();
 
 private:
