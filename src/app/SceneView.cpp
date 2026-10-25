@@ -46,6 +46,16 @@ namespace {
         double majorRadius;
     };
 
+    // Mouse wheel zoom. The limits are relative to the fitted view, to stay
+    // within float precision.
+    struct ZoomBehavior final
+    {
+        // Zoom factor per mouse wheel notch.
+        double stepFactor;
+        double minimum;
+        double maximum;
+    };
+
 }   // namespace
 
 constexpr int windowWeight = 1076;
@@ -72,11 +82,7 @@ constexpr int componentsPerColor = 3;
 constexpr QColor adaptiveColor{ 0xFF, 0xFF, 0xFF };
 // Line width in logical pixels, independent of the zoom.
 constexpr double lineWidth = 1.5;
-// Zoom factor per mouse wheel notch.
-constexpr double zoomStepFactor = 1.2;
-// Zoom limits relative to the fitted view, to stay within float precision.
-constexpr double minimumZoom = 0.01;
-constexpr double maximumZoom = 10000.0;
+constexpr ZoomBehavior zoomBehavior{ .stepFactor = 1.2, .minimum = 0.01, .maximum = 10000.0 };
 
 namespace {
 
@@ -331,9 +337,9 @@ void SceneView::wheelEvent(QWheelEvent* event)
     }
 
     const double newScale{ std::clamp(
-        m_viewScale / std::pow(zoomStepFactor, notches),
-        m_fittedViewScale / maximumZoom,
-        m_fittedViewScale / minimumZoom
+        m_viewScale / std::pow(zoomBehavior.stepFactor, notches),
+        m_fittedViewScale / zoomBehavior.maximum,
+        m_fittedViewScale / zoomBehavior.minimum
     ) };
 
     // Keep the world point under the cursor fixed by scaling its offset from the
