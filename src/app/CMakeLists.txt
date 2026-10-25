@@ -25,6 +25,7 @@ qt_add_resources(femtoCAD shaders
 
 target_link_libraries(femtoCAD
     PRIVATE
+        femtoCAD-core
         femtoCAD-domain
         femtoCAD-io
         femtoCAD::ms-gsl
