@@ -104,3 +104,17 @@ The last line is a diagonal on the Dashed layer; its dashes start at its left en
 
 The import shows five warnings: one linetype contains a text, one layer and one entity use an
 unknown linetype, one entity uses ByBlock and one entity has an invalid linetype scale.
+
+## showcase.dxf
+
+Colors, linetypes and lineweights together, best viewed with View > Show Lineweights on. Its unit
+is millimeters and its linetype scale 1.0.
+
+- On the left, a matrix: each row is a layer with its own true color and linetype (Continuous,
+  Dashed, Dotted, Dashdot, Center, Divide, Phantom), all lines use them ByLayer. From left to
+  right, the lines' own lineweights are 0.13, 0.25, 0.50, 1.00 and 2.11 mm.
+- On the right, a sunburst of 24 lines on one layer, each with its own color (around the color
+  wheel), linetype and lineweight (0.25, 0.50 or 1.00 mm).
+
+The import shows no warnings. At 2.11 mm the dots are as long as the line is wide, so the dotted
+line almost closes up.
