@@ -21,6 +21,8 @@ struct ViewSettings final
 {
     // Draw the x and y axes through the origin.
     bool showAxes{ true };
+    // Draw the dot grid.
+    bool showGrid{ true };
 };
 
 struct Settings final

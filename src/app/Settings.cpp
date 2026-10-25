@@ -72,6 +72,7 @@ Settings loadSettings()
     qsettings.beginGroup("view");
 
     settings.view.showAxes = qsettings.value("showAxes", settings.view.showAxes).toBool();
+    settings.view.showGrid = qsettings.value("showGrid", settings.view.showGrid).toBool();
 
     qsettings.endGroup();
 
@@ -98,6 +99,7 @@ void saveSettings(const Settings& settings)
     qsettings.beginGroup("view");
 
     qsettings.setValue("showAxes", settings.view.showAxes);
+    qsettings.setValue("showGrid", settings.view.showGrid);
 
     qsettings.endGroup();
 }
