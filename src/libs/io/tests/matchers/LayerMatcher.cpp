@@ -6,6 +6,28 @@
 
 #include <vector>
 
+namespace {
+
+// Compares the geometries only, since the ids are random.
+template <typename Geometry, typename GeometryMatcher>
+testing::Matcher<std::vector<fcad::domain::Entity<Geometry>>>
+AreEntities(const std::vector<fcad::domain::Entity<Geometry>>& expected, GeometryMatcher isGeometry)
+{
+    std::vector<testing::Matcher<fcad::domain::Entity<Geometry>>> elementMatchers;
+    elementMatchers.reserve(expected.size());
+    for (const fcad::domain::Entity<Geometry>& entity : expected) {
+        elementMatchers.push_back(
+            testing::Property(
+                "geometry", &fcad::domain::Entity<Geometry>::geometry, isGeometry(entity.geometry())
+            )
+        );
+    }
+
+    return testing::ElementsAreArray(std::move(elementMatchers));
+}
+
+}   // namespace
+
 testing::Matcher<fcad::domain::Layer> IsLayer(const fcad::domain::Layer& expected, double maxError)
 {
     return testing::AllOf(
@@ -13,17 +35,31 @@ testing::Matcher<fcad::domain::Layer> IsLayer(const fcad::domain::Layer& expecte
         testing::Field("visible", &fcad::domain::Layer::visible, expected.visible),
         testing::Field("color", &fcad::domain::Layer::color, expected.color),
         testing::Field(
-            "arcs", &fcad::domain::Layer::arcs, fcad::test_utils::AreArcs(expected.arcs, maxError)
+            "arcs",
+            &fcad::domain::Layer::arcs,
+            AreEntities(
+                expected.arcs,
+                [maxError](const fcad::geo::Arc& arc) {
+                    return fcad::test_utils::IsArc(arc, maxError);
+                }
+            )
         ),
         testing::Field(
             "lines",
             &fcad::domain::Layer::lines,
-            fcad::test_utils::AreLines(expected.lines, maxError)
+            AreEntities(
+                expected.lines,
+                [maxError](const fcad::geo::Line& line) {
+                    return fcad::test_utils::IsLine(line, maxError);
+                }
+            )
         ),
         testing::Field(
             "circles",
             &fcad::domain::Layer::circles,
-            fcad::test_utils::AreCircles(expected.circles, maxError)
+            AreEntities(expected.circles, [maxError](const fcad::geo::Circle& circle) {
+                return fcad::test_utils::IsCircle(circle, maxError);
+            })
         )
     );
 }

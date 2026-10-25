@@ -23,19 +23,19 @@ TEST(LayerTest, boundingBox)
     // Arrange
     fcad::domain::Layer layer{ "Layer Name" };
 
-    layer.lines.push_back(
+    layer.lines.emplace_back(
         fcad::geo::Line{
             .start = fcad::geo::Coordinate{ .x = 1.0, .y = 4.0 },
             .end = fcad::geo::Coordinate{ .x = 3.0, .y = 2.0 },
         }
     );
-    layer.circles.push_back(
+    layer.circles.emplace_back(
         fcad::geo::Circle{
             .center = { 2.0, 3.7 },
             .radius = fcad::geo::Radius{ 0.5 },
         }
     );
-    layer.arcs.push_back(
+    layer.arcs.emplace_back(
         fcad::geo::Arc{
             .center = { 3.0, 1.0 },
             .startAngle = fcad::core::Radians::zero,
