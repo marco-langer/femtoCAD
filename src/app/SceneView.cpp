@@ -1,5 +1,6 @@
 #include "SceneView.hpp"
 
+#include <QColor>
 #include <QDebug>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
@@ -19,6 +20,9 @@ constexpr geo::BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
 constexpr double viewMargin = 0.05;
 // Extent shown when the scene has neither width nor height (e.g. a single point).
 constexpr double minimumViewExtent = 1.0;
+// Background gradient, from the top to the bottom edge of the view.
+constexpr QColor backgroundTopColor{ 0x2C, 0x31, 0x3A };
+constexpr QColor backgroundBottomColor{ 0x16, 0x19, 0x1D };
 // Floats per point in the vertex buffers (x, y).
 constexpr int componentsPerVertex = 2;
 // Line width in logical pixels, independent of the zoom.
@@ -107,6 +111,18 @@ void SceneView::initializeGL()
 {
     initializeOpenGLFunctions();
 
+    m_backgroundProgram = std::make_unique<QOpenGLShaderProgram>();
+    m_backgroundProgram->addShaderFromSourceFile(
+        QOpenGLShader::Vertex, ":/shaders/background.vert"
+    );
+    m_backgroundProgram->addShaderFromSourceFile(
+        QOpenGLShader::Fragment, ":/shaders/background.frag"
+    );
+    if (!m_backgroundProgram->link()) {
+        qWarning() << "Linking the background shader failed:" << m_backgroundProgram->log();
+    }
+    m_backgroundVao.create();
+
     m_lineProgram = std::make_unique<QOpenGLShaderProgram>();
     m_lineProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/line.vert");
     m_lineProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/line.frag");
@@ -141,8 +157,16 @@ void SceneView::resizeGL(int /* width */, int /* height */)
 
 void SceneView::paintGL()
 {
-    glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
-    glClear(GL_COLOR_BUFFER_BIT);
+    // The background covers every pixel, so there is no need to clear first.
+    glDisable(GL_BLEND);
+    m_backgroundProgram->bind();
+    m_backgroundProgram->setUniformValue("u_topColor", backgroundTopColor);
+    m_backgroundProgram->setUniformValue("u_bottomColor", backgroundBottomColor);
+    {
+        QOpenGLVertexArrayObject::Binder vaoBinder(&m_backgroundVao);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+    m_backgroundProgram->release();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

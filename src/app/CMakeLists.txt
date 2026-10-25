@@ -17,6 +17,8 @@ qt_add_resources(femtoCAD shaders
     PREFIX /shaders
     BASE ${PROJECT_SOURCE_DIR}/shaders
     FILES
+        ${PROJECT_SOURCE_DIR}/shaders/background.frag
+        ${PROJECT_SOURCE_DIR}/shaders/background.vert
         ${PROJECT_SOURCE_DIR}/shaders/line.frag
         ${PROJECT_SOURCE_DIR}/shaders/line.vert
 )

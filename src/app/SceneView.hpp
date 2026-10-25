@@ -57,6 +57,10 @@ private:
     };
 
     const std::optional<domain::Document>& m_document;
+    std::unique_ptr<QOpenGLShaderProgram> m_backgroundProgram;
+    // Empty, since the background shader needs no vertex data. The core
+    // profile still requires a bound VAO to draw.
+    QOpenGLVertexArrayObject m_backgroundVao;
     std::unique_ptr<QOpenGLShaderProgram> m_lineProgram;
     Geometry m_lines;
 
