@@ -3,6 +3,7 @@
 #include "core/StrongUuid.hpp"
 #include "domain/Color.hpp"
 #include "domain/Entity.hpp"
+#include "domain/Lineweight.hpp"
 #include "geo/BoundingBox.hpp"
 
 #include <QString>
@@ -39,6 +40,9 @@ public:
     const Color& color() const;
     void setColor(Color color);
 
+    const LayerLineweight& lineweight() const;
+    void setLineweight(LayerLineweight lineweight);
+
     const Arcs& arcs() const;
     const Circles& circles() const;
     const Lines& lines() const;
@@ -52,6 +56,7 @@ private:
     QString m_name;
     bool m_visible{ true };
     Color m_color{ Adaptive{} };
+    LayerLineweight m_lineweight{ DefaultLineweight{} };
     Arcs m_arcs;
     Circles m_circles;
     Lines m_lines;

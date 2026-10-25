@@ -62,6 +62,15 @@ TEST(LayerTest, boundingBox)
     EXPECT_THAT(bb.value(), fcad::test_utils::IsBoundingBox(expectedBb));
 }
 
+TEST(LayerTest, lineweightIsDefaultByDefault)
+{
+    const fcad::domain::Layer layer{ "Layer Name" };
+
+    EXPECT_EQ(
+        layer.lineweight(), fcad::domain::LayerLineweight{ fcad::domain::DefaultLineweight{} }
+    );
+}
+
 TEST(LayerTest, newLayersHaveDifferentIds)
 {
     // Arrange
@@ -93,10 +102,12 @@ TEST(LayerTest, cloneHasNewIdsAndTheSameContent)
         .end = fcad::geo::Coordinate{ .x = 3.0, .y = 2.0 },
     };
     const fcad::domain::Color color{ fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 } };
+    const fcad::domain::LayerLineweight lineweight{ fcad::domain::Lineweight{ 50 } };
 
     fcad::domain::Layer layer{ "Layer Name" };
     layer.setVisible(false);
     layer.setColor(color);
+    layer.setLineweight(lineweight);
     layer.add(fcad::domain::Line{ geometry });
     layer.add(
         fcad::domain::Circle{ fcad::geo::Circle{
@@ -121,6 +132,7 @@ TEST(LayerTest, cloneHasNewIdsAndTheSameContent)
     EXPECT_EQ(clone.name(), layer.name());
     EXPECT_FALSE(clone.isVisible());
     EXPECT_EQ(clone.color(), color);
+    EXPECT_EQ(clone.lineweight(), lineweight);
 
     ASSERT_EQ(clone.lines().size(), 1);
     EXPECT_NE(clone.lines().front().id(), layer.lines().front().id());
