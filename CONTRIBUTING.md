@@ -32,7 +32,8 @@ each library are `build/<preset>/src/libs/<library>/tests/femtoCAD-<library>-tes
   matchers (`IsCircle`, `AreLines`, ...) with floating-point tolerance. Only test executables link
   it.
 - `src/app/` — the `femtoCAD` executable in the namespace `fcad::app`: `MainWindow`, `SceneView`
-  (QOpenGLWidget), `Settings`.
+  (QOpenGLWidget), `Settings`. Widgets of a single feature live in `features/`, e.g.
+  `features/io/dxf/` for the DXF import. Includes are relative to `src/app/`.
 - `cmake/dependencies/` — one file per dependency, each exposing a `femtoCAD::<name>` interface
   target. Link against those aliases, not the raw package targets.
 - `docs/` — documentation. `docs/adr/` holds the architecture decision records (ADRs).

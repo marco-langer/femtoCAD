@@ -1,6 +1,7 @@
 #pragma once
 
 #include "domain/Layer.hpp"
+#include "domain/LengthUnit.hpp"
 #include "geo/BoundingBox.hpp"
 
 #include <optional>
@@ -10,7 +11,7 @@ namespace fcad::domain {
 class Document final
 {
 public:
-    Document() = default;
+    explicit Document(LengthUnit unit);
     Document(const Document&) = delete;
     Document(Document&&) = default;
     ~Document() = default;
@@ -18,11 +19,15 @@ public:
     Document& operator=(const Document&) = delete;
     Document& operator=(Document&&) = default;
 
+    // The unit of all coordinates and lengths in the document.
+    LengthUnit unit() const;
+
     const Layers& layers() const&;
     void addLayer(Layer layer);
     void addLayers(Layers&& layers);
 
 private:
+    LengthUnit m_unit;
     Layers m_layers;
 };
 
