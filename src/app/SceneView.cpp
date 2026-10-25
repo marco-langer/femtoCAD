@@ -52,6 +52,12 @@ void SceneView::updateDocument()
     doneCurrent();
 }
 
+void SceneView::setAxesVisible(bool visible)
+{
+    m_axesVisible = visible;
+    update();
+}
+
 void SceneView::uploadGeometry()
 {
     std::optional<geo::BoundingBox> documentBounds;
@@ -185,6 +191,7 @@ void SceneView::paintGL()
     );
     m_backgroundProgram->setUniformValue("u_xAxisColor", xAxisColor);
     m_backgroundProgram->setUniformValue("u_yAxisColor", yAxisColor);
+    m_backgroundProgram->setUniformValue("u_axesVisible", m_axesVisible);
     {
         QOpenGLVertexArrayObject::Binder vaoBinder(&m_backgroundVao);
         glDrawArrays(GL_TRIANGLES, 0, 3);

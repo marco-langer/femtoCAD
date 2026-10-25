@@ -69,6 +69,12 @@ Settings loadSettings()
 
     qsettings.endGroup();
 
+    qsettings.beginGroup("view");
+
+    settings.view.showAxes = qsettings.value("showAxes", settings.view.showAxes).toBool();
+
+    qsettings.endGroup();
+
     return settings;
 }
 
@@ -86,6 +92,12 @@ void saveSettings(const Settings& settings)
 
     qsettings.setValue("fallbackUnit", toKey(settings.dxfImport.fallbackUnit));
     qsettings.setValue("useFallbackUnit", settings.dxfImport.useFallbackUnit);
+
+    qsettings.endGroup();
+
+    qsettings.beginGroup("view");
+
+    qsettings.setValue("showAxes", settings.view.showAxes);
 
     qsettings.endGroup();
 }

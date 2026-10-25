@@ -10,6 +10,7 @@ uniform vec2 u_origin;
 uniform float u_axisWidth;  // device pixels
 uniform vec4 u_xAxisColor;
 uniform vec4 u_yAxisColor;
+uniform bool u_axesVisible;
 
 out vec4 fragColor;
 
@@ -34,8 +35,10 @@ void main()
     color += (noise(gl_FragCoord.xy) - 0.5) / 255.0;
 
     // The x axis is the horizontal line through the origin, the y axis the vertical one.
-    color = mix(color, u_xAxisColor.rgb, coverage(abs(gl_FragCoord.y - u_origin.y)));
-    color = mix(color, u_yAxisColor.rgb, coverage(abs(gl_FragCoord.x - u_origin.x)));
+    if (u_axesVisible) {
+        color = mix(color, u_xAxisColor.rgb, coverage(abs(gl_FragCoord.y - u_origin.y)));
+        color = mix(color, u_yAxisColor.rgb, coverage(abs(gl_FragCoord.x - u_origin.x)));
+    }
 
     fragColor = vec4(color, 1.0);
 }
