@@ -39,6 +39,7 @@ testing::Matcher<fcad::domain::Layer> IsLayer(const fcad::domain::Layer& expecte
         testing::Property("name", &fcad::domain::Layer::name, expected.name()),
         testing::Property("visible", &fcad::domain::Layer::isVisible, expected.isVisible()),
         testing::Property("color", &fcad::domain::Layer::color, expected.color()),
+        testing::Property("lineweight", &fcad::domain::Layer::lineweight, expected.lineweight()),
         testing::Property(
             "arcs",
             &fcad::domain::Layer::arcs,

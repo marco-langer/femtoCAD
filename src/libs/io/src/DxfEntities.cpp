@@ -1,6 +1,7 @@
 #include "DxfEntities.hpp"
 
 #include "DxfColors.hpp"
+#include "DxfLineweights.hpp"
 
 #include "core/Angle.hpp"
 
@@ -23,6 +24,7 @@ domain::Layer toLayer(const odxf::Layer& dxfLayer)
 
     layer.setVisible(!isFrozen && !isOff);
     layer.setColor(toColor(colorIndex, dxfLayer.trueColor));
+    layer.setLineweight(toLayerLineweight(dxfLayer.lineweight));
 
     return layer;
 }

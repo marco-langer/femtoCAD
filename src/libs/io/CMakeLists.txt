@@ -7,6 +7,8 @@ add_library(femtoCAD-io STATIC
     src/DxfEntities.hpp
     src/DxfImport.cpp
     src/DxfImportError.cpp
+    src/DxfLineweights.cpp
+    src/DxfLineweights.hpp
     src/DxfUnits.cpp
     src/DxfUnits.hpp
 )

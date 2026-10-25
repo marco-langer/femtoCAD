@@ -4,6 +4,7 @@
 #include "domain/Entity.hpp"
 #include "domain/Layer.hpp"
 #include "domain/LengthUnit.hpp"
+#include "domain/Lineweight.hpp"
 #include "geo/Arc.hpp"
 #include "geo/Circle.hpp"
 #include "geo/Line.hpp"
@@ -21,15 +22,15 @@
 
 namespace {
 
-// The entity colors in the test files: example.dxf has one entity per color case, its copies with
-// other units use ByLayer only.
-enum class ExampleColors {
+// The colors and lineweights in the test files: example.dxf has one layer or entity per case, its
+// copies with other units use ByLayer entity colors and no lineweights only.
+enum class ExampleProperties {
     ByLayer,
     Mixed,
 };
 
 // The layers of the example files, with all coordinates and radii multiplied by scale.
-fcad::domain::Layers exampleLayers(double scale, ExampleColors colors)
+fcad::domain::Layers exampleLayers(double scale, ExampleProperties properties)
 {
     fcad::domain::Line indexColorLine{ fcad::geo::Line{
         .start = { 100.0 * scale, 100.0 * scale },
@@ -51,7 +52,7 @@ fcad::domain::Layers exampleLayers(double scale, ExampleColors colors)
         .radius = fcad::geo::Radius::fromValue(0.5 * scale).value(),
     } };
 
-    if (colors == ExampleColors::Mixed) {
+    if (properties == ExampleProperties::Mixed) {
         indexColorLine.setColor(fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 });
         trueColorLine.setColor(fcad::domain::Rgb{ .r = 0x30, .g = 0x50, .b = 0xA0 });
         byBlockCircle.setColor(fcad::domain::Adaptive{});
@@ -65,8 +66,18 @@ fcad::domain::Layers exampleLayers(double scale, ExampleColors colors)
     fcad::domain::Layer& linesLayer{ layers.emplace_back("Lines") };
     linesLayer.add(std::move(indexColorLine));
     linesLayer.add(std::move(trueColorLine));
+    if (properties == ExampleProperties::Mixed) {
+        linesLayer.setLineweight(fcad::domain::Lineweight{ 50 });
+    }
 
-    layers.emplace_back("Circles").add(std::move(byBlockCircle));
+    fcad::domain::Layer& circlesLayer{ layers.emplace_back("Circles") };
+    circlesLayer.add(std::move(byBlockCircle));
+    if (properties == ExampleProperties::Mixed) {
+        // Clamped from 300 in example.dxf.
+        circlesLayer.setLineweight(fcad::domain::Lineweight{ 211 });
+    }
+
+    // In example.dxf its lineweight is invalid (-5) and becomes the default.
     layers.emplace_back("Arcs").add(std::move(byEntityArc));
 
     return layers;
@@ -88,12 +99,15 @@ TEST(DxfImportTest, ImportExample)
         FAIL() << importResult.error().message.toStdString();
     }
 
-    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(1.0, ExampleColors::Mixed)));
+    EXPECT_THAT(
+        importResult.value().layers, AreLayers(exampleLayers(1.0, ExampleProperties::Mixed))
+    );
 
     const QStringList& warnings{ importResult.value().warnings };
-    ASSERT_EQ(warnings.size(), 2);
+    ASSERT_EQ(warnings.size(), 3);
     EXPECT_TRUE(warnings.at(0).startsWith(u"1 entity uses the color ByBlock"));
     EXPECT_TRUE(warnings.at(1).startsWith(u"1 entity uses the color ByEntity"));
+    EXPECT_TRUE(warnings.at(2).startsWith(u"1 layer has an invalid lineweight"));
 }
 
 TEST(DxfImportTest, ImportWithoutUnit)
@@ -128,7 +142,9 @@ TEST(DxfImportTest, ImportUnit)
     }
 
     EXPECT_EQ(importResult.value().unit, fcad::domain::LengthUnit::Millimeter);
-    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(1.0, ExampleColors::ByLayer)));
+    EXPECT_THAT(
+        importResult.value().layers, AreLayers(exampleLayers(1.0, ExampleProperties::ByLayer))
+    );
     EXPECT_TRUE(importResult.value().warnings.isEmpty());
 }
 
@@ -148,7 +164,7 @@ TEST(DxfImportTest, ImportUnsupportedUnit)
 
     EXPECT_EQ(importResult.value().unit, fcad::domain::LengthUnit::Meter);
     EXPECT_THAT(
-        importResult.value().layers, AreLayers(exampleLayers(10.0, ExampleColors::ByLayer))
+        importResult.value().layers, AreLayers(exampleLayers(10.0, ExampleProperties::ByLayer))
     );
     EXPECT_EQ(importResult.value().warnings.size(), 1);
 }

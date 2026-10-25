@@ -60,6 +60,8 @@ Lines
 7
 6
 CONTINUOUS
+370
+50
 0
 LAYER
 2
@@ -70,6 +72,8 @@ Circles
 7
 6
 CONTINUOUS
+370
+300
 0
 LAYER
 2
@@ -80,6 +84,8 @@ Arcs
 7
 6
 CONTINUOUS
+370
+-5
 0
 ENDTAB
 0

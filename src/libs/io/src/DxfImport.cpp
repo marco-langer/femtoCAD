@@ -9,6 +9,7 @@
 
 #include "DxfColors.hpp"
 #include "DxfEntities.hpp"
+#include "DxfLineweights.hpp"
 #include "DxfUnits.hpp"
 
 #include <opendxf/entities.hpp>
@@ -45,6 +46,7 @@ namespace {
         {
             QStringList warnings{ std::move(m_warnings) };
             warnings.append(unsupportedColorWarnings(m_byBlockCount, m_byEntityCount));
+            warnings.append(lineweightWarnings(m_lineweightCounts));
 
             return warnings;
         }
@@ -88,6 +90,10 @@ namespace {
 
         void layer(const odxf::Layer& layer) override
         {
+            if (!isValidLayerLineweight(layer.lineweight)) {
+                ++m_lineweightCounts.invalidLayers;
+            }
+
             m_layers.push_back(toLayer(layer));
             m_layerNames.push_back(layer.name);
         }
@@ -154,6 +160,7 @@ namespace {
         // Entities whose color is ByBlock or ByEntity, for the warnings.
         int m_byBlockCount{ 0 };
         int m_byEntityCount{ 0 };
+        LineweightCounts m_lineweightCounts;
     };
 
     ImportedDxf toImportedDxf(ReadStream&& stream)
