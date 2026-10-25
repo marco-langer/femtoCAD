@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/StrongUuid.hpp"
+#include "domain/Color.hpp"
 #include "geo/Arc.hpp"
 #include "geo/BoundingBox.hpp"
 #include "geo/Circle.hpp"
@@ -31,16 +32,26 @@ public:
     Entity& operator=(const Entity&) = delete;
     Entity& operator=(Entity&&) = default;
 
-    [[nodiscard]] Entity clone() const { return Entity{ m_geometry }; }
+    [[nodiscard]] Entity clone() const
+    {
+        Entity entity{ m_geometry };
+        entity.m_color = m_color;
+
+        return entity;
+    }
 
     EntityId id() const { return m_id; }
 
     const Geometry& geometry() const { return m_geometry; }
     void setGeometry(Geometry geometry) { m_geometry = std::move(geometry); }
 
+    const EntityColor& color() const { return m_color; }
+    void setColor(EntityColor color) { m_color = color; }
+
 private:
     EntityId m_id;
     Geometry m_geometry;
+    EntityColor m_color{ ByLayer{} };
 };
 
 using Arc = Entity<geo::Arc>;
