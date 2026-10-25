@@ -9,6 +9,7 @@
 
 #include "DxfColors.hpp"
 #include "DxfEntities.hpp"
+#include "DxfLinetypes.hpp"
 #include "DxfLineweights.hpp"
 #include "DxfUnits.hpp"
 
@@ -18,6 +19,7 @@
 #include <opendxf/ireadstream.hpp>
 #include <opendxf/layer.hpp>
 #include <opendxf/read.hpp>
+#include <opendxf/tables.hpp>
 
 #include <QStringList>
 
@@ -40,6 +42,8 @@ namespace {
     class ReadStream final : public odxf::IReadStream
     {
     public:
+        domain::Linetypes getLinetypes() && { return std::move(m_linetypes).takeLinetypes(); }
+        domain::LinetypeScale linetypeScale() const { return m_linetypeScale; }
         std::vector<domain::Layer> getLayers() && { return std::move(m_layers); }
         std::optional<domain::LengthUnit> unit() const { return m_unit; }
         QStringList getWarnings() &&
@@ -47,14 +51,18 @@ namespace {
             QStringList warnings{ std::move(m_warnings) };
             warnings.append(unsupportedColorWarnings(m_byBlockCount, m_byEntityCount));
             warnings.append(lineweightWarnings(m_lineweightCounts));
+            warnings.append(linetypeWarnings(m_linetypeCounts));
 
             return warnings;
         }
 
     private:
-        // The HEADER section comes before the entities, so m_scale is set before it's used.
+        // The HEADER section comes before the tables and entities, so m_scale is set before it's
+        // used.
         void header(const odxf::Header& header) override
         {
+            readLinetypeScale(header);
+
             const std::expected<std::optional<odxf::LengthUnit>, odxf::HeaderError> dxfUnit{
                 odxf::insertionUnits(header)
             };
@@ -88,13 +96,48 @@ namespace {
             }
         }
 
+        void readLinetypeScale(const odxf::Header& header)
+        {
+            const std::expected<std::optional<double>, odxf::HeaderError> scale{
+                odxf::lineTypeScale(header)
+            };
+            if (!scale.has_value()) {
+                m_warnings.push_back(
+                    QStringLiteral(u"The file's linetype scale is invalid. It uses 1.0 instead.")
+                );
+                return;
+            }
+
+            if (scale.value().has_value()) {
+                // lineTypeScale() only returns finite values greater than 0.
+                m_linetypeScale = domain::LinetypeScale::fromValue(scale.value().value()).value();
+            }
+        }
+
+        void lineType(const odxf::LineType& lineType) override
+        {
+            switch (m_linetypes.add(lineType, m_scale)) {
+            case AddedLinetype::Added:
+            case AddedLinetype::BuiltIn: break;
+            case AddedLinetype::Complex: ++m_linetypeCounts.complexLinetypes; break;
+            case AddedLinetype::Invalid: ++m_linetypeCounts.invalidLinetypes; break;
+            }
+        }
+
+        // DXF writes the LTYPE table before the LAYER table, so the layer's linetype is known.
         void layer(const odxf::Layer& layer) override
         {
             if (!isValidLayerLineweight(layer.lineweight)) {
                 ++m_lineweightCounts.invalidLayers;
             }
 
-            m_layers.push_back(toLayer(layer));
+            domain::Layer& added{ m_layers.emplace_back(toLayer(layer)) };
+            const std::optional<domain::LinetypeId> linetype{ m_linetypes.find(layer.lineType) };
+            if (linetype.has_value()) {
+                added.setLinetype(linetype.value());
+            } else {
+                ++m_linetypeCounts.unknownLayerLinetypes;
+            }
             m_layerNames.push_back(layer.name);
         }
 
@@ -158,6 +201,8 @@ namespace {
         }
 
 
+        DxfLinetypes m_linetypes;
+        domain::LinetypeScale m_linetypeScale{ 1.0 };
         domain::Layers m_layers;
         std::vector<std::string> m_layerNames;
         std::optional<domain::LengthUnit> m_unit;
@@ -168,13 +213,17 @@ namespace {
         int m_byBlockCount{ 0 };
         int m_byEntityCount{ 0 };
         LineweightCounts m_lineweightCounts;
+        LinetypeCounts m_linetypeCounts;
     };
 
     ImportedDxf toImportedDxf(ReadStream&& stream)
     {
         const std::optional<domain::LengthUnit> unit{ stream.unit() };
+        const domain::LinetypeScale linetypeScale{ stream.linetypeScale() };
 
         return ImportedDxf{
+            .linetypes = std::move(stream).getLinetypes(),
+            .linetypeScale = linetypeScale,
             .layers = std::move(stream).getLayers(),
             .unit = unit,
             .warnings = std::move(stream).getWarnings(),

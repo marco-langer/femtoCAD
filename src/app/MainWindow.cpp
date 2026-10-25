@@ -169,7 +169,8 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    domain::Document document{ unit.value() };
+    domain::Document document{ unit.value(), std::move(importedDxf.linetypes) };
+    document.setLinetypeScale(importedDxf.linetypeScale);
     document.addLayers(std::move(importedDxf.layers));
     m_workspace.setDocument(std::move(document));
     m_settings.dxfImport.lastImportPath = filePath;
