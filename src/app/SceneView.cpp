@@ -23,6 +23,10 @@ constexpr double minimumViewExtent = 1.0;
 // Background gradient, from the top to the bottom edge of the view.
 constexpr QColor backgroundTopColor{ 0x2C, 0x31, 0x3A };
 constexpr QColor backgroundBottomColor{ 0x16, 0x19, 0x1D };
+// Axes through the world origin, behind the drawing. Width in logical pixels.
+constexpr QColor xAxisColor{ 0xB8, 0x4A, 0x4A };
+constexpr QColor yAxisColor{ 0x4A, 0x9A, 0x55 };
+constexpr double axisWidth = 1.0;
 // Floats per point in the vertex buffers (x, y).
 constexpr int componentsPerVertex = 2;
 // Line width in logical pixels, independent of the zoom.
@@ -157,11 +161,30 @@ void SceneView::resizeGL(int /* width */, int /* height */)
 
 void SceneView::paintGL()
 {
+    // Not fitted yet because the widget has no size, so there is nothing to draw.
+    if (m_viewScale == 0.0) {
+        return;
+    }
+
+    const qreal pixelRatio{ devicePixelRatio() };
+
     // The background covers every pixel, so there is no need to clear first.
     glDisable(GL_BLEND);
     m_backgroundProgram->bind();
     m_backgroundProgram->setUniformValue("u_topColor", backgroundTopColor);
     m_backgroundProgram->setUniformValue("u_bottomColor", backgroundBottomColor);
+    // Window coordinates have y up, widget coordinates y down.
+    const QPointF origin{ mapFromWorld(geo::Coordinate{ .x = 0.0, .y = 0.0 }) };
+    m_backgroundProgram->setUniformValue(
+        "u_origin",
+        QVector2D{ gsl::narrow_cast<float>(origin.x() * pixelRatio),
+                   gsl::narrow_cast<float>((height() - origin.y()) * pixelRatio) }
+    );
+    m_backgroundProgram->setUniformValue(
+        "u_axisWidth", gsl::narrow_cast<float>(axisWidth * pixelRatio)
+    );
+    m_backgroundProgram->setUniformValue("u_xAxisColor", xAxisColor);
+    m_backgroundProgram->setUniformValue("u_yAxisColor", yAxisColor);
     {
         QOpenGLVertexArrayObject::Binder vaoBinder(&m_backgroundVao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -170,8 +193,6 @@ void SceneView::paintGL()
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    const qreal pixelRatio{ devicePixelRatio() };
 
     m_lineProgram->bind();
     m_lineProgram->setUniformValue("u_viewProjection", viewProjection());
@@ -262,6 +283,13 @@ QPointF SceneView::mapToWorld(const QPointF& widgetPosition) const
     // Widget y points down, world y up.
     return QPointF{ m_viewCenter.x + (widgetPosition.x() - width() / 2.0) * m_viewScale,
                     m_viewCenter.y - (widgetPosition.y() - height() / 2.0) * m_viewScale };
+}
+
+QPointF SceneView::mapFromWorld(const geo::Coordinate& world) const
+{
+    // Widget y points down, world y up.
+    return QPointF{ width() / 2.0 + (world.x - m_viewCenter.x) / m_viewScale,
+                    height() / 2.0 - (world.y - m_viewCenter.y) / m_viewScale };
 }
 
 QMatrix4x4 SceneView::viewProjection() const
