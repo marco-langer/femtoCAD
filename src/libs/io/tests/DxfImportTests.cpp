@@ -1,6 +1,7 @@
 #include "io/DxfImport.hpp"
 
 #include "domain/Color.hpp"
+#include "domain/Document.hpp"
 #include "domain/Entity.hpp"
 #include "domain/Layer.hpp"
 #include "domain/LengthUnit.hpp"
@@ -196,6 +197,30 @@ TEST(DxfImportTest, ImportExample)
     EXPECT_TRUE(warnings.at(8).startsWith(u"1 entity uses the linetype ByBlock"));
     EXPECT_TRUE(warnings.at(9).startsWith(u"1 entity uses an unknown linetype"));
     EXPECT_TRUE(warnings.at(10).startsWith(u"1 entity has an invalid linetype scale"));
+}
+
+TEST(DxfImportTest, ToDocument)
+{
+    // Arrange
+    fcad::core::Result<fcad::io::ImportedDxf> importResult{
+        fcad::io::importDxf(TEST_DATA_DIR "example.dxf")
+    };
+    ASSERT_TRUE(importResult.has_value());
+
+    // Act
+    const fcad::domain::Document document{
+        fcad::io::toDocument(std::move(importResult.value()), fcad::domain::LengthUnit::Inch)
+    };
+
+    // Assert
+    EXPECT_EQ(document.unit(), fcad::domain::LengthUnit::Inch);
+    ASSERT_EQ(document.linetypes().size(), 3);
+    auto linetype{ document.linetypes().begin() };
+    EXPECT_EQ(linetype->id(), fcad::domain::continuousLinetypeId());
+    EXPECT_EQ((++linetype)->name().value(), u"DASHED");
+    EXPECT_EQ((++linetype)->name().value(), u"DOTTED");
+    EXPECT_EQ(document.linetypeScale(), fcad::domain::LinetypeScale{ 2.0 });
+    EXPECT_THAT(document.layers(), AreLayers(exampleLayers(1.0, ExampleProperties::Mixed)));
 }
 
 TEST(DxfImportTest, ImportWithoutUnit)

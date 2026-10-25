@@ -289,6 +289,16 @@ namespace {
 
 }   // namespace
 
+domain::Document toDocument(ImportedDxf&& imported, domain::LengthUnit unit)
+{
+    // The linetypes first, since the layers and entities refer to them.
+    domain::Document document{ unit, std::move(imported.linetypes) };
+    document.setLinetypeScale(imported.linetypeScale);
+    document.addLayers(std::move(imported.layers));
+
+    return document;
+}
+
 core::Result<ImportedDxf> importDxf(const QString& filePath)
 {
     ReadStream stream;
