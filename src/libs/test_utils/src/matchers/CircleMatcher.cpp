@@ -23,15 +23,4 @@ IsCircle(const std::optional<geo::Circle>& expected, double maxError)
     return testing::Eq(std::nullopt);
 }
 
-testing::Matcher<geo::Circles> AreCircles(const geo::Circles& expected, double maxError)
-{
-    std::vector<testing::Matcher<geo::Circle>> elementMatchers;
-    elementMatchers.reserve(expected.size());
-    for (const geo::Circle& expectedCircle : expected) {
-        elementMatchers.push_back(IsCircle(expectedCircle, maxError));
-    }
-
-    return testing::ElementsAreArray(std::move(elementMatchers));
-}
-
 }   // namespace fcad::test_utils

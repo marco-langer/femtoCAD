@@ -12,16 +12,4 @@ testing::Matcher<geo::Line> IsLine(const geo::Line& expected, double maxError)
     );
 }
 
-testing::Matcher<std::vector<geo::Line>>
-AreLines(const std::vector<geo::Line>& expected, double maxError)
-{
-    std::vector<testing::Matcher<geo::Line>> elementMatchers;
-    elementMatchers.reserve(expected.size());
-    for (const geo::Line& line : expected) {
-        elementMatchers.push_back(IsLine(line, maxError));
-    }
-
-    return testing::ElementsAreArray(elementMatchers);
-}
-
 }   // namespace fcad::test_utils
