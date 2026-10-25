@@ -1,9 +1,12 @@
 #include "DxfColors.hpp"
 
+#include <QStringView>
+
 #include <gsl/narrow>
 
 #include <array>
 #include <cstdint>
+#include <variant>
 
 namespace fcad::io {
 
@@ -74,6 +77,55 @@ domain::Color toColor(int index, std::optional<int> trueColor)
     }
 
     return toRgb(palette.at(gsl::narrow_cast<std::size_t>(index)));
+}
+
+domain::EntityColor toEntityColor(int index, std::optional<int> trueColor)
+{
+    if (!trueColor.has_value()) {
+        if (index == byBlockIndex) {
+            return domain::Adaptive{};
+        }
+        if (index == byLayerIndex || index == byEntityIndex || index < 1 || index > 255) {
+            return domain::ByLayer{};
+        }
+    }
+
+    return std::visit(
+        [](const auto& color) { return domain::EntityColor{ color }; }, toColor(index, trueColor)
+    );
+}
+
+QStringList unsupportedColorWarnings(int byBlockCount, int byEntityCount)
+{
+    QStringList warnings;
+
+    if (byBlockCount == 1) {
+        warnings.push_back(QStringLiteral(
+            u"1 entity uses the color ByBlock, which femtoCAD doesn't support yet. It is drawn in "
+            u"white or black, depending on the background."
+        ));
+    } else if (byBlockCount > 1) {
+        warnings.push_back(
+            QStringView{ u"%1 entities use the color ByBlock, which femtoCAD doesn't support yet. "
+                         u"They are drawn in white or black, depending on the background." }
+                .arg(QString::number(byBlockCount))
+        );
+    }
+
+    if (byEntityCount == 1) {
+        warnings.push_back(QStringLiteral(
+            u"1 entity uses the color ByEntity, which femtoCAD doesn't support. It uses its "
+            u"layer's color."
+        ));
+    } else if (byEntityCount > 1) {
+        warnings.push_back(
+            QStringView{ u"%1 entities use the color ByEntity, which femtoCAD doesn't support. "
+                         u"They use their layer's color." }
+                .arg(QString::number(byEntityCount))
+        );
+    }
+
+    return warnings;
 }
 
 }   // namespace fcad::io

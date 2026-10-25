@@ -1,5 +1,7 @@
 #include "io/DxfImport.hpp"
 
+#include "domain/Color.hpp"
+#include "domain/Entity.hpp"
 #include "domain/Layer.hpp"
 #include "domain/LengthUnit.hpp"
 #include "geo/Arc.hpp"
@@ -10,52 +12,62 @@
 #include "matchers/LayerMatcher.hpp"
 
 #include <QFile>
+#include <QStringList>
 
 #include <gtest/gtest.h>
 
 #include <optional>
+#include <utility>
 
 namespace {
 
-// The layers of example.dxf, with all coordinates and radii multiplied by scale.
-fcad::domain::Layers exampleLayers(double scale)
+// The entity colors in the test files: example.dxf has one entity per color case, its copies with
+// other units use ByLayer only.
+enum class ExampleColors {
+    ByLayer,
+    Mixed,
+};
+
+// The layers of the example files, with all coordinates and radii multiplied by scale.
+fcad::domain::Layers exampleLayers(double scale, ExampleColors colors)
 {
+    fcad::domain::Line indexColorLine{ fcad::geo::Line{
+        .start = { 100.0 * scale, 100.0 * scale },
+        .end = { 350.0 * scale, 400.0 * scale },
+    } };
+    fcad::domain::Line trueColorLine{ fcad::geo::Line{
+        .start = { 150.0 * scale, 130.0 * scale },
+        .end = { 250.0 * scale, 130.0 * scale },
+    } };
+    fcad::domain::Circle byBlockCircle{ fcad::geo::Circle{
+        .center = { 50.4 * scale, 65.0 * scale },
+        .radius = fcad::geo::Radius::fromValue(2.5 * scale).value(),
+    } };
+    // ByEntity, which becomes ByLayer.
+    fcad::domain::Arc byEntityArc{ fcad::geo::Arc{
+        .center = { 0.0 * scale, 2.0 * scale },
+        .startAngle = fcad::core::Radians::fromDegrees(0.0),
+        .endAngle = fcad::core::Radians::fromDegrees(180.0),
+        .radius = fcad::geo::Radius::fromValue(0.5 * scale).value(),
+    } };
+
+    if (colors == ExampleColors::Mixed) {
+        indexColorLine.setColor(fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 });
+        trueColorLine.setColor(fcad::domain::Rgb{ .r = 0x30, .g = 0x50, .b = 0xA0 });
+        byBlockCircle.setColor(fcad::domain::Adaptive{});
+    }
+
     fcad::domain::Layers layers;
 
     fcad::domain::Layer& testLayer{ layers.emplace_back("Test Layer") };
     testLayer.setVisible(false);
 
     fcad::domain::Layer& linesLayer{ layers.emplace_back("Lines") };
-    linesLayer.add(
-        fcad::domain::Line{ fcad::geo::Line{
-            .start = { 100.0 * scale, 100.0 * scale },
-            .end = { 350.0 * scale, 400.0 * scale },
-        } }
-    );
-    linesLayer.add(
-        fcad::domain::Line{ fcad::geo::Line{
-            .start = { 150.0 * scale, 130.0 * scale },
-            .end = { 250.0 * scale, 130.0 * scale },
-        } }
-    );
+    linesLayer.add(std::move(indexColorLine));
+    linesLayer.add(std::move(trueColorLine));
 
-    fcad::domain::Layer& circlesLayer{ layers.emplace_back("Circles") };
-    circlesLayer.add(
-        fcad::domain::Circle{ fcad::geo::Circle{
-            .center = { 50.4 * scale, 65.0 * scale },
-            .radius = fcad::geo::Radius::fromValue(2.5 * scale).value(),
-        } }
-    );
-
-    fcad::domain::Layer& arcsLayer{ layers.emplace_back("Arcs") };
-    arcsLayer.add(
-        fcad::domain::Arc{ fcad::geo::Arc{
-            .center = { 0.0 * scale, 2.0 * scale },
-            .startAngle = fcad::core::Radians::fromDegrees(0.0),
-            .endAngle = fcad::core::Radians::fromDegrees(180.0),
-            .radius = fcad::geo::Radius::fromValue(0.5 * scale).value(),
-        } }
-    );
+    layers.emplace_back("Circles").add(std::move(byBlockCircle));
+    layers.emplace_back("Arcs").add(std::move(byEntityArc));
 
     return layers;
 }
@@ -76,7 +88,12 @@ TEST(DxfImportTest, ImportExample)
         FAIL() << importResult.error().message.toStdString();
     }
 
-    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(1.0)));
+    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(1.0, ExampleColors::Mixed)));
+
+    const QStringList& warnings{ importResult.value().warnings };
+    ASSERT_EQ(warnings.size(), 2);
+    EXPECT_TRUE(warnings.at(0).startsWith(u"1 entity uses the color ByBlock"));
+    EXPECT_TRUE(warnings.at(1).startsWith(u"1 entity uses the color ByEntity"));
 }
 
 TEST(DxfImportTest, ImportWithoutUnit)
@@ -111,7 +128,7 @@ TEST(DxfImportTest, ImportUnit)
     }
 
     EXPECT_EQ(importResult.value().unit, fcad::domain::LengthUnit::Millimeter);
-    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(1.0)));
+    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(1.0, ExampleColors::ByLayer)));
     EXPECT_TRUE(importResult.value().warnings.isEmpty());
 }
 
@@ -130,7 +147,9 @@ TEST(DxfImportTest, ImportUnsupportedUnit)
     }
 
     EXPECT_EQ(importResult.value().unit, fcad::domain::LengthUnit::Meter);
-    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(10.0)));
+    EXPECT_THAT(
+        importResult.value().layers, AreLayers(exampleLayers(10.0, ExampleColors::ByLayer))
+    );
     EXPECT_EQ(importResult.value().warnings.size(), 1);
 }
 
