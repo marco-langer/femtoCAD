@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/BoundedValue.hpp"
+#include "domain/Color.hpp"
 
 #include <variant>
 
@@ -18,5 +19,11 @@ struct DefaultLineweight final
 };
 
 using LayerLineweight = std::variant<DefaultLineweight, Lineweight>;
+
+using EntityLineweight = std::variant<ByLayer, DefaultLineweight, Lineweight>;
+
+// The lineweight an entity is drawn with: its own, or for ByLayer its layer's.
+LayerLineweight
+resolved(const EntityLineweight& entityLineweight, const LayerLineweight& layerLineweight);
 
 }   // namespace fcad::domain

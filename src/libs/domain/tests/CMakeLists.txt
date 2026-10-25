@@ -2,6 +2,7 @@ add_executable(femtoCAD-domain-tests
     ColorTests.cpp
     EntityTests.cpp
     LayerTests.cpp
+    LineweightTests.cpp
 )
 
 target_link_libraries(femtoCAD-domain-tests
