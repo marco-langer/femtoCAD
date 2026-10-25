@@ -32,6 +32,7 @@ public:
 
     void updateDocument();
     void setAxesVisible(bool visible);
+    void setGridVisible(bool visible);
 
 protected:
     void initializeGL() override;
@@ -75,6 +76,7 @@ private:
     double m_fittedViewScale{ 0.0 };
     QPointF m_lastMousePos;
     bool m_axesVisible{ true };
+    bool m_gridVisible{ true };
 };
 
 }   // namespace fcad::app

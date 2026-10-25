@@ -13,6 +13,23 @@
 
 namespace fcad::app {
 
+namespace {
+
+    // Dot grid, behind the axes. Spacings are powers of ten in world units.
+    // The minor dots use the finest one at least minimumSpacing apart and
+    // fade in as they spread out, until the next one replaces them. Major
+    // dots are ten times as far apart. Spacing and radii in logical pixels.
+    struct GridStyle final
+    {
+        // Alpha is the strength of a fully shown dot.
+        QColor color;
+        double minimumSpacing;
+        double minorRadius;
+        double majorRadius;
+    };
+
+}   // namespace
+
 constexpr int windowWeight = 1076;
 constexpr int windowHeight = 768;
 constexpr geo::BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
@@ -27,6 +44,10 @@ constexpr QColor backgroundBottomColor{ 0x16, 0x19, 0x1D };
 constexpr QColor xAxisColor{ 0xB8, 0x4A, 0x4A };
 constexpr QColor yAxisColor{ 0x4A, 0x9A, 0x55 };
 constexpr double axisWidth = 1.0;
+constexpr GridStyle gridStyle{ .color{ 0xA8, 0xB2, 0xC2, 0x99 },
+                               .minimumSpacing = 16.0,
+                               .minorRadius = 1.0,
+                               .majorRadius = 1.75 };
 // Floats per point in the vertex buffers (x, y).
 constexpr int componentsPerVertex = 2;
 // Line width in logical pixels, independent of the zoom.
@@ -55,6 +76,12 @@ void SceneView::updateDocument()
 void SceneView::setAxesVisible(bool visible)
 {
     m_axesVisible = visible;
+    update();
+}
+
+void SceneView::setGridVisible(bool visible)
+{
+    m_gridVisible = visible;
     update();
 }
 
@@ -181,10 +208,10 @@ void SceneView::paintGL()
     m_backgroundProgram->setUniformValue("u_bottomColor", backgroundBottomColor);
     // Window coordinates have y up, widget coordinates y down.
     const QPointF origin{ mapFromWorld(geo::Coordinate{ .x = 0.0, .y = 0.0 }) };
+    const double originX{ origin.x() * pixelRatio };
+    const double originY{ (height() - origin.y()) * pixelRatio };
     m_backgroundProgram->setUniformValue(
-        "u_origin",
-        QVector2D{ gsl::narrow_cast<float>(origin.x() * pixelRatio),
-                   gsl::narrow_cast<float>((height() - origin.y()) * pixelRatio) }
+        "u_origin", QVector2D{ gsl::narrow_cast<float>(originX), gsl::narrow_cast<float>(originY) }
     );
     m_backgroundProgram->setUniformValue(
         "u_axisWidth", gsl::narrow_cast<float>(axisWidth * pixelRatio)
@@ -192,6 +219,40 @@ void SceneView::paintGL()
     m_backgroundProgram->setUniformValue("u_xAxisColor", xAxisColor);
     m_backgroundProgram->setUniformValue("u_yAxisColor", yAxisColor);
     m_backgroundProgram->setUniformValue("u_axesVisible", m_axesVisible);
+
+    // The minor spacing ends up in [minimumSpacing, 10 * minimumSpacing),
+    // and the minor dots' intensity goes from 0 to 1 over that range.
+    const double gridSpacingWorld{
+        std::pow(10.0, std::ceil(std::log10(gridStyle.minimumSpacing * m_viewScale)))
+    };
+    const double gridSpacing{ gridSpacingWorld / m_viewScale };
+    const double gridSpacingDevice{ gridSpacing * pixelRatio };
+    const double majorGridSpacingDevice{ gridSpacingDevice * 10.0 };
+    m_backgroundProgram->setUniformValue(
+        "u_gridSpacing", gsl::narrow_cast<float>(gridSpacingDevice)
+    );
+    m_backgroundProgram->setUniformValue(
+        "u_gridMinorOffset",
+        QVector2D{ gsl::narrow_cast<float>(std::fmod(originX, gridSpacingDevice)),
+                   gsl::narrow_cast<float>(std::fmod(originY, gridSpacingDevice)) }
+    );
+    m_backgroundProgram->setUniformValue(
+        "u_gridMajorOffset",
+        QVector2D{ gsl::narrow_cast<float>(std::fmod(originX, majorGridSpacingDevice)),
+                   gsl::narrow_cast<float>(std::fmod(originY, majorGridSpacingDevice)) }
+    );
+    m_backgroundProgram->setUniformValue(
+        "u_gridMinorRadius", gsl::narrow_cast<float>(gridStyle.minorRadius * pixelRatio)
+    );
+    m_backgroundProgram->setUniformValue(
+        "u_gridMajorRadius", gsl::narrow_cast<float>(gridStyle.majorRadius * pixelRatio)
+    );
+    m_backgroundProgram->setUniformValue(
+        "u_gridMinorIntensity",
+        gsl::narrow_cast<float>(std::log10(gridSpacing / gridStyle.minimumSpacing))
+    );
+    m_backgroundProgram->setUniformValue("u_gridColor", gridStyle.color);
+    m_backgroundProgram->setUniformValue("u_gridVisible", m_gridVisible);
     {
         QOpenGLVertexArrayObject::Binder vaoBinder(&m_backgroundVao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
