@@ -8,7 +8,7 @@
 
 namespace {
 
-// Compares geometry and color, not the ids, since they are random.
+// Compares geometry, color and lineweight, not the ids, since they are random.
 template <typename Geometry, typename GeometryMatcher>
 testing::Matcher<std::vector<fcad::domain::Entity<Geometry>>>
 AreEntities(const std::vector<fcad::domain::Entity<Geometry>>& expected, GeometryMatcher isGeometry)
@@ -23,7 +23,10 @@ AreEntities(const std::vector<fcad::domain::Entity<Geometry>>& expected, Geometr
                     &fcad::domain::Entity<Geometry>::geometry,
                     isGeometry(entity.geometry())
                 ),
-                testing::Property("color", &fcad::domain::Entity<Geometry>::color, entity.color())
+                testing::Property("color", &fcad::domain::Entity<Geometry>::color, entity.color()),
+                testing::Property(
+                    "lineweight", &fcad::domain::Entity<Geometry>::lineweight, entity.lineweight()
+                )
             )
         );
     }

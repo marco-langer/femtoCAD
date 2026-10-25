@@ -56,6 +56,12 @@ fcad::domain::Layers exampleLayers(double scale, ExampleProperties properties)
         indexColorLine.setColor(fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 });
         trueColorLine.setColor(fcad::domain::Rgb{ .r = 0x30, .g = 0x50, .b = 0xA0 });
         byBlockCircle.setColor(fcad::domain::Adaptive{});
+
+        indexColorLine.setLineweight(fcad::domain::Lineweight{ 35 });
+        trueColorLine.setLineweight(fcad::domain::DefaultLineweight{});
+        // ByBlock and an invalid lineweight, which become the default.
+        byBlockCircle.setLineweight(fcad::domain::DefaultLineweight{});
+        byEntityArc.setLineweight(fcad::domain::DefaultLineweight{});
     }
 
     fcad::domain::Layers layers;
@@ -104,10 +110,12 @@ TEST(DxfImportTest, ImportExample)
     );
 
     const QStringList& warnings{ importResult.value().warnings };
-    ASSERT_EQ(warnings.size(), 3);
+    ASSERT_EQ(warnings.size(), 5);
     EXPECT_TRUE(warnings.at(0).startsWith(u"1 entity uses the color ByBlock"));
     EXPECT_TRUE(warnings.at(1).startsWith(u"1 entity uses the color ByEntity"));
     EXPECT_TRUE(warnings.at(2).startsWith(u"1 layer has an invalid lineweight"));
+    EXPECT_TRUE(warnings.at(3).startsWith(u"1 entity uses the lineweight ByBlock"));
+    EXPECT_TRUE(warnings.at(4).startsWith(u"1 entity has an invalid lineweight"));
 }
 
 TEST(DxfImportTest, ImportWithoutUnit)
