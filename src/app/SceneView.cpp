@@ -1,5 +1,7 @@
 #include "SceneView.hpp"
 
+#include "core/Overload.hpp"
+
 #include <QColor>
 #include <QDebug>
 #include <QMouseEvent>
@@ -10,6 +12,7 @@
 #include <algorithm>
 #include <cmath>
 #include <utility>
+#include <variant>
 
 namespace fcad::app {
 
@@ -63,6 +66,10 @@ constexpr GridStyle gridStyle{ .color{ 0xA8, 0xB2, 0xC2, 0x99 },
                                .majorRadius = 1.75 };
 // Floats per point in the vertex buffers (x, y).
 constexpr int componentsPerVertex = 2;
+// Floats per color in the vertex buffers (r, g, b).
+constexpr int componentsPerColor = 3;
+// What adaptive colors become: white, which contrasts with the dark background.
+constexpr QColor adaptiveColor{ 0xFF, 0xFF, 0xFF };
 // Line width in logical pixels, independent of the zoom.
 constexpr double lineWidth = 1.5;
 // Zoom factor per mouse wheel notch.
@@ -70,6 +77,21 @@ constexpr double zoomStepFactor = 1.2;
 // Zoom limits relative to the fitted view, to stay within float precision.
 constexpr double minimumZoom = 0.01;
 constexpr double maximumZoom = 10000.0;
+
+namespace {
+
+    QColor toQColor(const domain::Color& color)
+    {
+        return std::visit(
+            core::Overload{
+                [](const domain::Rgb& rgb) { return QColor{ rgb.r, rgb.g, rgb.b }; },
+                [](const domain::Adaptive& /* adaptive */) { return adaptiveColor; },
+            },
+            color
+        );
+    }
+
+}   // namespace
 
 SceneView::SceneView(const std::optional<domain::Document>& document)
     : m_document{ document }
@@ -110,11 +132,15 @@ void SceneView::uploadGeometry()
 
         for (const domain::Layer& layer : document.layers()) {
             if (layer.visible) {
+                const QColor color{ toQColor(layer.color) };
                 for (const geo::Line& line : layer.lines) {
                     vertices.push_back(gsl::narrow_cast<float>(line.start.x));
                     vertices.push_back(gsl::narrow_cast<float>(line.start.y));
                     vertices.push_back(gsl::narrow_cast<float>(line.end.x));
                     vertices.push_back(gsl::narrow_cast<float>(line.end.y));
+                    vertices.push_back(color.redF());
+                    vertices.push_back(color.greenF());
+                    vertices.push_back(color.blueF());
                     ++m_lines.instanceCount;
                 }
             }
@@ -136,18 +162,24 @@ void SceneView::uploadGeometry()
 
     m_lines.vbo.allocate(vertices.data(), gsl::narrow_cast<int>(vertices.size() * sizeof(float)));
 
-    // Per line: start point, then end point.
-    constexpr int stride{ 2 * componentsPerVertex * sizeof(float) };
+    // Per line: start point, end point, then color.
+    constexpr int stride{ (2 * componentsPerVertex + componentsPerColor) * sizeof(float) };
     const int startLocation{ m_lineProgram->attributeLocation("a_start") };
     const int endLocation{ m_lineProgram->attributeLocation("a_end") };
+    const int colorLocation{ m_lineProgram->attributeLocation("a_color") };
     m_lineProgram->enableAttributeArray(startLocation);
     m_lineProgram->enableAttributeArray(endLocation);
+    m_lineProgram->enableAttributeArray(colorLocation);
     m_lineProgram->setAttributeBuffer(startLocation, GL_FLOAT, 0, componentsPerVertex, stride);
     m_lineProgram->setAttributeBuffer(
         endLocation, GL_FLOAT, componentsPerVertex * sizeof(float), componentsPerVertex, stride
     );
+    m_lineProgram->setAttributeBuffer(
+        colorLocation, GL_FLOAT, 2 * componentsPerVertex * sizeof(float), componentsPerColor, stride
+    );
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(startLocation), 1);
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(endLocation), 1);
+    glVertexAttribDivisor(gsl::narrow_cast<GLuint>(colorLocation), 1);
 
     m_lines.vbo.release();
     m_lines.vao.release();

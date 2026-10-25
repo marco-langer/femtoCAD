@@ -3,6 +3,7 @@
 in vec2 v_position;
 flat in vec2 v_start;
 flat in vec2 v_end;
+flat in vec3 v_color;
 
 uniform float u_lineWidth;  // device pixels
 
@@ -25,5 +26,5 @@ void main()
         discard;
     }
 
-    fragColor = vec4(1.0, 0.0, 0.0, alpha);
+    fragColor = vec4(v_color, alpha);
 }

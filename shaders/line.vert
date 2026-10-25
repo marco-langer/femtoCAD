@@ -4,6 +4,7 @@
 // strip, 4 vertices), so there is no per-vertex buffer.
 layout(location = 0) in vec2 a_start;
 layout(location = 1) in vec2 a_end;
+layout(location = 2) in vec3 a_color;
 
 uniform mat4 u_viewProjection;
 uniform vec2 u_viewportSize;  // device pixels
@@ -13,6 +14,7 @@ uniform float u_lineWidth;    // device pixels
 out vec2 v_position;
 flat out vec2 v_start;
 flat out vec2 v_end;
+flat out vec3 v_color;
 
 vec2 toPixels(vec2 world)
 {
@@ -41,5 +43,6 @@ void main()
     v_position = position;
     v_start = start;
     v_end = end;
+    v_color = a_color;
     gl_Position = vec4(position / u_viewportSize * 2.0 - 1.0, 0.0, 1.0);
 }
