@@ -54,6 +54,16 @@ bool isComplex(const odxf::LineType& dxfLinetype)
     });
 }
 
+bool isByLayer(const std::string& name)
+{
+    return QString::fromStdString(name).compare(u"BYLAYER", Qt::CaseInsensitive) == 0;
+}
+
+bool isByBlock(const std::string& name)
+{
+    return QString::fromStdString(name).compare(u"BYBLOCK", Qt::CaseInsensitive) == 0;
+}
+
 QStringList linetypeWarnings(const LinetypeCounts& counts)
 {
     QStringList warnings;
@@ -86,18 +96,44 @@ QStringList linetypeWarnings(const LinetypeCounts& counts)
         ));
     }
 
+    if (counts.byBlockEntities > 0) {
+        warnings.push_back(countWarning(
+            counts.byBlockEntities,
+            u"1 entity uses the linetype ByBlock, which femtoCAD doesn't support yet. It is drawn "
+            u"continuous.",
+            u"%1 entities use the linetype ByBlock, which femtoCAD doesn't support yet. They are "
+            u"drawn continuous."
+        ));
+    }
+
+    if (counts.unknownEntityLinetypes > 0) {
+        warnings.push_back(countWarning(
+            counts.unknownEntityLinetypes,
+            u"1 entity uses an unknown linetype. It is drawn continuous.",
+            u"%1 entities use an unknown linetype. They are drawn continuous."
+        ));
+    }
+
+    if (counts.invalidEntityScales > 0) {
+        warnings.push_back(countWarning(
+            counts.invalidEntityScales,
+            u"1 entity has an invalid linetype scale. It uses 1.0 instead.",
+            u"%1 entities have an invalid linetype scale. They use 1.0 instead."
+        ));
+    }
+
     return warnings;
 }
 
 AddedLinetype DxfLinetypes::add(const odxf::LineType& dxfLinetype, double scale)
 {
-    const QString name{ QString::fromStdString(dxfLinetype.name) };
-    if (name.compare(u"BYLAYER", Qt::CaseInsensitive) == 0
-        || name.compare(u"BYBLOCK", Qt::CaseInsensitive) == 0) {
+    if (isByLayer(dxfLinetype.name) || isByBlock(dxfLinetype.name)) {
         return AddedLinetype::BuiltIn;
     }
 
-    std::optional<domain::LinetypeName> linetypeName{ domain::LinetypeName::fromValue(name) };
+    std::optional<domain::LinetypeName> linetypeName{
+        domain::LinetypeName::fromValue(QString::fromStdString(dxfLinetype.name))
+    };
     if (!linetypeName.has_value()) {
         return AddedLinetype::Invalid;
     }
