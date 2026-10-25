@@ -84,12 +84,12 @@ void SceneView::uploadGeometry()
 
     // Per line: start point, then end point.
     constexpr int stride{ 2 * componentsPerVertex * sizeof(float) };
-    const int startLocation{ m_program->attributeLocation("a_start") };
-    const int endLocation{ m_program->attributeLocation("a_end") };
-    m_program->enableAttributeArray(startLocation);
-    m_program->enableAttributeArray(endLocation);
-    m_program->setAttributeBuffer(startLocation, GL_FLOAT, 0, componentsPerVertex, stride);
-    m_program->setAttributeBuffer(
+    const int startLocation{ m_lineProgram->attributeLocation("a_start") };
+    const int endLocation{ m_lineProgram->attributeLocation("a_end") };
+    m_lineProgram->enableAttributeArray(startLocation);
+    m_lineProgram->enableAttributeArray(endLocation);
+    m_lineProgram->setAttributeBuffer(startLocation, GL_FLOAT, 0, componentsPerVertex, stride);
+    m_lineProgram->setAttributeBuffer(
         endLocation, GL_FLOAT, componentsPerVertex * sizeof(float), componentsPerVertex, stride
     );
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(startLocation), 1);
@@ -97,7 +97,7 @@ void SceneView::uploadGeometry()
 
     m_lines.vbo.release();
     m_lines.vao.release();
-    m_program->release();
+    m_lineProgram->release();
 
     fitViewToScene();
     update();
@@ -107,17 +107,17 @@ void SceneView::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    m_program = std::make_unique<QOpenGLShaderProgram>();
-    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/line.vert");
-    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/line.frag");
-    if (!m_program->link()) {
-        qWarning() << "Linking the line shader failed:" << m_program->log();
+    m_lineProgram = std::make_unique<QOpenGLShaderProgram>();
+    m_lineProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/line.vert");
+    m_lineProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/line.frag");
+    if (!m_lineProgram->link()) {
+        qWarning() << "Linking the line shader failed:" << m_lineProgram->log();
     }
 
     m_lines.vao.create();
     m_lines.vbo.create();
 
-    m_program->release();
+    m_lineProgram->release();
 
     uploadGeometry();
 }
@@ -149,20 +149,20 @@ void SceneView::paintGL()
 
     const qreal pixelRatio{ devicePixelRatio() };
 
-    m_program->bind();
-    m_program->setUniformValue("u_viewProjection", viewProjection());
-    m_program->setUniformValue(
+    m_lineProgram->bind();
+    m_lineProgram->setUniformValue("u_viewProjection", viewProjection());
+    m_lineProgram->setUniformValue(
         "u_viewportSize",
         QVector2D{ gsl::narrow_cast<float>(width() * pixelRatio),
                    gsl::narrow_cast<float>(height() * pixelRatio) }
     );
-    m_program->setUniformValue("u_lineWidth", gsl::narrow_cast<float>(lineWidth * pixelRatio));
+    m_lineProgram->setUniformValue("u_lineWidth", gsl::narrow_cast<float>(lineWidth * pixelRatio));
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_lines.vao);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_lines.instanceCount);
 
-    m_program->release();
+    m_lineProgram->release();
 }
 
 void SceneView::wheelEvent(QWheelEvent* event)
