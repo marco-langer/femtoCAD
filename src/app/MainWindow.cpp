@@ -25,6 +25,7 @@ MainWindow::MainWindow(domain::Workspace& workspace, Settings& settings)
 
     m_sceneView = new SceneView{ m_workspace.document() };
     m_sceneView->setAxesVisible(m_settings.view.showAxes);
+    m_sceneView->setGridVisible(m_settings.view.showGrid);
 
     setStatusBar(new QStatusBar{});
 
@@ -69,6 +70,11 @@ void MainWindow::createActions()
     showAxesAction->setChecked(m_settings.view.showAxes);
     connect(showAxesAction, &QAction::toggled, this, &MainWindow::onShowAxesToggled);
 
+    auto* showGridAction{ new QAction{ "Show Grid" } };
+    showGridAction->setCheckable(true);
+    showGridAction->setChecked(m_settings.view.showGrid);
+    connect(showGridAction, &QAction::toggled, this, &MainWindow::onShowGridToggled);
+
     QMenu* fileMenu{ menuBar()->addMenu("&File") };
     fileMenu->addAction(newAction);
     fileMenu->addAction(saveAction);
@@ -84,6 +90,7 @@ void MainWindow::createActions()
 
     QMenu* viewMenu{ menuBar()->addMenu("&View") };
     viewMenu->addAction(showAxesAction);
+    viewMenu->addAction(showGridAction);
 }
 
 void MainWindow::updateWindowTitle(const QString& filePath)
@@ -108,6 +115,12 @@ void MainWindow::onShowAxesToggled(bool visible)
 {
     m_settings.view.showAxes = visible;
     m_sceneView->setAxesVisible(visible);
+}
+
+void MainWindow::onShowGridToggled(bool visible)
+{
+    m_settings.view.showGrid = visible;
+    m_sceneView->setGridVisible(visible);
 }
 
 void MainWindow::onImportDxf()
