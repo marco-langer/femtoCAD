@@ -171,3 +171,17 @@ TEST(LinetypeTest, continuousIsBuiltIn)
     EXPECT_EQ(continuous.name(), nameOf(u"Continuous"));
     EXPECT_TRUE(continuous.pattern().isContinuous());
 }
+
+TEST(LinetypeTest, resolvedByLayerIsTheLayerLinetype)
+{
+    const fcad::domain::LinetypeId layerLinetype{ fcad::domain::LinetypeId::generate() };
+
+    EXPECT_EQ(fcad::domain::resolved(fcad::domain::ByLayer{}, layerLinetype), layerLinetype);
+}
+
+TEST(LinetypeTest, resolvedOwnLinetypeIgnoresTheLayerLinetype)
+{
+    const fcad::domain::LinetypeId own{ fcad::domain::LinetypeId::generate() };
+
+    EXPECT_EQ(fcad::domain::resolved(own, fcad::domain::continuousLinetypeId()), own);
+}

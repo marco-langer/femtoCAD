@@ -114,6 +114,17 @@ const LinetypeName& Linetype::name() const { return m_definition.name; }
 
 const DashPattern& Linetype::pattern() const { return m_definition.pattern; }
 
+LinetypeId resolved(const EntityLinetype& entityLinetype, LinetypeId layerLinetype)
+{
+    return std::visit(
+        core::Overload{
+            [layerLinetype](const ByLayer& /* byLayer */) { return layerLinetype; },
+            [](LinetypeId own) { return own; },
+        },
+        entityLinetype
+    );
+}
+
 Linetype::Linetype(LinetypeId id, LinetypeDefinition definition)
     : m_id{ id }
     , m_definition{ std::move(definition) }
