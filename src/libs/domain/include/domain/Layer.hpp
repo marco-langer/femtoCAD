@@ -1,10 +1,8 @@
 #pragma once
 
 #include "domain/Color.hpp"
-#include "geo/Arc.hpp"
+#include "domain/Entity.hpp"
 #include "geo/BoundingBox.hpp"
-#include "geo/Circle.hpp"
-#include "geo/Line.hpp"
 
 #include <QString>
 
@@ -22,9 +20,9 @@ struct Layer final
     QString name;
     bool visible{ true };
     Color color{ Adaptive{} };
-    geo::Arcs arcs;
-    std::vector<geo::Line> lines;
-    geo::Circles circles;
+    Arcs arcs;
+    Lines lines;
+    Circles circles;
 };
 
 using Layers = std::vector<Layer>;

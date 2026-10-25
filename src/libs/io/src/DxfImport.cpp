@@ -92,7 +92,7 @@ namespace {
                 const std::optional<geo::Arc> maybeArc{ toArc(arc, m_scale) };
 
                 if (maybeArc.has_value()) {
-                    m_layers.at(layerIndex.value()).arcs.push_back(maybeArc.value());
+                    m_layers.at(layerIndex.value()).arcs.emplace_back(maybeArc.value());
                 }
             }
         }
@@ -102,7 +102,7 @@ namespace {
             const std::optional<std::size_t> layerIndex{ core::indexOf(m_layerNames, line.layer) };
 
             if (layerIndex.has_value()) {
-                m_layers.at(layerIndex.value()).lines.push_back(toLine(line, m_scale));
+                m_layers.at(layerIndex.value()).lines.emplace_back(toLine(line, m_scale));
             }
         }
 
@@ -116,7 +116,7 @@ namespace {
                 const std::optional<geo::Circle> maybeCircle{ toCircle(circle, m_scale) };
 
                 if (maybeCircle.has_value()) {
-                    m_layers.at(layerIndex.value()).circles.push_back(maybeCircle.value());
+                    m_layers.at(layerIndex.value()).circles.emplace_back(maybeCircle.value());
                 }
             }
         }

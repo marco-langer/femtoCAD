@@ -139,7 +139,8 @@ void SceneView::uploadGeometry()
         for (const domain::Layer& layer : document.layers()) {
             if (layer.visible) {
                 const QColor color{ toQColor(layer.color) };
-                for (const geo::Line& line : layer.lines) {
+                for (const domain::Line& entity : layer.lines) {
+                    const geo::Line& line{ entity.geometry() };
                     vertices.push_back(gsl::narrow_cast<float>(line.start.x));
                     vertices.push_back(gsl::narrow_cast<float>(line.start.y));
                     vertices.push_back(gsl::narrow_cast<float>(line.end.x));
