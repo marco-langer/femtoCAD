@@ -1,6 +1,7 @@
 #pragma once
 
 #include "domain/LengthUnit.hpp"
+#include "domain/Lineweight.hpp"
 
 #include <QString>
 
@@ -23,12 +24,16 @@ struct ViewSettings final
     bool showAxes{ true };
     // Draw the dot grid.
     bool showGrid{ true };
+    // Draw lines with their lineweight. Otherwise all lines are equally thin.
+    bool showLineweights{ true };
 };
 
 struct Settings final
 {
     // The unit of new documents.
     domain::LengthUnit defaultUnit{ domain::LengthUnit::Millimeter };
+    // What DefaultLineweight stands for.
+    domain::Lineweight defaultLineweightWidth{ 25 };
     DxfImportSettings dxfImport;
     ViewSettings view;
 };

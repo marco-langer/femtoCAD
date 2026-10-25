@@ -46,6 +46,15 @@ namespace {
         double majorRadius;
     };
 
+    // Line widths in logical pixels, independent of the zoom.
+    struct LineStyle final
+    {
+        // All lines, when lineweights are hidden.
+        double width;
+        // The narrowest a line gets when lineweights are shown, so that thin ones stay visible.
+        double minimumLineweightWidth;
+    };
+
     // Mouse wheel zoom. The limits are relative to the fitted view, to stay
     // within float precision.
     struct ZoomBehavior final
@@ -78,10 +87,12 @@ constexpr GridStyle gridStyle{ .color{ 0xA8, 0xB2, 0xC2, 0x99 },
 constexpr int componentsPerVertex = 2;
 // Floats per color in the vertex buffers (r, g, b).
 constexpr int componentsPerColor = 3;
+// Floats per lineweight in the vertex buffers (millimeters).
+constexpr int componentsPerLineweight = 1;
 // What adaptive colors become: white, which contrasts with the dark background.
 constexpr QColor adaptiveColor{ 0xFF, 0xFF, 0xFF };
-// Line width in logical pixels, independent of the zoom.
-constexpr double lineWidth = 1.5;
+constexpr LineStyle lineStyle{ .width = 1.5, .minimumLineweightWidth = 1.0 };
+constexpr double millimetersPerInch = 25.4;
 constexpr ZoomBehavior zoomBehavior{ .stepFactor = 1.2, .minimum = 0.01, .maximum = 10000.0 };
 
 namespace {
@@ -95,6 +106,23 @@ namespace {
             },
             color
         );
+    }
+
+    float toMillimeters(
+        const domain::LayerLineweight& lineweight, domain::Lineweight defaultLineweightWidth
+    )
+    {
+        const domain::Lineweight width{ std::visit(
+            core::Overload{
+                [defaultLineweightWidth](const domain::DefaultLineweight& /* default */) {
+                    return defaultLineweightWidth;
+                },
+                [](const domain::Lineweight& own) { return own; },
+            },
+            lineweight
+        ) };
+
+        return gsl::narrow_cast<float>(width.value()) / 100.0F;
     }
 
 }   // namespace
@@ -117,6 +145,9 @@ void SceneView::updateDocument()
     makeCurrent();
     uploadGeometry();
     doneCurrent();
+
+    fitViewToScene();
+    update();
 }
 
 void SceneView::setAxesVisible(bool visible)
@@ -128,6 +159,29 @@ void SceneView::setAxesVisible(bool visible)
 void SceneView::setGridVisible(bool visible)
 {
     m_gridVisible = visible;
+    update();
+}
+
+void SceneView::setLineweightsVisible(bool visible)
+{
+    m_lineweightsVisible = visible;
+    update();
+}
+
+void SceneView::setDefaultLineweightWidth(domain::Lineweight width)
+{
+    m_defaultLineweightWidth = width;
+
+    // The width is part of the uploaded geometry. Without a GL context, initializeGL() uploads it.
+    if (!isValid()) {
+        return;
+    }
+
+    // Upload again without fitting the view, which stays where it is.
+    makeCurrent();
+    uploadGeometry();
+    doneCurrent();
+
     update();
 }
 
@@ -146,6 +200,9 @@ void SceneView::uploadGeometry()
                 for (const domain::Line& entity : layer.lines()) {
                     const geo::Line& line{ entity.geometry() };
                     const QColor color{ toQColor(domain::resolved(entity.color(), layer.color())) };
+                    const float lineweight{
+                        toMillimeters(layer.lineweight(), m_defaultLineweightWidth)
+                    };
                     vertices.push_back(gsl::narrow_cast<float>(line.start.x));
                     vertices.push_back(gsl::narrow_cast<float>(line.start.y));
                     vertices.push_back(gsl::narrow_cast<float>(line.end.x));
@@ -153,6 +210,7 @@ void SceneView::uploadGeometry()
                     vertices.push_back(color.redF());
                     vertices.push_back(color.greenF());
                     vertices.push_back(color.blueF());
+                    vertices.push_back(lineweight);
                     ++m_lines.instanceCount;
                 }
             }
@@ -174,14 +232,17 @@ void SceneView::uploadGeometry()
 
     m_lines.vbo.allocate(vertices.data(), gsl::narrow_cast<int>(vertices.size() * sizeof(float)));
 
-    // Per line: start point, end point, then color.
-    constexpr int stride{ (2 * componentsPerVertex + componentsPerColor) * sizeof(float) };
+    // Per line: start point, end point, color, then lineweight.
+    constexpr int stride{ (2 * componentsPerVertex + componentsPerColor + componentsPerLineweight)
+                          * sizeof(float) };
     const int startLocation{ m_lineProgram->attributeLocation("a_start") };
     const int endLocation{ m_lineProgram->attributeLocation("a_end") };
     const int colorLocation{ m_lineProgram->attributeLocation("a_color") };
+    const int lineweightLocation{ m_lineProgram->attributeLocation("a_lineweight") };
     m_lineProgram->enableAttributeArray(startLocation);
     m_lineProgram->enableAttributeArray(endLocation);
     m_lineProgram->enableAttributeArray(colorLocation);
+    m_lineProgram->enableAttributeArray(lineweightLocation);
     m_lineProgram->setAttributeBuffer(startLocation, GL_FLOAT, 0, componentsPerVertex, stride);
     m_lineProgram->setAttributeBuffer(
         endLocation, GL_FLOAT, componentsPerVertex * sizeof(float), componentsPerVertex, stride
@@ -189,16 +250,21 @@ void SceneView::uploadGeometry()
     m_lineProgram->setAttributeBuffer(
         colorLocation, GL_FLOAT, 2 * componentsPerVertex * sizeof(float), componentsPerColor, stride
     );
+    m_lineProgram->setAttributeBuffer(
+        lineweightLocation,
+        GL_FLOAT,
+        (2 * componentsPerVertex + componentsPerColor) * sizeof(float),
+        componentsPerLineweight,
+        stride
+    );
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(startLocation), 1);
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(endLocation), 1);
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(colorLocation), 1);
+    glVertexAttribDivisor(gsl::narrow_cast<GLuint>(lineweightLocation), 1);
 
     m_lines.vbo.release();
     m_lines.vao.release();
     m_lineProgram->release();
-
-    fitViewToScene();
-    update();
 }
 
 void SceneView::initializeGL()
@@ -230,6 +296,7 @@ void SceneView::initializeGL()
     m_lineProgram->release();
 
     uploadGeometry();
+    fitViewToScene();
 }
 
 void SceneView::resizeGL(int /* width */, int /* height */)
@@ -326,7 +393,18 @@ void SceneView::paintGL()
         QVector2D{ gsl::narrow_cast<float>(width() * pixelRatio),
                    gsl::narrow_cast<float>(height() * pixelRatio) }
     );
-    m_lineProgram->setUniformValue("u_lineWidth", gsl::narrow_cast<float>(lineWidth * pixelRatio));
+    m_lineProgram->setUniformValue("u_lineweightsVisible", m_lineweightsVisible);
+    // The logical DPI follows the user's display scaling, the physical one is often wrong.
+    m_lineProgram->setUniformValue(
+        "u_pixelsPerMillimeter",
+        gsl::narrow_cast<float>(logicalDpiX() / millimetersPerInch * pixelRatio)
+    );
+    m_lineProgram->setUniformValue(
+        "u_minimumLineWidth", gsl::narrow_cast<float>(lineStyle.minimumLineweightWidth * pixelRatio)
+    );
+    m_lineProgram->setUniformValue(
+        "u_lineWidth", gsl::narrow_cast<float>(lineStyle.width * pixelRatio)
+    );
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_lines.vao);
 
