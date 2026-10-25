@@ -27,6 +27,7 @@ target_link_libraries(femtoCAD
     PRIVATE
         femtoCAD-core
         femtoCAD-domain
+        femtoCAD-geo
         femtoCAD-io
         femtoCAD::ms-gsl
         femtoCAD::qt-widgets
