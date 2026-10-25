@@ -45,6 +45,7 @@ protected:
 
 private:
     QPointF mapToWorld(const QPointF& widgetPosition) const;
+    QPointF mapFromWorld(const geo::Coordinate& world) const;
     QMatrix4x4 viewProjection() const;
     void uploadGeometry();
     void fitViewToScene();
