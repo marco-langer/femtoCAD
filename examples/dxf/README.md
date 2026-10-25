@@ -5,18 +5,26 @@ tests use their own files in `src/libs/io/tests/TestData/`.
 
 ## example.dxf
 
-A copy of the import tests' example file. It has no length unit, so the import asks for one.
+A copy of the import tests' example file. It has no length unit, so the import asks for one. Its
+linetype scale is 2.0, and its linetypes are DASHED and DOTTED; GAS embeds a text, and BAD<NAME>
+and a second "dashed" are invalid.
 
-- Layer "Test Layer" is frozen and empty.
-- Layer "Lines" (lineweight 0.50 mm): a red line (color index 1) 0.35 mm wide and a line in the
-  true color `#3050A0` with the default lineweight.
-- Layer "Circles" (lineweight 300, clamped to 2.11 mm): a circle with the color and the lineweight
-  ByBlock. The color is drawn in white or black, the lineweight is the default one.
-- Layer "Arcs" (an invalid lineweight, -5): an arc with the color ByEntity, drawn in its layer's
-  color, and an invalid lineweight (-7).
+- Layer "Test Layer" (linetype GAS, drawn continuous) is frozen and empty.
+- Layer "Lines" (lineweight 0.50 mm, dashed): a red line (color index 1) 0.35 mm wide, dotted with
+  the scale 3.0, and a line in the true color `#3050A0` with the default lineweight, dashed like
+  its layer.
+- Layer "Circles" (lineweight 300, clamped to 2.11 mm, dotted): a circle with the color, the
+  lineweight and the linetype ByBlock. The color is drawn in white or black, the lineweight is the
+  default one and the linetype continuous.
+- Layer "Arcs" (an invalid lineweight, -5, and an unknown linetype): an arc with the color
+  ByEntity, drawn in its layer's color, an invalid lineweight (-7), an unknown linetype and an
+  invalid linetype scale.
 
-The import warns about the ByBlock and ByEntity colors, the invalid layer lineweight, the ByBlock
-lineweight and the invalid entity lineweight.
+The patterns are short compared to the drawing, so the lines are drawn continuous until you zoom
+in. The import warns about the ByBlock and ByEntity colors, the invalid layer lineweight, the
+ByBlock lineweight, the invalid entity lineweight and six linetype cases: the complex and the
+invalid linetypes, the layer's unknown linetype, the ByBlock linetype, the entity's unknown linetype
+and its invalid scale.
 
 ## layer-colors.dxf
 
@@ -69,3 +77,30 @@ Then, after a gap, twelve lines on the 0.70 mm layer, each with its own lineweig
 
 The import shows three warnings: one layer has an invalid lineweight, one entity uses ByBlock and
 one entity has an invalid lineweight.
+
+## linetypes.dxf
+
+Horizontal lines, all white or black, to compare linetypes. Its unit is millimeters and its
+linetype scale 1.0. From top to bottom, first one line per layer, each with the linetype ByLayer:
+
+1. Continuous
+2. Dashed: 6 mm dashes, 3 mm gaps
+3. Dotted: dots 2 mm apart
+4. Dash dot: 8 mm dashes, with a dot in each gap
+5. Gas: a linetype with a text, drawn continuous
+6. Unknown linetype: drawn continuous
+
+Then, after a gap, seven lines on the Continuous layer, each with its own linetype:
+
+1. DASHED
+2. DASHED with the scale 0.5: half as long dashes and gaps
+3. DASHED with the scale 2.0: twice as long
+4. CENTER: long and short dashes
+5. ByBlock: continuous
+6. An unknown linetype: continuous
+7. DASHED with an invalid scale (-1), which becomes 1.0
+
+The last line is a diagonal on the Dashed layer; its dashes start at its left end.
+
+The import shows five warnings: one linetype contains a text, one layer and one entity use an
+unknown linetype, one entity uses ByBlock and one entity has an invalid linetype scale.
