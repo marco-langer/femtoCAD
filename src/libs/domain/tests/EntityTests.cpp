@@ -58,10 +58,20 @@ TEST(EntityTest, moveKeepsTheId)
     EXPECT_THAT(moved.geometry(), fcad::test_utils::IsLine(someLine));
 }
 
-TEST(EntityTest, cloneHasANewIdAndTheSameGeometry)
+TEST(EntityTest, colorIsByLayerByDefault)
+{
+    const fcad::domain::Line line{ someLine };
+
+    EXPECT_EQ(line.color(), fcad::domain::EntityColor{ fcad::domain::ByLayer{} });
+}
+
+TEST(EntityTest, cloneHasANewIdAndTheSameContent)
 {
     // Arrange
-    const fcad::domain::Line line{ someLine };
+    const fcad::domain::EntityColor color{ fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 } };
+
+    fcad::domain::Line line{ someLine };
+    line.setColor(color);
 
     // Act
     const fcad::domain::Line clone{ line.clone() };
@@ -69,6 +79,7 @@ TEST(EntityTest, cloneHasANewIdAndTheSameGeometry)
     // Assert
     EXPECT_NE(clone.id(), line.id());
     EXPECT_THAT(clone.geometry(), fcad::test_utils::IsLine(someLine));
+    EXPECT_EQ(clone.color(), color);
 }
 
 TEST(EntityTest, setGeometryKeepsTheId)

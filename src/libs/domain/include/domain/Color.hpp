@@ -24,4 +24,15 @@ struct Adaptive final
 
 using Color = std::variant<Rgb, Adaptive>;
 
+// The color of the entity's layer.
+struct ByLayer final
+{
+    bool operator==(const ByLayer&) const = default;
+};
+
+using EntityColor = std::variant<ByLayer, Rgb, Adaptive>;
+
+// The color an entity is drawn in: its own, or for ByLayer its layer's.
+Color resolved(const EntityColor& entityColor, const Color& layerColor);
+
 }   // namespace fcad::domain
