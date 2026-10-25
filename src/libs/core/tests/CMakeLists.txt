@@ -1,6 +1,7 @@
 add_executable(femtoCAD-core-tests
     AngleTests.cpp
     NonNegativeTests.cpp
+    OverloadTests.cpp
 )
 
 target_link_libraries(femtoCAD-core-tests

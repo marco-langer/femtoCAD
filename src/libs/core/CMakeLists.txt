@@ -2,6 +2,7 @@ add_library(femtoCAD-core INTERFACE
     include/core/Angle.hpp
     include/core/Error.hpp
     include/core/NonNegative.hpp
+    include/core/Overload.hpp
     include/core/Result.hpp
     include/core/VectorExtensions.hpp
 )
