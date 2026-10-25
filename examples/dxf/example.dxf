@@ -60,6 +60,8 @@ Lines
 7
 6
 CONTINUOUS
+370
+50
 0
 LAYER
 2
@@ -70,6 +72,8 @@ Circles
 7
 6
 CONTINUOUS
+370
+300
 0
 LAYER
 2
@@ -80,6 +84,8 @@ Arcs
 7
 6
 CONTINUOUS
+370
+-5
 0
 ENDTAB
 0
@@ -102,6 +108,8 @@ AcDbLine
 Lines
 62
 1
+370
+35
 10
 100.000000
 20
@@ -124,6 +132,8 @@ Lines
 5
 420
 3166368
+370
+-3
 10
 150.000000
 20
@@ -144,6 +154,8 @@ AcDbCircle
 Circles
 62
 0
+370
+-2
 10
 50.400000
 20
@@ -160,6 +172,8 @@ AcDbCircle
 Arcs
 62
 257
+370
+-7
 10
 0.000000
 20
