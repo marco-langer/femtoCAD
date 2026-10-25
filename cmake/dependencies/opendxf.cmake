@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
     opendxf
     GIT_REPOSITORY https://github.com/marco-langer/opendxf.git
-    GIT_TAG        3f167fc6bd524bd0e5a4c00fdb695bd8487b2521
+    GIT_TAG        7da0a9d8b9063811b625f3d266ef74a0914fa68c
 )
 
 FetchContent_MakeAvailable(opendxf)
