@@ -34,13 +34,22 @@ public:
 
     const Layers& layers() const&;
 
-    /** @pre The layer's linetype is in the document. */
+    /**
+     * @pre The layer's linetype is in the document.
+     * @pre The linetypes of the layer's entities are in the document, unless they are ByLayer.
+     */
     void addLayer(Layer layer);
 
-    /** @pre The linetype of each layer is in the document. */
+    /**
+     * @pre The linetype of each layer is in the document.
+     * @pre The linetypes of the layers' entities are in the document, unless they are ByLayer.
+     */
     void addLayers(Layers&& layers);
 
 private:
+    // ByLayer counts as contained, since it refers to no linetype.
+    bool contains(const EntityLinetype& linetype) const;
+
     LengthUnit m_unit;
     Linetypes m_linetypes;
     LinetypeScale m_linetypeScale{ 1.0 };

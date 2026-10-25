@@ -2,8 +2,10 @@
 
 #include <gsl/assert>
 
+#include <algorithm>
 #include <ranges>
 #include <utility>
+#include <variant>
 
 namespace fcad::domain {
 
@@ -32,6 +34,15 @@ const Layers& Document::layers() const& { return m_layers; }
 void Document::addLayer(Layer layer)
 {
     Expects(m_linetypes.contains(layer.linetype()));
+    Expects(std::ranges::all_of(layer.arcs(), [this](const Arc& arc) {
+        return contains(arc.linetype());
+    }));
+    Expects(std::ranges::all_of(layer.circles(), [this](const Circle& circle) {
+        return contains(circle.linetype());
+    }));
+    Expects(std::ranges::all_of(layer.lines(), [this](const Line& line) {
+        return contains(line.linetype());
+    }));
 
     m_layers.push_back(std::move(layer));
 }
@@ -41,6 +52,12 @@ void Document::addLayers(Layers&& layers)
     for (Layer& layer : layers) {
         addLayer(std::move(layer));
     }
+}
+
+bool Document::contains(const EntityLinetype& linetype) const
+{
+    return std::holds_alternative<ByLayer>(linetype)
+        || m_linetypes.contains(std::get<LinetypeId>(linetype));
 }
 
 std::optional<geo::BoundingBox> boundingBox(const Document& document)

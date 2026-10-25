@@ -2,6 +2,7 @@
 
 #include "core/StrongUuid.hpp"
 #include "domain/Color.hpp"
+#include "domain/Linetype.hpp"
 #include "domain/Lineweight.hpp"
 #include "geo/Arc.hpp"
 #include "geo/BoundingBox.hpp"
@@ -38,6 +39,8 @@ public:
         Entity entity{ m_geometry };
         entity.m_color = m_color;
         entity.m_lineweight = m_lineweight;
+        entity.m_linetype = m_linetype;
+        entity.m_linetypeScale = m_linetypeScale;
 
         return entity;
     }
@@ -53,11 +56,20 @@ public:
     const EntityLineweight& lineweight() const { return m_lineweight; }
     void setLineweight(EntityLineweight lineweight) { m_lineweight = lineweight; }
 
+    const EntityLinetype& linetype() const { return m_linetype; }
+    void setLinetype(EntityLinetype linetype) { m_linetype = linetype; }
+
+    /** Scales the dash pattern on top of the document's linetype scale. */
+    LinetypeScale linetypeScale() const { return m_linetypeScale; }
+    void setLinetypeScale(LinetypeScale scale) { m_linetypeScale = scale; }
+
 private:
     EntityId m_id;
     Geometry m_geometry;
     EntityColor m_color{ ByLayer{} };
     EntityLineweight m_lineweight{ ByLayer{} };
+    EntityLinetype m_linetype{ ByLayer{} };
+    LinetypeScale m_linetypeScale{ 1.0 };
 };
 
 using Arc = Entity<geo::Arc>;

@@ -2,6 +2,7 @@
 
 #include "core/Positive.hpp"
 #include "core/StrongUuid.hpp"
+#include "domain/ByLayer.hpp"
 
 #include <QString>
 
@@ -129,5 +130,10 @@ private:
 
 /** Scales all dash patterns of a document, or those of one entity. */
 using LinetypeScale = core::Positive<double, struct LinetypeScaleTag>;
+
+using EntityLinetype = std::variant<ByLayer, LinetypeId>;
+
+/** The linetype an entity is drawn with: its own, or for ByLayer its layer's. */
+LinetypeId resolved(const EntityLinetype& entityLinetype, LinetypeId layerLinetype);
 
 }   // namespace fcad::domain

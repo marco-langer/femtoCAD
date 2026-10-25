@@ -72,6 +72,14 @@ TEST(EntityTest, lineweightIsByLayerByDefault)
     EXPECT_EQ(line.lineweight(), fcad::domain::EntityLineweight{ fcad::domain::ByLayer{} });
 }
 
+TEST(EntityTest, linetypeIsByLayerWithScaleOneByDefault)
+{
+    const fcad::domain::Line line{ someLine };
+
+    EXPECT_EQ(line.linetype(), fcad::domain::EntityLinetype{ fcad::domain::ByLayer{} });
+    EXPECT_EQ(line.linetypeScale(), fcad::domain::LinetypeScale{ 1.0 });
+}
+
 TEST(EntityTest, cloneHasANewIdAndTheSameContent)
 {
     // Arrange
@@ -81,6 +89,9 @@ TEST(EntityTest, cloneHasANewIdAndTheSameContent)
     fcad::domain::Line line{ someLine };
     line.setColor(color);
     line.setLineweight(lineweight);
+    const fcad::domain::EntityLinetype linetype{ fcad::domain::LinetypeId::generate() };
+    line.setLinetype(linetype);
+    line.setLinetypeScale(fcad::domain::LinetypeScale{ 2.5 });
 
     // Act
     const fcad::domain::Line clone{ line.clone() };
@@ -90,6 +101,8 @@ TEST(EntityTest, cloneHasANewIdAndTheSameContent)
     EXPECT_THAT(clone.geometry(), fcad::test_utils::IsLine(someLine));
     EXPECT_EQ(clone.color(), color);
     EXPECT_EQ(clone.lineweight(), lineweight);
+    EXPECT_EQ(clone.linetype(), linetype);
+    EXPECT_EQ(clone.linetypeScale(), fcad::domain::LinetypeScale{ 2.5 });
 }
 
 TEST(EntityTest, setGeometryKeepsTheId)
