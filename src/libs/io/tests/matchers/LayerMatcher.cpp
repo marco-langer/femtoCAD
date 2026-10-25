@@ -11,6 +11,7 @@ testing::Matcher<fcad::domain::Layer> IsLayer(const fcad::domain::Layer& expecte
     return testing::AllOf(
         testing::Field("name", &fcad::domain::Layer::name, expected.name),
         testing::Field("visible", &fcad::domain::Layer::visible, expected.visible),
+        testing::Field("color", &fcad::domain::Layer::color, expected.color),
         testing::Field(
             "arcs", &fcad::domain::Layer::arcs, fcad::test_utils::AreArcs(expected.arcs, maxError)
         ),
