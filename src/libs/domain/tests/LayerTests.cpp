@@ -71,6 +71,13 @@ TEST(LayerTest, lineweightIsDefaultByDefault)
     );
 }
 
+TEST(LayerTest, linetypeIsContinuousByDefault)
+{
+    const fcad::domain::Layer layer{ "Layer Name" };
+
+    EXPECT_EQ(layer.linetype(), fcad::domain::continuousLinetypeId());
+}
+
 TEST(LayerTest, newLayersHaveDifferentIds)
 {
     // Arrange
@@ -108,6 +115,8 @@ TEST(LayerTest, cloneHasNewIdsAndTheSameContent)
     layer.setVisible(false);
     layer.setColor(color);
     layer.setLineweight(lineweight);
+    const fcad::domain::LinetypeId linetype{ fcad::domain::LinetypeId::generate() };
+    layer.setLinetype(linetype);
     layer.add(fcad::domain::Line{ geometry });
     layer.add(
         fcad::domain::Circle{ fcad::geo::Circle{
@@ -133,6 +142,7 @@ TEST(LayerTest, cloneHasNewIdsAndTheSameContent)
     EXPECT_FALSE(clone.isVisible());
     EXPECT_EQ(clone.color(), color);
     EXPECT_EQ(clone.lineweight(), lineweight);
+    EXPECT_EQ(clone.linetype(), linetype);
 
     ASSERT_EQ(clone.lines().size(), 1);
     EXPECT_NE(clone.lines().front().id(), layer.lines().front().id());

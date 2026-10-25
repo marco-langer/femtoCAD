@@ -1,8 +1,10 @@
 add_executable(femtoCAD-domain-tests
     ColorTests.cpp
+    DocumentTests.cpp
     EntityTests.cpp
     LayerTests.cpp
     LinetypeTests.cpp
+    LinetypesTests.cpp
     LineweightTests.cpp
 )
 

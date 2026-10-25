@@ -36,6 +36,7 @@ Layer Layer::clone() const
     layer.m_visible = m_visible;
     layer.m_color = m_color;
     layer.m_lineweight = m_lineweight;
+    layer.m_linetype = m_linetype;
 
     for (const Arc& arc : m_arcs) {
         layer.add(arc.clone());
@@ -67,6 +68,10 @@ void Layer::setColor(Color color) { m_color = color; }
 const LayerLineweight& Layer::lineweight() const { return m_lineweight; }
 
 void Layer::setLineweight(LayerLineweight lineweight) { m_lineweight = lineweight; }
+
+LinetypeId Layer::linetype() const { return m_linetype; }
+
+void Layer::setLinetype(LinetypeId linetype) { m_linetype = linetype; }
 
 const Arcs& Layer::arcs() const { return m_arcs; }
 

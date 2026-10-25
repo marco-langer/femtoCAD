@@ -127,8 +127,6 @@ private:
     LinetypeDefinition m_definition;
 };
 
-using Linetypes = std::vector<Linetype>;
-
 /** Scales all dash patterns of a document, or those of one entity. */
 using LinetypeScale = core::Positive<double, struct LinetypeScaleTag>;
 

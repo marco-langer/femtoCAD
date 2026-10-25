@@ -3,6 +3,7 @@
 #include "core/StrongUuid.hpp"
 #include "domain/Color.hpp"
 #include "domain/Entity.hpp"
+#include "domain/Linetype.hpp"
 #include "domain/Lineweight.hpp"
 #include "geo/BoundingBox.hpp"
 
@@ -43,6 +44,9 @@ public:
     const LayerLineweight& lineweight() const;
     void setLineweight(LayerLineweight lineweight);
 
+    LinetypeId linetype() const;
+    void setLinetype(LinetypeId linetype);
+
     const Arcs& arcs() const;
     const Circles& circles() const;
     const Lines& lines() const;
@@ -57,6 +61,7 @@ private:
     bool m_visible{ true };
     Color m_color{ Adaptive{} };
     LayerLineweight m_lineweight{ DefaultLineweight{} };
+    LinetypeId m_linetype{ continuousLinetypeId() };
     Arcs m_arcs;
     Circles m_circles;
     Lines m_lines;
