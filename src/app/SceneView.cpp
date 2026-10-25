@@ -1,6 +1,8 @@
 #include "SceneView.hpp"
 
 #include "core/Overload.hpp"
+#include "domain/Linetype.hpp"
+#include "domain/Linetypes.hpp"
 
 #include <QColor>
 #include <QDebug>
@@ -11,8 +13,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <utility>
 #include <variant>
+#include <vector>
 
 namespace fcad::app {
 
@@ -53,6 +57,8 @@ namespace {
         double width;
         // The narrowest a line gets when lineweights are shown, so that thin ones stay visible.
         double minimumLineweightWidth;
+        // Dash patterns shorter than this are drawn continuous, since their dashes would blur.
+        double minimumPatternLength;
     };
 
     // Mouse wheel zoom. The limits are relative to the fitted view, to stay
@@ -91,7 +97,13 @@ constexpr int componentsPerColor = 3;
 constexpr int componentsPerLineweight = 1;
 // What adaptive colors become: white, which contrasts with the dark background.
 constexpr QColor adaptiveColor{ 0xFF, 0xFF, 0xFF };
-constexpr LineStyle lineStyle{ .width = 1.5, .minimumLineweightWidth = 1.0 };
+constexpr LineStyle lineStyle{ .width = 1.5,
+                               .minimumLineweightWidth = 1.0,
+                               .minimumPatternLength = 4.0 };
+// Floats per dash pattern reference in the vertex buffers (first element, count, scale).
+constexpr int componentsPerPattern = 3;
+// Must match maximumPatternElements in shaders/line.frag.
+constexpr std::size_t maximumPatternElements = 512;
 constexpr double millimetersPerInch = 25.4;
 constexpr ZoomBehavior zoomBehavior{ .stepFactor = 1.2, .minimum = 0.01, .maximum = 10000.0 };
 
@@ -123,6 +135,75 @@ namespace {
         ) };
 
         return gsl::narrow_cast<float>(width.value()) / 100.0F;
+    }
+
+    // Where a linetype's dash pattern is in Patterns::elements.
+    struct PatternRange final
+    {
+        float offset{ 0.0F };
+        // 0 for a continuous line.
+        float count{ 0.0F };
+    };
+
+    // The dash patterns of a document's linetypes, as u_patterns in line.frag expects them.
+    struct Patterns final
+    {
+        std::vector<float> elements;
+        std::vector<std::pair<domain::LinetypeId, PatternRange>> ranges;
+
+        PatternRange range(domain::LinetypeId id) const
+        {
+            const auto it{
+                std::ranges::find(ranges, id, &std::pair<domain::LinetypeId, PatternRange>::first)
+            };
+
+            return it != ranges.end() ? it->second : PatternRange{};
+        }
+    };
+
+    float toShaderLength(const domain::PatternElement& element)
+    {
+        return std::visit(
+            core::Overload{
+                [](const domain::Dash& dash) {
+                    return gsl::narrow_cast<float>(dash.length.value());
+                },
+                [](const domain::Gap& gap) { return -gsl::narrow_cast<float>(gap.length.value()); },
+                [](const domain::Dot& /* dot */) { return 0.0F; },
+            },
+            element
+        );
+    }
+
+    // Linetypes whose patterns don't fit into the shader anymore are drawn continuous.
+    Patterns toPatterns(const domain::Linetypes& linetypes)
+    {
+        Patterns patterns;
+
+        for (const domain::Linetype& linetype : linetypes) {
+            if (linetype.pattern().isContinuous()) {
+                continue;
+            }
+
+            const domain::PatternElements& pattern{ linetype.pattern().elements() };
+
+            if (patterns.elements.size() + pattern.size() > maximumPatternElements) {
+                qWarning() << "Too many dash pattern elements; drawing linetype"
+                           << linetype.name().value() << "continuous";
+                continue;
+            }
+
+            patterns.ranges.emplace_back(
+                linetype.id(),
+                PatternRange{ .offset = gsl::narrow_cast<float>(patterns.elements.size()),
+                              .count = gsl::narrow_cast<float>(pattern.size()) }
+            );
+            for (const domain::PatternElement& element : pattern) {
+                patterns.elements.push_back(toShaderLength(element));
+            }
+        }
+
+        return patterns;
     }
 
 }   // namespace
@@ -191,9 +272,13 @@ void SceneView::uploadGeometry()
     std::vector<float> vertices;
 
     m_lines.instanceCount = 0;
+    m_patterns.clear();
     if (m_document.has_value()) {
         const domain::Document& document{ m_document.value() };
         documentBounds = domain::boundingBox(document);
+
+        Patterns patterns{ toPatterns(document.linetypes()) };
+        const float linetypeScale{ gsl::narrow_cast<float>(document.linetypeScale().value()) };
 
         for (const domain::Layer& layer : document.layers()) {
             if (layer.isVisible()) {
@@ -204,6 +289,7 @@ void SceneView::uploadGeometry()
                         domain::resolved(entity.lineweight(), layer.lineweight()),
                         m_defaultLineweightWidth
                     ) };
+                    const PatternRange pattern{ patterns.range(layer.linetype()) };
                     vertices.push_back(gsl::narrow_cast<float>(line.start.x));
                     vertices.push_back(gsl::narrow_cast<float>(line.start.y));
                     vertices.push_back(gsl::narrow_cast<float>(line.end.x));
@@ -212,10 +298,15 @@ void SceneView::uploadGeometry()
                     vertices.push_back(color.greenF());
                     vertices.push_back(color.blueF());
                     vertices.push_back(lineweight);
+                    vertices.push_back(pattern.offset);
+                    vertices.push_back(pattern.count);
+                    vertices.push_back(linetypeScale);
                     ++m_lines.instanceCount;
                 }
             }
         }
+
+        m_patterns = std::move(patterns.elements);
     }
 
     m_sceneBounds = documentBounds.value_or(defaultBounds);
@@ -233,17 +324,20 @@ void SceneView::uploadGeometry()
 
     m_lines.vbo.allocate(vertices.data(), gsl::narrow_cast<int>(vertices.size() * sizeof(float)));
 
-    // Per line: start point, end point, color, then lineweight.
-    constexpr int stride{ (2 * componentsPerVertex + componentsPerColor + componentsPerLineweight)
+    // Per line: start point, end point, color, lineweight, then dash pattern.
+    constexpr int stride{ (2 * componentsPerVertex + componentsPerColor + componentsPerLineweight
+                           + componentsPerPattern)
                           * sizeof(float) };
     const int startLocation{ m_lineProgram->attributeLocation("a_start") };
     const int endLocation{ m_lineProgram->attributeLocation("a_end") };
     const int colorLocation{ m_lineProgram->attributeLocation("a_color") };
     const int lineweightLocation{ m_lineProgram->attributeLocation("a_lineweight") };
+    const int patternLocation{ m_lineProgram->attributeLocation("a_pattern") };
     m_lineProgram->enableAttributeArray(startLocation);
     m_lineProgram->enableAttributeArray(endLocation);
     m_lineProgram->enableAttributeArray(colorLocation);
     m_lineProgram->enableAttributeArray(lineweightLocation);
+    m_lineProgram->enableAttributeArray(patternLocation);
     m_lineProgram->setAttributeBuffer(startLocation, GL_FLOAT, 0, componentsPerVertex, stride);
     m_lineProgram->setAttributeBuffer(
         endLocation, GL_FLOAT, componentsPerVertex * sizeof(float), componentsPerVertex, stride
@@ -258,10 +352,18 @@ void SceneView::uploadGeometry()
         componentsPerLineweight,
         stride
     );
+    m_lineProgram->setAttributeBuffer(
+        patternLocation,
+        GL_FLOAT,
+        (2 * componentsPerVertex + componentsPerColor + componentsPerLineweight) * sizeof(float),
+        componentsPerPattern,
+        stride
+    );
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(startLocation), 1);
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(endLocation), 1);
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(colorLocation), 1);
     glVertexAttribDivisor(gsl::narrow_cast<GLuint>(lineweightLocation), 1);
+    glVertexAttribDivisor(gsl::narrow_cast<GLuint>(patternLocation), 1);
 
     m_lines.vbo.release();
     m_lines.vao.release();
@@ -405,6 +507,18 @@ void SceneView::paintGL()
     );
     m_lineProgram->setUniformValue(
         "u_lineWidth", gsl::narrow_cast<float>(lineStyle.width * pixelRatio)
+    );
+    if (!m_patterns.empty()) {
+        m_lineProgram->setUniformValueArray(
+            "u_patterns", m_patterns.data(), gsl::narrow_cast<int>(m_patterns.size()), 1
+        );
+    }
+    m_lineProgram->setUniformValue(
+        "u_worldPerPixel", gsl::narrow_cast<float>(m_viewScale / pixelRatio)
+    );
+    m_lineProgram->setUniformValue(
+        "u_minimumPatternLength",
+        gsl::narrow_cast<float>(lineStyle.minimumPatternLength * pixelRatio)
     );
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_lines.vao);

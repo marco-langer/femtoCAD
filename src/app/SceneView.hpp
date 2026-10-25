@@ -14,6 +14,7 @@
 
 #include <memory>
 #include <optional>
+#include <vector>
 
 namespace fcad::app {
 
@@ -71,6 +72,8 @@ private:
     QOpenGLVertexArrayObject m_backgroundVao;
     std::unique_ptr<QOpenGLShaderProgram> m_lineProgram;
     Geometry m_lines;
+    // The dash patterns for u_patterns in shaders/line.frag.
+    std::vector<float> m_patterns;
 
     geo::BoundingBox m_sceneBounds;
     // World point at the widget's centre.
