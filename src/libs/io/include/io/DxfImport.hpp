@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/Result.hpp"
+#include "domain/Document.hpp"
 #include "domain/Layer.hpp"
 #include "domain/LengthUnit.hpp"
 #include "domain/Linetype.hpp"
@@ -27,5 +28,11 @@ struct ImportedDxf final
 };
 
 core::Result<ImportedDxf> importDxf(const QString& filePath);
+
+/**
+ * The document of an imported file: its linetypes, linetype scale and layers, in unit. That's the
+ * file's unit, or for a file without one the unit the user picked. The warnings aren't used.
+ */
+domain::Document toDocument(ImportedDxf&& imported, domain::LengthUnit unit);
 
 }   // namespace fcad::io

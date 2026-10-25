@@ -8,6 +8,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QStringList>
 #include <QToolBar>
 
 #include <optional>
@@ -169,16 +170,14 @@ void MainWindow::onImportDxf()
         return;
     }
 
-    domain::Document document{ unit.value(), std::move(importedDxf.linetypes) };
-    document.setLinetypeScale(importedDxf.linetypeScale);
-    document.addLayers(std::move(importedDxf.layers));
-    m_workspace.setDocument(std::move(document));
+    const QStringList warnings{ std::move(importedDxf.warnings) };
+    m_workspace.setDocument(io::toDocument(std::move(importedDxf), unit.value()));
     m_settings.dxfImport.lastImportPath = filePath;
     m_sceneView->updateDocument();
     updateWindowTitle(filePath);
 
-    if (!importedDxf.warnings.isEmpty()) {
-        QMessageBox::warning(this, "Dxf import", importedDxf.warnings.join('\n'));
+    if (!warnings.isEmpty()) {
+        QMessageBox::warning(this, "Dxf import", warnings.join('\n'));
     }
 }
 
