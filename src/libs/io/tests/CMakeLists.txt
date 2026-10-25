@@ -1,4 +1,5 @@
 add_executable(femtoCAD-io-tests
+    DxfColorsTests.cpp
     DxfEntitiesTests.cpp
     DxfImportTests.cpp
     DxfUnitsTests.cpp

@@ -1,6 +1,8 @@
 add_library(femtoCAD-io STATIC
     include/io/DxfImport.hpp
     include/io/DxfImportError.hpp
+    src/DxfColors.cpp
+    src/DxfColors.hpp
     src/DxfEntities.cpp
     src/DxfEntities.hpp
     src/DxfImport.cpp
@@ -14,6 +16,7 @@ target_link_libraries(femtoCAD-io
         femtoCAD-domain
         femtoCAD::qt-core
     PRIVATE
+        femtoCAD::ms-gsl
         femtoCAD::opendxf
         femtoCAD::warnings
 )
