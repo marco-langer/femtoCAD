@@ -6,6 +6,9 @@ layout(location = 0) in vec2 a_start;
 layout(location = 1) in vec2 a_end;
 layout(location = 2) in vec3 a_color;
 layout(location = 3) in float a_lineweight;  // millimeters
+// The line's dash pattern in u_patterns of line.frag: first element, number of
+// elements (0 for a continuous line) and the scale of its lengths.
+layout(location = 4) in vec3 a_pattern;
 
 uniform mat4 u_viewProjection;
 uniform vec2 u_viewportSize;  // device pixels
@@ -22,6 +25,9 @@ flat out vec2 v_start;
 flat out vec2 v_end;
 flat out vec3 v_color;
 flat out float v_lineWidth;
+flat out int v_patternOffset;
+flat out int v_patternCount;
+flat out float v_patternScale;
 
 vec2 toPixels(vec2 world)
 {
@@ -56,5 +62,8 @@ void main()
     v_end = end;
     v_color = a_color;
     v_lineWidth = lineWidth;
+    v_patternOffset = int(a_pattern.x);
+    v_patternCount = int(a_pattern.y);
+    v_patternScale = a_pattern.z;
     gl_Position = vec4(position / u_viewportSize * 2.0 - 1.0, 0.0, 1.0);
 }
