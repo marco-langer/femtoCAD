@@ -4,6 +4,7 @@ add_library(femtoCAD-core INTERFACE
     include/core/Error.hpp
     include/core/NonNegative.hpp
     include/core/Overload.hpp
+    include/core/Positive.hpp
     include/core/Result.hpp
     include/core/StrongUuid.hpp
     include/core/VectorExtensions.hpp

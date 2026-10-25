@@ -3,6 +3,7 @@ add_executable(femtoCAD-core-tests
     BoundedValueTests.cpp
     NonNegativeTests.cpp
     OverloadTests.cpp
+    PositiveTests.cpp
     StrongUuidTests.cpp
 )
 
