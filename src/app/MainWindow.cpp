@@ -133,6 +133,10 @@ void MainWindow::onImportDxf()
     m_settings.dxfImport.lastImportPath = filePath;
     m_sceneView->updateDocument();
     updateWindowTitle(filePath);
+
+    if (!importedDxf.warnings.isEmpty()) {
+        QMessageBox::warning(this, "Dxf import", importedDxf.warnings.join('\n'));
+    }
 }
 
 void MainWindow::onClose() { close(); }

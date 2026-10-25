@@ -15,6 +15,53 @@
 
 #include <optional>
 
+namespace {
+
+// The layers of example.dxf, with all coordinates and radii multiplied by scale.
+fcad::domain::Layers exampleLayers(double scale)
+{
+    fcad::domain::Layers layers;
+
+    fcad::domain::Layer& testLayer{ layers.emplace_back("Test Layer") };
+    testLayer.visible = false;
+
+    fcad::domain::Layer& linesLayer{ layers.emplace_back("Lines") };
+    linesLayer.lines.push_back(
+        fcad::geo::Line{
+            .start = { 100.0 * scale, 100.0 * scale },
+            .end = { 350.0 * scale, 400.0 * scale },
+        }
+    );
+    linesLayer.lines.push_back(
+        fcad::geo::Line{
+            .start = { 150.0 * scale, 130.0 * scale },
+            .end = { 250.0 * scale, 130.0 * scale },
+        }
+    );
+
+    fcad::domain::Layer& circlesLayer{ layers.emplace_back("Circles") };
+    circlesLayer.circles.push_back(
+        fcad::geo::Circle{
+            .center = { 50.4 * scale, 65.0 * scale },
+            .radius = fcad::geo::Radius::fromValue(2.5 * scale).value(),
+        }
+    );
+
+    fcad::domain::Layer& arcsLayer{ layers.emplace_back("Arcs") };
+    arcsLayer.arcs.push_back(
+        fcad::geo::Arc{
+            .center = { 0.0 * scale, 2.0 * scale },
+            .startAngle = fcad::core::Radians::fromDegrees(0.0),
+            .endAngle = fcad::core::Radians::fromDegrees(180.0),
+            .radius = fcad::geo::Radius::fromValue(0.5 * scale).value(),
+        }
+    );
+
+    return layers;
+}
+
+}   // namespace
+
 TEST(DxfImportTest, ImportExample)
 {
     // Arrange
@@ -29,46 +76,7 @@ TEST(DxfImportTest, ImportExample)
         FAIL() << importResult.error().message.toStdString();
     }
 
-    const fcad::domain::Layers& layers{ importResult.value().layers };
-
-    fcad::domain::Layers expectedLayers;
-
-    fcad::domain::Layer& testLayer{ expectedLayers.emplace_back("Test Layer") };
-    testLayer.visible = false;
-
-    fcad::domain::Layer& linesLayer{ expectedLayers.emplace_back("Lines") };
-    linesLayer.lines.push_back(
-        fcad::geo::Line{
-            .start = { 100.0, 100.0 },
-            .end = { 350.0, 400.0 },
-        }
-    );
-    linesLayer.lines.push_back(
-        fcad::geo::Line{
-            .start = { 150.0, 130.0 },
-            .end = { 250.0, 130.0 },
-        }
-    );
-
-    fcad::domain::Layer& circlesLayer{ expectedLayers.emplace_back("Circles") };
-    circlesLayer.circles.push_back(
-        fcad::geo::Circle{
-            .center = { 50.4, 65.0 },
-            .radius = fcad::geo::Radius{ 2.5 },
-        }
-    );
-
-    fcad::domain::Layer& arcsLayer{ expectedLayers.emplace_back("Arcs") };
-    arcsLayer.arcs.push_back(
-        fcad::geo::Arc{
-            .center = { 0.0, 2.0 },
-            .startAngle = fcad::core::Radians::fromDegrees(0.0),
-            .endAngle = fcad::core::Radians::fromDegrees(180.0),
-            .radius = fcad::geo::Radius{ 0.5 },
-        }
-    );
-
-    EXPECT_THAT(layers, AreLayers(expectedLayers));
+    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(1.0)));
 }
 
 TEST(DxfImportTest, ImportWithoutUnit)
@@ -103,6 +111,45 @@ TEST(DxfImportTest, ImportUnit)
     }
 
     EXPECT_EQ(importResult.value().unit, fcad::domain::LengthUnit::Millimeter);
+    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(1.0)));
+    EXPECT_TRUE(importResult.value().warnings.isEmpty());
+}
+
+TEST(DxfImportTest, ImportUnsupportedUnit)
+{
+    // Arrange
+    const QString filePath{ TEST_DATA_DIR "example-decameter.dxf" };
+    ASSERT_TRUE(QFile::exists(filePath));
+
+    // Act
+    fcad::core::Result<fcad::io::ImportedDxf> importResult{ fcad::io::importDxf(filePath) };
+
+    // Assert
+    if (!importResult.has_value()) {
+        FAIL() << importResult.error().message.toStdString();
+    }
+
+    EXPECT_EQ(importResult.value().unit, fcad::domain::LengthUnit::Meter);
+    EXPECT_THAT(importResult.value().layers, AreLayers(exampleLayers(10.0)));
+    EXPECT_EQ(importResult.value().warnings.size(), 1);
+}
+
+TEST(DxfImportTest, ImportInvalidUnit)
+{
+    // Arrange
+    const QString filePath{ TEST_DATA_DIR "invalid-unit.dxf" };
+    ASSERT_TRUE(QFile::exists(filePath));
+
+    // Act
+    fcad::core::Result<fcad::io::ImportedDxf> importResult{ fcad::io::importDxf(filePath) };
+
+    // Assert
+    if (!importResult.has_value()) {
+        FAIL() << importResult.error().message.toStdString();
+    }
+
+    EXPECT_EQ(importResult.value().unit, std::nullopt);
+    EXPECT_EQ(importResult.value().warnings.size(), 1);
 }
 
 TEST(DxfImportTest, MissingFile)
