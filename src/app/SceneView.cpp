@@ -15,6 +15,21 @@ namespace fcad::app {
 
 namespace {
 
+    // Vertical gradient, from the top to the bottom edge of the view.
+    struct BackgroundStyle final
+    {
+        QColor topColor;
+        QColor bottomColor;
+    };
+
+    // Axes through the world origin, behind the drawing. Width in logical pixels.
+    struct AxesStyle final
+    {
+        QColor xColor;
+        QColor yColor;
+        double width;
+    };
+
     // Dot grid, behind the axes. Spacings are powers of ten in world units.
     // The minor dots use the finest one at least minimumSpacing apart and
     // fade in as they spread out, until the next one replaces them. Major
@@ -37,13 +52,11 @@ constexpr geo::BoundingBox defaultBounds{ .min{ 0.0, 0.0 }, .max{ 1.0, 1.0 } };
 constexpr double viewMargin = 0.05;
 // Extent shown when the scene has neither width nor height (e.g. a single point).
 constexpr double minimumViewExtent = 1.0;
-// Background gradient, from the top to the bottom edge of the view.
-constexpr QColor backgroundTopColor{ 0x23, 0x27, 0x2E };
-constexpr QColor backgroundBottomColor{ 0x11, 0x13, 0x16 };
-// Axes through the world origin, behind the drawing. Width in logical pixels.
-constexpr QColor xAxisColor{ 0xB8, 0x4A, 0x4A };
-constexpr QColor yAxisColor{ 0x4A, 0x9A, 0x55 };
-constexpr double axisWidth = 1.0;
+constexpr BackgroundStyle backgroundStyle{ .topColor{ 0x23, 0x27, 0x2E },
+                                           .bottomColor{ 0x11, 0x13, 0x16 } };
+constexpr AxesStyle axesStyle{ .xColor{ 0xB8, 0x4A, 0x4A },
+                               .yColor{ 0x4A, 0x9A, 0x55 },
+                               .width = 1.0 };
 constexpr GridStyle gridStyle{ .color{ 0xA8, 0xB2, 0xC2, 0x99 },
                                .minimumSpacing = 16.0,
                                .minorRadius = 1.0,
@@ -204,8 +217,8 @@ void SceneView::paintGL()
     // The background covers every pixel, so there is no need to clear first.
     glDisable(GL_BLEND);
     m_backgroundProgram->bind();
-    m_backgroundProgram->setUniformValue("u_topColor", backgroundTopColor);
-    m_backgroundProgram->setUniformValue("u_bottomColor", backgroundBottomColor);
+    m_backgroundProgram->setUniformValue("u_topColor", backgroundStyle.topColor);
+    m_backgroundProgram->setUniformValue("u_bottomColor", backgroundStyle.bottomColor);
     // Window coordinates have y up, widget coordinates y down.
     const QPointF origin{ mapFromWorld(geo::Coordinate{ .x = 0.0, .y = 0.0 }) };
     const double originX{ origin.x() * pixelRatio };
@@ -214,10 +227,10 @@ void SceneView::paintGL()
         "u_origin", QVector2D{ gsl::narrow_cast<float>(originX), gsl::narrow_cast<float>(originY) }
     );
     m_backgroundProgram->setUniformValue(
-        "u_axisWidth", gsl::narrow_cast<float>(axisWidth * pixelRatio)
+        "u_axisWidth", gsl::narrow_cast<float>(axesStyle.width * pixelRatio)
     );
-    m_backgroundProgram->setUniformValue("u_xAxisColor", xAxisColor);
-    m_backgroundProgram->setUniformValue("u_yAxisColor", yAxisColor);
+    m_backgroundProgram->setUniformValue("u_xAxisColor", axesStyle.xColor);
+    m_backgroundProgram->setUniformValue("u_yAxisColor", axesStyle.yColor);
     m_backgroundProgram->setUniformValue("u_axesVisible", m_axesVisible);
 
     // The minor spacing ends up in [minimumSpacing, 10 * minimumSpacing),
