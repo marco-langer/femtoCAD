@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/StrongUuid.hpp"
 #include "domain/Color.hpp"
 #include "domain/Entity.hpp"
 #include "geo/BoundingBox.hpp"
@@ -11,6 +12,9 @@
 
 namespace fcad::domain {
 
+using LayerId = core::StrongUuid<struct LayerIdTag>;
+
+// Move-only like the entities; clone() gives the copy and all its entities new ids.
 class Layer final
 {
 public:
@@ -21,6 +25,10 @@ public:
 
     Layer& operator=(const Layer&) = delete;
     Layer& operator=(Layer&&) = default;
+
+    [[nodiscard]] Layer clone() const;
+
+    LayerId id() const;
 
     const QString& name() const;
     void setName(QString name);
@@ -40,6 +48,7 @@ public:
     void add(Line line);
 
 private:
+    LayerId m_id;
     QString m_name;
     bool m_visible{ true };
     Color m_color{ Adaptive{} };

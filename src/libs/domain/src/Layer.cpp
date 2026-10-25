@@ -26,8 +26,30 @@ namespace {
 }   // namespace
 
 Layer::Layer(QString name)
-    : m_name{ std::move(name) }
+    : m_id{ LayerId::generate() }
+    , m_name{ std::move(name) }
 {}
+
+Layer Layer::clone() const
+{
+    Layer layer{ m_name };
+    layer.m_visible = m_visible;
+    layer.m_color = m_color;
+
+    for (const Arc& arc : m_arcs) {
+        layer.add(arc.clone());
+    }
+    for (const Circle& circle : m_circles) {
+        layer.add(circle.clone());
+    }
+    for (const Line& line : m_lines) {
+        layer.add(line.clone());
+    }
+
+    return layer;
+}
+
+LayerId Layer::id() const { return m_id; }
 
 const QString& Layer::name() const { return m_name; }
 
