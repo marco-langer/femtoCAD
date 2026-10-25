@@ -1,5 +1,7 @@
 #pragma once
 
+#include "domain/ByLayer.hpp"
+
 #include <cstdint>
 #include <variant>
 
@@ -23,12 +25,6 @@ struct Adaptive final
 };
 
 using Color = std::variant<Rgb, Adaptive>;
-
-// The entity's layer's value, e.g. its color.
-struct ByLayer final
-{
-    bool operator==(const ByLayer&) const = default;
-};
 
 using EntityColor = std::variant<ByLayer, Rgb, Adaptive>;
 

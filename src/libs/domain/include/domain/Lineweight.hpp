@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/BoundedValue.hpp"
-#include "domain/Color.hpp"
+#include "domain/ByLayer.hpp"
 
 #include <variant>
 
