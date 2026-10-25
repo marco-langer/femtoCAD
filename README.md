@@ -1,18 +1,12 @@
-## Building
+# femtoCAD
 
-### Dependencies
+A small 2D CAD application in C++23 and Qt6. Today it imports and displays
+DXF files with their layers, colors, linetypes and lineweights. Editing and
+a native file format are planned.
 
-On Debian:
+![showcase.dxf in femtoCAD](docs/images/showcase.png)
 
-    sudo apt install build-essential cmake qt6-base-dev
-
-This project uses [vcpkg](https://github.com/microsoft/vcpkg) for C++ dependencies.
-
-Set `VCPKG_ROOT` to your vcpkg installation:
-
-    export VCPKG_ROOT=/path/to/vcpkg
-
-### Build
-
-    cmake --preset release
-    cmake --build --preset release
+- [Building](docs/building.md)
+- [Contributing](CONTRIBUTING.md)
+- [Architecture decisions](docs/adr/)
+- [Example DXF files](examples/dxf/)

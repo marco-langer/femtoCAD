@@ -2,14 +2,7 @@
 
 ## Build & test
 
-Requires `VCPKG_ROOT` to point at a vcpkg checkout (see `README.md`).
-
-    cmake --preset release          # or: debug (for manual testing)
-    cmake --build --preset release
-    ctest --preset release
-
-Binaries land in `build/<preset>/`. The app is `build/<preset>/src/app/femtoCAD`, the tests of
-each library are `build/<preset>/src/libs/<library>/tests/femtoCAD-<library>-tests`.
+See [docs/building.md](docs/building.md).
 
 ## Layout
 
