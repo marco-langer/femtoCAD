@@ -109,6 +109,11 @@ QSize SceneView::sizeHint() const { return QSize{ windowWeight, windowHeight }; 
 
 void SceneView::updateDocument()
 {
+    // Before the first show there is no GL context yet. initializeGL() uploads the document then.
+    if (!isValid()) {
+        return;
+    }
+
     makeCurrent();
     uploadGeometry();
     doneCurrent();
