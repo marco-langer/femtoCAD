@@ -4,8 +4,7 @@ in vec2 v_position;
 flat in vec2 v_start;
 flat in vec2 v_end;
 flat in vec3 v_color;
-
-uniform float u_lineWidth;  // device pixels
+flat in float v_lineWidth;  // device pixels
 
 out vec4 fragColor;
 
@@ -21,7 +20,7 @@ void main()
 {
     // Capsule around the segment, with a one pixel soft edge.
     float distance = distanceToSegment(v_position, v_start, v_end);
-    float alpha = clamp(u_lineWidth * 0.5 + 0.5 - distance, 0.0, 1.0);
+    float alpha = clamp(v_lineWidth * 0.5 + 0.5 - distance, 0.0, 1.0);
     if (alpha <= 0.0) {
         discard;
     }

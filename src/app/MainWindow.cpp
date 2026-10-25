@@ -26,6 +26,8 @@ MainWindow::MainWindow(domain::Workspace& workspace, Settings& settings)
     m_sceneView = new SceneView{ m_workspace.document() };
     m_sceneView->setAxesVisible(m_settings.view.showAxes);
     m_sceneView->setGridVisible(m_settings.view.showGrid);
+    m_sceneView->setLineweightsVisible(m_settings.view.showLineweights);
+    m_sceneView->setDefaultLineweightWidth(m_settings.defaultLineweightWidth);
 
     setStatusBar(new QStatusBar{});
 
@@ -75,6 +77,11 @@ void MainWindow::createActions()
     showGridAction->setChecked(m_settings.view.showGrid);
     connect(showGridAction, &QAction::toggled, this, &MainWindow::onShowGridToggled);
 
+    auto* showLineweightsAction{ new QAction{ "Show Lineweights" } };
+    showLineweightsAction->setCheckable(true);
+    showLineweightsAction->setChecked(m_settings.view.showLineweights);
+    connect(showLineweightsAction, &QAction::toggled, this, &MainWindow::onShowLineweightsToggled);
+
     QMenu* fileMenu{ menuBar()->addMenu("&File") };
     fileMenu->addAction(newAction);
     fileMenu->addAction(saveAction);
@@ -91,6 +98,7 @@ void MainWindow::createActions()
     QMenu* viewMenu{ menuBar()->addMenu("&View") };
     viewMenu->addAction(showAxesAction);
     viewMenu->addAction(showGridAction);
+    viewMenu->addAction(showLineweightsAction);
 }
 
 void MainWindow::updateWindowTitle(const QString& filePath)
@@ -121,6 +129,12 @@ void MainWindow::onShowGridToggled(bool visible)
 {
     m_settings.view.showGrid = visible;
     m_sceneView->setGridVisible(visible);
+}
+
+void MainWindow::onShowLineweightsToggled(bool visible)
+{
+    m_settings.view.showLineweights = visible;
+    m_sceneView->setLineweightsVisible(visible);
 }
 
 void MainWindow::onImportDxf()

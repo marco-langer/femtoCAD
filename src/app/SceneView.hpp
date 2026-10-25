@@ -1,6 +1,7 @@
 #pragma once
 
 #include "domain/Document.hpp"
+#include "domain/Lineweight.hpp"
 #include "geo/BoundingBox.hpp"
 
 #include <QMatrix4x4>
@@ -33,6 +34,9 @@ public:
     void updateDocument();
     void setAxesVisible(bool visible);
     void setGridVisible(bool visible);
+    void setLineweightsVisible(bool visible);
+    // The width of lines whose lineweight is DefaultLineweight.
+    void setDefaultLineweightWidth(domain::Lineweight width);
 
 protected:
     void initializeGL() override;
@@ -60,6 +64,7 @@ private:
     };
 
     const std::optional<domain::Document>& m_document;
+    domain::Lineweight m_defaultLineweightWidth{ 25 };
     std::unique_ptr<QOpenGLShaderProgram> m_backgroundProgram;
     // Empty, since the background shader needs no vertex data. The core
     // profile still requires a bound VAO to draw.
@@ -77,6 +82,7 @@ private:
     QPointF m_lastMousePos;
     bool m_axesVisible{ true };
     bool m_gridVisible{ true };
+    bool m_lineweightsVisible{ true };
 };
 
 }   // namespace fcad::app

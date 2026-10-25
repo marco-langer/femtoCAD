@@ -1,6 +1,7 @@
 #include "Settings.hpp"
 
 #include "domain/LengthUnit.hpp"
+#include "domain/Lineweight.hpp"
 
 #include <QSettings>
 
@@ -45,6 +46,18 @@ namespace {
         return fromKey(qsettings.value(key).toString()).value_or(defaultUnit);
     }
 
+    domain::Lineweight
+    loadLineweight(const QSettings& qsettings, const QString& key, domain::Lineweight fallback)
+    {
+        bool isInt{ false };
+        const int value{ qsettings.value(key).toInt(&isInt) };
+        if (!isInt) {
+            return fallback;
+        }
+
+        return domain::Lineweight::fromValue(value).value_or(fallback);
+    }
+
 }   // namespace
 
 Settings loadSettings()
@@ -54,6 +67,8 @@ Settings loadSettings()
     QSettings qsettings{ "femtoCAD", "femtoCAD" };
 
     settings.defaultUnit = loadUnit(qsettings, "defaultUnit", settings.defaultUnit);
+    settings.defaultLineweightWidth =
+        loadLineweight(qsettings, "defaultLineweightWidth", settings.defaultLineweightWidth);
 
     qsettings.beginGroup("dxfImport");
 
@@ -73,6 +88,8 @@ Settings loadSettings()
 
     settings.view.showAxes = qsettings.value("showAxes", settings.view.showAxes).toBool();
     settings.view.showGrid = qsettings.value("showGrid", settings.view.showGrid).toBool();
+    settings.view.showLineweights =
+        qsettings.value("showLineweights", settings.view.showLineweights).toBool();
 
     qsettings.endGroup();
 
@@ -84,6 +101,7 @@ void saveSettings(const Settings& settings)
     QSettings qsettings{ "femtoCAD", "femtoCAD" };
 
     qsettings.setValue("defaultUnit", toKey(settings.defaultUnit));
+    qsettings.setValue("defaultLineweightWidth", settings.defaultLineweightWidth.value());
 
     qsettings.beginGroup("dxfImport");
 
@@ -100,6 +118,7 @@ void saveSettings(const Settings& settings)
 
     qsettings.setValue("showAxes", settings.view.showAxes);
     qsettings.setValue("showGrid", settings.view.showGrid);
+    qsettings.setValue("showLineweights", settings.view.showLineweights);
 
     qsettings.endGroup();
 }
