@@ -146,7 +146,14 @@ namespace {
                 }
             }
 
+            if (dxfEntity.lineweight == byBlockLineweightValue) {
+                ++m_lineweightCounts.byBlockEntities;
+            } else if (!isValidEntityLineweight(dxfEntity.lineweight)) {
+                ++m_lineweightCounts.invalidEntities;
+            }
+
             entity.setColor(toEntityColor(dxfEntity.color, dxfEntity.trueColor));
+            entity.setLineweight(toEntityLineweight(dxfEntity.lineweight));
             m_layers.at(layerIndex).add(std::move(entity));
         }
 
