@@ -9,7 +9,6 @@ target_link_libraries(femtoCAD-geo-tests
     PRIVATE
         femtoCAD-geo
         femtoCAD-test_utils
-        femtoCAD::fmt
         femtoCAD::warnings
         GTest::gmock_main
 )
