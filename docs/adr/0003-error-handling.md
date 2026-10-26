@@ -24,8 +24,8 @@ or call APIs that throw.
   makes the call a compile error. This lets a constructor for literals reject invalid values at
   compile time.
 - Test code may throw. An exception fails the test, which keeps tests short and readable.
-- Exceptions stay enabled in the build. The standard library, fmt, GSL and GoogleTest keep working
-  as specified.
+- Exceptions stay enabled in the build. The standard library, GSL and GoogleTest keep working as
+  specified.
 
 ### Errors are values
 

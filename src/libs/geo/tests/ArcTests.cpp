@@ -2,7 +2,7 @@
 
 #include "test_utils/matchers/BoundingBoxMatcher.hpp"
 
-#include <fmt/format.h>
+#include <format>
 #include <gtest/gtest.h>
 
 struct ArcBoundingBoxParams final
@@ -226,7 +226,7 @@ INSTANTIATE_TEST_SUITE_P(
         }
     ),
     [](const testing::TestParamInfo<ArcBoundingBoxParams>& paramInfo) {
-        return fmt::format(
+        return std::format(
             "{}_{}",
             fcad::core::Degrees{ paramInfo.param.startAngle }.value(),
             fcad::core::Degrees{ paramInfo.param.endAngle }.value()
