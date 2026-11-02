@@ -20,10 +20,10 @@ namespace fcad::io {
  * the elements aren't a valid DashPattern, e.g. only gaps.
  */
 std::optional<domain::DashPattern>
-toDashPattern(const odxf::LineTypeElements& elements, double scale);
+toDashPattern(const odxf::line_type_elements& elements, double scale);
 
 /** Whether the linetype embeds texts or shapes, which femtoCAD doesn't support. */
-bool isComplex(const odxf::LineType& dxfLinetype);
+bool isComplex(const odxf::line_type& dxfLinetype);
 
 /** Whether an entity's linetype name (group code 6) is BYLAYER or BYBLOCK, in any case. */
 bool isByLayer(const std::string& name);
@@ -59,7 +59,7 @@ class DxfLinetypes final
 {
 public:
     /** Adds a linetype of the LTYPE table, with its lengths multiplied by scale. */
-    AddedLinetype add(const odxf::LineType& dxfLinetype, double scale);
+    AddedLinetype add(const odxf::line_type& dxfLinetype, double scale);
 
     /** The id for a name a layer or an entity refers to. Empty if no linetype has that name. */
     std::optional<domain::LinetypeId> find(const std::string& name) const;

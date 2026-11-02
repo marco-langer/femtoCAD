@@ -19,12 +19,12 @@ namespace {
 }   // namespace
 
 std::optional<domain::DashPattern>
-toDashPattern(const odxf::LineTypeElements& elements, double scale)
+toDashPattern(const odxf::line_type_elements& elements, double scale)
 {
     domain::PatternElements patternElements;
     patternElements.reserve(elements.size());
 
-    for (const odxf::LineTypeElement& element : elements) {
+    for (const odxf::line_type_element& element : elements) {
         if (element.length == 0.0) {
             patternElements.push_back(domain::Dot{});
             continue;
@@ -47,10 +47,10 @@ toDashPattern(const odxf::LineTypeElements& elements, double scale)
     return domain::DashPattern::fromElements(std::move(patternElements));
 }
 
-bool isComplex(const odxf::LineType& dxfLinetype)
+bool isComplex(const odxf::line_type& dxfLinetype)
 {
-    return std::ranges::any_of(dxfLinetype.elements, [](const odxf::LineTypeElement& element) {
-        return element.complexFlags != 0;
+    return std::ranges::any_of(dxfLinetype.elements, [](const odxf::line_type_element& element) {
+        return element.complex_flags != 0;
     });
 }
 
@@ -125,7 +125,7 @@ QStringList linetypeWarnings(const LinetypeCounts& counts)
     return warnings;
 }
 
-AddedLinetype DxfLinetypes::add(const odxf::LineType& dxfLinetype, double scale)
+AddedLinetype DxfLinetypes::add(const odxf::line_type& dxfLinetype, double scale)
 {
     if (isByLayer(dxfLinetype.name) || isByBlock(dxfLinetype.name)) {
         return AddedLinetype::BuiltIn;

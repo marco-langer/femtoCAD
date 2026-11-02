@@ -15,10 +15,10 @@
 
 #include <opendxf/entities.hpp>
 #include <opendxf/header.hpp>
-#include <opendxf/headervariables.hpp>
-#include <opendxf/ireadstream.hpp>
+#include <opendxf/header_variables.hpp>
+#include <opendxf/io/read.hpp>
+#include <opendxf/io/read_stream_base.hpp>
 #include <opendxf/layer.hpp>
-#include <opendxf/read.hpp>
 #include <opendxf/tables.hpp>
 
 #include <QStringList>
@@ -39,7 +39,7 @@ namespace {
         return reinterpret_cast<const char8_t*>(filePath.toUtf8().constData());
     }
 
-    class ReadStream final : public odxf::IReadStream
+    class ReadStream final : public odxf::read_stream_base
     {
     public:
         domain::Linetypes getLinetypes() && { return std::move(m_linetypes).takeLinetypes(); }
@@ -59,12 +59,12 @@ namespace {
     private:
         // The HEADER section comes before the tables and entities, so m_scale is set before it's
         // used.
-        void header(const odxf::Header& header) override
+        void header(const odxf::header& header) override
         {
             readLinetypeScale(header);
 
-            const std::expected<std::optional<odxf::LengthUnit>, odxf::HeaderError> dxfUnit{
-                odxf::insertionUnits(header)
+            const std::expected<std::optional<odxf::length_unit>, odxf::header_error> dxfUnit{
+                odxf::insertion_units(header)
             };
             if (!dxfUnit.has_value()) {
                 m_warnings.push_back(
@@ -96,10 +96,10 @@ namespace {
             }
         }
 
-        void readLinetypeScale(const odxf::Header& header)
+        void readLinetypeScale(const odxf::header& header)
         {
-            const std::expected<std::optional<double>, odxf::HeaderError> scale{
-                odxf::lineTypeScale(header)
+            const std::expected<std::optional<double>, odxf::header_error> scale{
+                odxf::line_type_scale(header)
             };
             if (!scale.has_value()) {
                 m_warnings.push_back(
@@ -114,7 +114,7 @@ namespace {
             }
         }
 
-        void lineType(const odxf::LineType& lineType) override
+        void line_type(const odxf::line_type& lineType) override
         {
             switch (m_linetypes.add(lineType, m_scale)) {
             case AddedLinetype::Added:
@@ -125,14 +125,14 @@ namespace {
         }
 
         // DXF writes the LTYPE table before the LAYER table, so the layer's linetype is known.
-        void layer(const odxf::Layer& layer) override
+        void layer(const odxf::layer& layer) override
         {
             if (!isValidLayerLineweight(layer.lineweight)) {
                 ++m_lineweightCounts.invalidLayers;
             }
 
             domain::Layer& added{ m_layers.emplace_back(toLayer(layer)) };
-            const std::optional<domain::LinetypeId> linetype{ m_linetypes.find(layer.lineType) };
+            const std::optional<domain::LinetypeId> linetype{ m_linetypes.find(layer.line_type) };
             if (linetype.has_value()) {
                 added.setLinetype(linetype.value());
             } else {
@@ -141,52 +141,58 @@ namespace {
             m_layerNames.push_back(layer.name);
         }
 
-        void arc(const odxf::Arc& arc) override
+        void arc(const odxf::arc& arc) override
         {
-            const std::optional<std::size_t> layerIndex{ core::indexOf(m_layerNames, arc.layer) };
+            const std::optional<std::size_t> layerIndex{
+                core::indexOf(m_layerNames, arc.properties.layer)
+            };
 
             if (layerIndex.has_value()) {
                 const std::optional<geo::Arc> maybeArc{ toArc(arc, m_scale) };
 
                 if (maybeArc.has_value()) {
-                    add(layerIndex.value(), domain::Arc{ maybeArc.value() }, arc);
+                    add(layerIndex.value(), domain::Arc{ maybeArc.value() }, arc.properties);
                 }
             }
         }
 
-        void line(const odxf::Line& line) override
+        void line(const odxf::line& line) override
         {
-            const std::optional<std::size_t> layerIndex{ core::indexOf(m_layerNames, line.layer) };
+            const std::optional<std::size_t> layerIndex{
+                core::indexOf(m_layerNames, line.properties.layer)
+            };
 
             if (layerIndex.has_value()) {
-                add(layerIndex.value(), domain::Line{ toLine(line, m_scale) }, line);
+                add(layerIndex.value(), domain::Line{ toLine(line, m_scale) }, line.properties);
             }
         }
 
-        void circle(const odxf::Circle& circle) override
+        void circle(const odxf::circle& circle) override
         {
             const std::optional<std::size_t> layerIndex{
-                core::indexOf(m_layerNames, circle.layer)
+                core::indexOf(m_layerNames, circle.properties.layer)
             };
 
             if (layerIndex.has_value()) {
                 const std::optional<geo::Circle> maybeCircle{ toCircle(circle, m_scale) };
 
                 if (maybeCircle.has_value()) {
-                    add(layerIndex.value(), domain::Circle{ maybeCircle.value() }, circle);
+                    add(layerIndex.value(),
+                        domain::Circle{ maybeCircle.value() },
+                        circle.properties);
                 }
             }
         }
 
         template <typename Entity>
-        void setLinetype(Entity& entity, const odxf::Entity& dxfEntity)
+        void setLinetype(Entity& entity, const odxf::entity_properties& dxfEntity)
         {
-            if (isByBlock(dxfEntity.lineType)) {
+            if (isByBlock(dxfEntity.line_type)) {
                 ++m_linetypeCounts.byBlockEntities;
                 entity.setLinetype(domain::continuousLinetypeId());
-            } else if (!isByLayer(dxfEntity.lineType)) {
+            } else if (!isByLayer(dxfEntity.line_type)) {
                 const std::optional<domain::LinetypeId> linetype{
-                    m_linetypes.find(dxfEntity.lineType)
+                    m_linetypes.find(dxfEntity.line_type)
                 };
                 if (!linetype.has_value()) {
                     ++m_linetypeCounts.unknownEntityLinetypes;
@@ -195,7 +201,7 @@ namespace {
             }
 
             const std::optional<domain::LinetypeScale> scale{
-                domain::LinetypeScale::fromValue(dxfEntity.lineTypeScale)
+                domain::LinetypeScale::fromValue(dxfEntity.line_type_scale)
             };
             if (scale.has_value()) {
                 entity.setLinetypeScale(scale.value());
@@ -205,9 +211,9 @@ namespace {
         }
 
         template <typename Entity>
-        void add(std::size_t layerIndex, Entity entity, const odxf::Entity& dxfEntity)
+        void add(std::size_t layerIndex, Entity entity, const odxf::entity_properties& dxfEntity)
         {
-            if (!dxfEntity.trueColor.has_value()) {
+            if (!dxfEntity.true_color.has_value()) {
                 if (dxfEntity.color == byBlockIndex) {
                     ++m_byBlockCount;
                 } else if (dxfEntity.color == byEntityIndex) {
@@ -221,7 +227,7 @@ namespace {
                 ++m_lineweightCounts.invalidEntities;
             }
 
-            entity.setColor(toEntityColor(dxfEntity.color, dxfEntity.trueColor));
+            entity.setColor(toEntityColor(dxfEntity.color, dxfEntity.true_color));
             entity.setLineweight(toEntityLineweight(dxfEntity.lineweight));
             setLinetype(entity, dxfEntity);
             m_layers.at(layerIndex).add(std::move(entity));
@@ -257,32 +263,33 @@ namespace {
         };
     }
 
-    QString toErrorMessage(const odxf::Error& error)
+    QString toErrorMessage(const odxf::error& error)
     {
-        if (error.lineNumber.has_value()) {
+        if (error.line_number.has_value()) {
             if (!error.what.empty()) {
                 return QStringView{ u"Line %1: %2" }.arg(
-                    QString::number(error.lineNumber.value()), QString::fromStdString(error.what)
+                    QString::number(error.line_number.value()), QString::fromStdString(error.what)
                 );
             }
 
-            return QStringView{ u"Line %1" }.arg(QString::number(error.lineNumber.value()));
+            return QStringView{ u"Line %1" }.arg(QString::number(error.line_number.value()));
         }
 
         return QString::fromStdString(error.what);
     }
 
-    DxfImportError toErrorCode(odxf::Error::Type type)
+    DxfImportError toErrorCode(odxf::error_type type)
     {
         switch (type) {
-        case odxf::Error::Type::FileOpenError: return DxfImportError::CannotOpenFile;
-        case odxf::Error::Type::InvalidFile: return DxfImportError::InvalidFile;
+        case odxf::error_type::file_open_error: return DxfImportError::CannotOpenFile;
+        case odxf::error_type::invalid_file:
+        case odxf::error_type::write_error: return DxfImportError::InvalidFile;
         }
 
         return DxfImportError::InvalidFile;
     }
 
-    core::Error toError(const odxf::Error& error)
+    core::Error toError(const odxf::error& error)
     {
         return core::Error{ .code = toErrorCode(error.type), .message = toErrorMessage(error) };
     }
@@ -303,9 +310,9 @@ core::Result<ImportedDxf> importDxf(const QString& filePath)
 {
     ReadStream stream;
 
-    return odxf::read(stream, toStdFilePath(filePath))
+    return odxf::read(toStdFilePath(filePath), stream)
         .transform([&stream] { return toImportedDxf(std::move(stream)); })
-        .transform_error([](const odxf::Error& error) { return toError(error); });
+        .transform_error([](const odxf::error& error) { return toError(error); });
 }
 
 }   // namespace fcad::io

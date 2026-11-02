@@ -23,7 +23,7 @@
 TEST(DxfEntitiesTest, ToLayer)
 {
     // Arrange
-    const odxf::Layer dxfLayer{ .name = "Walls" };
+    const odxf::layer dxfLayer{ .name = "Walls" };
 
     // Act
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
@@ -40,7 +40,7 @@ TEST(DxfEntitiesTest, ToLayer)
 TEST(DxfEntitiesTest, ToLayerLineweight)
 {
     // Arrange
-    const odxf::Layer dxfLayer{ .name = "Walls", .lineweight = 50 };
+    const odxf::layer dxfLayer{ .name = "Walls", .lineweight = 50 };
 
     // Act
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
@@ -52,7 +52,7 @@ TEST(DxfEntitiesTest, ToLayerLineweight)
 TEST(DxfEntitiesTest, ToLayerColor)
 {
     // Arrange
-    const odxf::Layer dxfLayer{ .name = "Walls", .color = 1 };
+    const odxf::layer dxfLayer{ .name = "Walls", .color = 1 };
 
     // Act
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
@@ -66,7 +66,7 @@ TEST(DxfEntitiesTest, ToLayerColor)
 TEST(DxfEntitiesTest, ToLayerTrueColor)
 {
     // Arrange
-    const odxf::Layer dxfLayer{ .name = "Walls", .color = 1, .trueColor = 0x3050A0 };
+    const odxf::layer dxfLayer{ .name = "Walls", .color = 1, .true_color = 0x3050A0 };
 
     // Act
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
@@ -79,7 +79,7 @@ TEST(DxfEntitiesTest, ToLayerTrueColor)
 TEST(DxfEntitiesTest, ToLayerOff)
 {
     // Arrange
-    const odxf::Layer dxfLayer{ .name = "Walls", .color = -1 };
+    const odxf::layer dxfLayer{ .name = "Walls", .color = -1 };
 
     // Act
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
@@ -93,7 +93,7 @@ TEST(DxfEntitiesTest, ToLayerOff)
 TEST(DxfEntitiesTest, ToLayerOffWithInvalidColor)
 {
     // Arrange
-    const odxf::Layer dxfLayer{ .name = "Walls", .color = std::numeric_limits<int>::min() };
+    const odxf::layer dxfLayer{ .name = "Walls", .color = std::numeric_limits<int>::min() };
 
     // Act
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
@@ -106,7 +106,7 @@ TEST(DxfEntitiesTest, ToLayerOffWithInvalidColor)
 TEST(DxfEntitiesTest, ToLayerFrozen)
 {
     // Arrange
-    const odxf::Layer dxfLayer{ .name = "Walls", .flags = odxf::Layer::Flags::Frozen };
+    const odxf::layer dxfLayer{ .name = "Walls", .flags = odxf::layer::frozen };
 
     // Act
     const fcad::domain::Layer layer{ fcad::io::toLayer(dxfLayer) };
@@ -118,9 +118,9 @@ TEST(DxfEntitiesTest, ToLayerFrozen)
 TEST(DxfEntitiesTest, ToLineScaled)
 {
     // Arrange
-    odxf::Line dxfLine;
-    dxfLine.start = odxf::Coordinate3d{ .x = 1.0, .y = 2.0, .z = 3.0 };
-    dxfLine.end = odxf::Coordinate3d{ .x = 4.0, .y = 5.0, .z = 6.0 };
+    odxf::line dxfLine;
+    dxfLine.start = odxf::coordinate3d{ .x = 1.0, .y = 2.0, .z = 3.0 };
+    dxfLine.end = odxf::coordinate3d{ .x = 4.0, .y = 5.0, .z = 6.0 };
 
     // Act
     const fcad::geo::Line line{ fcad::io::toLine(dxfLine, 10.0) };
@@ -136,8 +136,8 @@ TEST(DxfEntitiesTest, ToLineScaled)
 TEST(DxfEntitiesTest, ToCircleScaled)
 {
     // Arrange
-    odxf::Circle dxfCircle;
-    dxfCircle.center = odxf::Coordinate3d{ .x = 1.0, .y = 2.0 };
+    odxf::circle dxfCircle;
+    dxfCircle.center = odxf::coordinate3d{ .x = 1.0, .y = 2.0 };
     dxfCircle.radius = 0.5;
 
     // Act
@@ -156,7 +156,7 @@ TEST(DxfEntitiesTest, ToCircleScaled)
 TEST(DxfEntitiesTest, ToCircleWithNegativeRadius)
 {
     // Arrange
-    odxf::Circle dxfCircle;
+    odxf::circle dxfCircle;
     dxfCircle.radius = -0.5;
 
     // Act
@@ -169,11 +169,11 @@ TEST(DxfEntitiesTest, ToCircleWithNegativeRadius)
 TEST(DxfEntitiesTest, ToArcScaled)
 {
     // Arrange
-    odxf::Arc dxfArc;
-    dxfArc.center = odxf::Coordinate3d{ .x = 1.0, .y = 2.0 };
+    odxf::arc dxfArc;
+    dxfArc.center = odxf::coordinate3d{ .x = 1.0, .y = 2.0 };
     dxfArc.radius = 0.5;
-    dxfArc.startAngle = 90.0;
-    dxfArc.endAngle = 180.0;
+    dxfArc.start_angle = 90.0;
+    dxfArc.end_angle = 180.0;
 
     // Act
     const std::optional<fcad::geo::Arc> arc{ fcad::io::toArc(dxfArc, 10.0) };
@@ -194,7 +194,7 @@ TEST(DxfEntitiesTest, ToArcScaled)
 TEST(DxfEntitiesTest, ToArcWithNegativeRadius)
 {
     // Arrange
-    odxf::Arc dxfArc;
+    odxf::arc dxfArc;
     dxfArc.radius = -0.5;
 
     // Act

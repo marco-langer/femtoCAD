@@ -2,7 +2,7 @@
 
 #include "domain/LengthUnit.hpp"
 
-#include <opendxf/headervariables.hpp>
+#include <opendxf/header_variables.hpp>
 
 #include <gtest/gtest.h>
 
@@ -12,16 +12,16 @@
 
 TEST(DxfUnitsTest, ToUnitConversionWithoutUnit)
 {
-    EXPECT_FALSE(fcad::io::toUnitConversion(odxf::LengthUnit::Unitless).has_value());
-    EXPECT_FALSE(fcad::io::toUnitConversion(static_cast<odxf::LengthUnit>(-1)).has_value());
-    EXPECT_FALSE(fcad::io::toUnitConversion(static_cast<odxf::LengthUnit>(25)).has_value());
+    EXPECT_FALSE(fcad::io::toUnitConversion(odxf::length_unit::unitless).has_value());
+    EXPECT_FALSE(fcad::io::toUnitConversion(static_cast<odxf::length_unit>(-1)).has_value());
+    EXPECT_FALSE(fcad::io::toUnitConversion(static_cast<odxf::length_unit>(25)).has_value());
 }
 
 namespace {
 
 struct UnitConversionParam final
 {
-    odxf::LengthUnit dxfUnit;
+    odxf::length_unit dxfUnit;
     fcad::domain::LengthUnit expectedUnit;
     double expectedFactor;
 };
@@ -62,48 +62,49 @@ INSTANTIATE_TEST_SUITE_P(
     AllDxfUnits,
     DxfUnitConversionTest,
     testing::Values(
-        UnitConversionParam{ odxf::LengthUnit::Inches, fcad::domain::LengthUnit::Inch, 1.0 },
-        UnitConversionParam{ odxf::LengthUnit::Feet, fcad::domain::LengthUnit::Foot, 1.0 },
-        UnitConversionParam{ odxf::LengthUnit::Miles, fcad::domain::LengthUnit::Mile, 1.0 },
+        UnitConversionParam{ odxf::length_unit::inches, fcad::domain::LengthUnit::Inch, 1.0 },
+        UnitConversionParam{ odxf::length_unit::feet, fcad::domain::LengthUnit::Foot, 1.0 },
+        UnitConversionParam{ odxf::length_unit::miles, fcad::domain::LengthUnit::Mile, 1.0 },
         UnitConversionParam{
-            odxf::LengthUnit::Millimeters, fcad::domain::LengthUnit::Millimeter, 1.0 },
+            odxf::length_unit::millimeters, fcad::domain::LengthUnit::Millimeter, 1.0 },
         UnitConversionParam{
-            odxf::LengthUnit::Centimeters, fcad::domain::LengthUnit::Centimeter, 1.0 },
-        UnitConversionParam{ odxf::LengthUnit::Meters, fcad::domain::LengthUnit::Meter, 1.0 },
+            odxf::length_unit::centimeters, fcad::domain::LengthUnit::Centimeter, 1.0 },
+        UnitConversionParam{ odxf::length_unit::meters, fcad::domain::LengthUnit::Meter, 1.0 },
         UnitConversionParam{
-            odxf::LengthUnit::Kilometers, fcad::domain::LengthUnit::Kilometer, 1.0 },
+            odxf::length_unit::kilometers, fcad::domain::LengthUnit::Kilometer, 1.0 },
         UnitConversionParam{
-            odxf::LengthUnit::Microinches, fcad::domain::LengthUnit::Inch, 1.0e-6 },
-        UnitConversionParam{ odxf::LengthUnit::Mils, fcad::domain::LengthUnit::Inch, 1.0e-3 },
-        UnitConversionParam{ odxf::LengthUnit::Yards, fcad::domain::LengthUnit::Yard, 1.0 },
+            odxf::length_unit::microinches, fcad::domain::LengthUnit::Inch, 1.0e-6 },
+        UnitConversionParam{ odxf::length_unit::mils, fcad::domain::LengthUnit::Inch, 1.0e-3 },
+        UnitConversionParam{ odxf::length_unit::yards, fcad::domain::LengthUnit::Yard, 1.0 },
         UnitConversionParam{
-            odxf::LengthUnit::Angstroms, fcad::domain::LengthUnit::Micrometer, 1.0e-4 },
+            odxf::length_unit::angstroms, fcad::domain::LengthUnit::Micrometer, 1.0e-4 },
         UnitConversionParam{
-            odxf::LengthUnit::Nanometers, fcad::domain::LengthUnit::Micrometer, 1.0e-3 },
-        UnitConversionParam{ odxf::LengthUnit::Microns, fcad::domain::LengthUnit::Micrometer, 1.0 },
+            odxf::length_unit::nanometers, fcad::domain::LengthUnit::Micrometer, 1.0e-3 },
         UnitConversionParam{
-            odxf::LengthUnit::Decimeters, fcad::domain::LengthUnit::Decimeter, 1.0 },
-        UnitConversionParam{ odxf::LengthUnit::Decameters, fcad::domain::LengthUnit::Meter, 10.0 },
+            odxf::length_unit::microns, fcad::domain::LengthUnit::Micrometer, 1.0 },
         UnitConversionParam{
-            odxf::LengthUnit::Hectometers, fcad::domain::LengthUnit::Meter, 100.0 },
+            odxf::length_unit::decimeters, fcad::domain::LengthUnit::Decimeter, 1.0 },
+        UnitConversionParam{ odxf::length_unit::decameters, fcad::domain::LengthUnit::Meter, 10.0 },
         UnitConversionParam{
-            odxf::LengthUnit::Gigameters, fcad::domain::LengthUnit::Kilometer, 1.0e6 },
-        UnitConversionParam{ odxf::LengthUnit::AstronomicalUnits,
+            odxf::length_unit::hectometers, fcad::domain::LengthUnit::Meter, 100.0 },
+        UnitConversionParam{
+            odxf::length_unit::gigameters, fcad::domain::LengthUnit::Kilometer, 1.0e6 },
+        UnitConversionParam{ odxf::length_unit::astronomical_units,
                              fcad::domain::LengthUnit::Kilometer,
                              1.495'978'707e8 },
-        UnitConversionParam{ odxf::LengthUnit::LightYears,
+        UnitConversionParam{ odxf::length_unit::light_years,
                              fcad::domain::LengthUnit::Kilometer,
                              9.460'730'472'580'8e12 },
-        UnitConversionParam{ odxf::LengthUnit::Parsecs,
+        UnitConversionParam{ odxf::length_unit::parsecs,
                              fcad::domain::LengthUnit::Kilometer,
                              3.085'677'581'491'367e13 },
         UnitConversionParam{
-            odxf::LengthUnit::USSurveyFeet, fcad::domain::LengthUnit::Foot, usSurveyFactor },
+            odxf::length_unit::us_survey_feet, fcad::domain::LengthUnit::Foot, usSurveyFactor },
         UnitConversionParam{
-            odxf::LengthUnit::USSurveyInch, fcad::domain::LengthUnit::Inch, usSurveyFactor },
+            odxf::length_unit::us_survey_inch, fcad::domain::LengthUnit::Inch, usSurveyFactor },
         UnitConversionParam{
-            odxf::LengthUnit::USSurveyYard, fcad::domain::LengthUnit::Yard, usSurveyFactor },
+            odxf::length_unit::us_survey_yard, fcad::domain::LengthUnit::Yard, usSurveyFactor },
         UnitConversionParam{
-            odxf::LengthUnit::USSurveyMile, fcad::domain::LengthUnit::Mile, usSurveyFactor }
+            odxf::length_unit::us_survey_mile, fcad::domain::LengthUnit::Mile, usSurveyFactor }
     )
 );

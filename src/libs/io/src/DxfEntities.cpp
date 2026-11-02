@@ -7,12 +7,12 @@
 
 namespace fcad::io {
 
-geo::Coordinate toCoordinate(const odxf::Coordinate3d& coordinate3d, double scale)
+geo::Coordinate toCoordinate(const odxf::coordinate3d& coordinate3d, double scale)
 {
     return geo::Coordinate{ .x = coordinate3d.x * scale, .y = coordinate3d.y * scale };
 }
 
-domain::Layer toLayer(const odxf::Layer& dxfLayer)
+domain::Layer toLayer(const odxf::layer& dxfLayer)
 {
     domain::Layer layer{ QString::fromStdString(dxfLayer.name) };
 
@@ -20,16 +20,16 @@ domain::Layer toLayer(const odxf::Layer& dxfLayer)
     // leaving them negative avoids overflowing on the most negative int.
     const bool isOff{ dxfLayer.color < 0 };
     const int colorIndex{ (dxfLayer.color >= -255 && isOff) ? -dxfLayer.color : dxfLayer.color };
-    const bool isFrozen{ (dxfLayer.flags & odxf::Layer::Flags::Frozen) != 0 };
+    const bool isFrozen{ (dxfLayer.flags & odxf::layer::frozen) != 0 };
 
     layer.setVisible(!isFrozen && !isOff);
-    layer.setColor(toColor(colorIndex, dxfLayer.trueColor));
+    layer.setColor(toColor(colorIndex, dxfLayer.true_color));
     layer.setLineweight(toLayerLineweight(dxfLayer.lineweight));
 
     return layer;
 }
 
-geo::Line toLine(const odxf::Line& dxfLine, double scale)
+geo::Line toLine(const odxf::line& dxfLine, double scale)
 {
     return geo::Line{
         .start = toCoordinate(dxfLine.start, scale),
@@ -37,7 +37,7 @@ geo::Line toLine(const odxf::Line& dxfLine, double scale)
     };
 }
 
-std::optional<geo::Circle> toCircle(const odxf::Circle& dxfCircle, double scale)
+std::optional<geo::Circle> toCircle(const odxf::circle& dxfCircle, double scale)
 {
     const std::optional<geo::Radius> radius{ geo::Radius::fromValue(dxfCircle.radius * scale) };
     if (!radius.has_value()) {
@@ -52,7 +52,7 @@ std::optional<geo::Circle> toCircle(const odxf::Circle& dxfCircle, double scale)
     return circle;
 }
 
-std::optional<geo::Arc> toArc(const odxf::Arc& dxfArc, double scale)
+std::optional<geo::Arc> toArc(const odxf::arc& dxfArc, double scale)
 {
     const std::optional<geo::Radius> radius{ geo::Radius::fromValue(dxfArc.radius * scale) };
     if (!radius.has_value()) {
@@ -62,8 +62,8 @@ std::optional<geo::Arc> toArc(const odxf::Arc& dxfArc, double scale)
     geo::Arc arc;
 
     arc.center = toCoordinate(dxfArc.center, scale);
-    arc.startAngle = core::Radians::fromDegrees(dxfArc.startAngle);
-    arc.endAngle = core::Radians::fromDegrees(dxfArc.endAngle);
+    arc.startAngle = core::Radians::fromDegrees(dxfArc.start_angle);
+    arc.endAngle = core::Radians::fromDegrees(dxfArc.end_angle);
     arc.radius = radius.value();
 
     return arc;
