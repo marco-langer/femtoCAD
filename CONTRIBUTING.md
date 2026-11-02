@@ -78,9 +78,22 @@ e.g. `fix/dxf-arc-negative-radius`.
 | `docs/`    | Documentation                    | `docs/`, `CLAUDE.md`, `CONTRIBUTING.md`, `README.md`, `CHANGELOG.md` only |
 | `chore/`   | Build, CMake, CI, dependencies, reformatting | Build/tooling files; no behavior changes        |
 
+If a task needs changes outside its branch's scope, discuss it with the maintainer first instead
+of widening the branch.
+
+## Agree first
+
+Discuss these changes with the maintainer before making them:
+
+- Changes to `.clang-format`.
+- Adding, removing or bumping a dependency. This covers `vcpkg.json` (packages and the
+  `builtin-baseline`), the FetchContent pins in `cmake/dependencies/` (e.g. opendxf's `GIT_TAG`)
+  and system packages such as Qt.
+
 ## Git
 
 - History on `main` is linear. Branches are rebased onto `main`; there are no merge commits.
+- Commits that haven't landed on `main` may be amended or reworked. `main` is never rewritten.
 - Keep commits small and focused. Each commit should build and pass the tests.
 
 ### Commit messages
