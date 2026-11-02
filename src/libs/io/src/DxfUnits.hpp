@@ -2,7 +2,7 @@
 
 #include "domain/LengthUnit.hpp"
 
-#include <opendxf/headervariables.hpp>
+#include <opendxf/header_variables.hpp>
 
 #include <QString>
 
@@ -19,10 +19,10 @@ struct UnitConversion final
 };
 
 // Empty if the unit isn't specified.
-std::optional<UnitConversion> toUnitConversion(odxf::LengthUnit dxfUnit);
+std::optional<UnitConversion> toUnitConversion(odxf::length_unit dxfUnit);
 
 // Names for messages, e.g. "decameters".
-QString toName(odxf::LengthUnit dxfUnit);
+QString toName(odxf::length_unit dxfUnit);
 QString toName(domain::LengthUnit unit);
 
 }   // namespace fcad::io

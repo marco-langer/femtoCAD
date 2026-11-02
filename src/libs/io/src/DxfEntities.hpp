@@ -16,16 +16,16 @@ namespace fcad::io {
 
 // The functions taking a scale multiply all coordinates and lengths by it.
 
-geo::Coordinate toCoordinate(const odxf::Coordinate3d& coordinate3d, double scale);
+geo::Coordinate toCoordinate(const odxf::coordinate3d& coordinate3d, double scale);
 
-domain::Layer toLayer(const odxf::Layer& dxfLayer);
+domain::Layer toLayer(const odxf::layer& dxfLayer);
 
-geo::Line toLine(const odxf::Line& dxfLine, double scale);
-
-// Empty if the radius is negative.
-std::optional<geo::Circle> toCircle(const odxf::Circle& dxfCircle, double scale);
+geo::Line toLine(const odxf::line& dxfLine, double scale);
 
 // Empty if the radius is negative.
-std::optional<geo::Arc> toArc(const odxf::Arc& dxfArc, double scale);
+std::optional<geo::Circle> toCircle(const odxf::circle& dxfCircle, double scale);
+
+// Empty if the radius is negative.
+std::optional<geo::Arc> toArc(const odxf::arc& dxfArc, double scale);
 
 }   // namespace fcad::io

@@ -15,17 +15,17 @@
 
 namespace {
 
-odxf::LineType dxfLinetype(std::string name, odxf::LineTypeElements elements)
+odxf::line_type dxfLinetype(std::string name, odxf::line_type_elements elements)
 {
-    return odxf::LineType{
+    return odxf::line_type{
         .name = std::move(name),
-        .displayName = "A linetype",
+        .display_name = "A linetype",
         .flags = 0,
         .elements = std::move(elements),
     };
 }
 
-const odxf::LineTypeElements dxfDashed{ { .length = 0.5 }, { .length = -0.25 } };
+const odxf::line_type_elements dxfDashed{ { .length = 0.5 }, { .length = -0.25 } };
 
 }   // namespace
 
@@ -92,7 +92,8 @@ TEST(DxfLinetypesTest, IsComplex)
     EXPECT_FALSE(fcad::io::isComplex(dxfLinetype("DASHED", dxfDashed)));
     EXPECT_TRUE(
         fcad::io::isComplex(dxfLinetype(
-            "GAS", { { .length = 0.5 }, { .length = -0.2, .complexFlags = 2 }, { .length = -0.25 } }
+            "GAS",
+            { { .length = 0.5 }, { .length = -0.2, .complex_flags = 2 }, { .length = -0.25 } }
         ))
     );
 }
@@ -164,7 +165,7 @@ TEST(DxfLinetypesTest, AddComplexMapsToContinuous)
 
     // Act
     const fcad::io::AddedLinetype added{ linetypes.add(
-        dxfLinetype("GAS", { { .length = 0.5 }, { .length = -0.2, .complexFlags = 2 } }), 1.0
+        dxfLinetype("GAS", { { .length = 0.5 }, { .length = -0.2, .complex_flags = 2 } }), 1.0
     ) };
 
     // Assert
