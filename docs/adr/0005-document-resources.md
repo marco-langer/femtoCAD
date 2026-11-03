@@ -11,10 +11,11 @@ pattern such as "dash, gap, dot, gap", and many layers and entities share it. Te
 dimension styles and hatch patterns work the same way and will follow.
 
 DXF keeps these definitions in tables, e.g. the LTYPE table for linetypes. Layers and entities
-refer to an entry by its name, compared without regard to case. Some names are special: BYLAYER
-and BYBLOCK aren't definitions but tell the entity to use its layer's or its block's linetype,
-and CONTINUOUS is the solid line. Apart from these, the set of linetypes is open: every file can
-define its own, under any other name.
+refer to an entry by its name. Programs commonly compare names without regard to case, though
+the DXF reference doesn't say so. Some names are special: BYLAYER and BYBLOCK aren't definitions
+but tell the entity to use its layer's or its block's linetype, and CONTINUOUS is the solid line.
+Apart from these, the set of linetypes is open: every file can define its own, under any other
+name.
 
 DXF also keeps layers in a table, and entities refer to their layer by name. In femtoCAD, layers
 aren't shared definitions but containers: a layer holds its entities (ADR 0001), so entities
@@ -57,7 +58,8 @@ There are three ways to model this:
 - Each resource has a typed id, e.g. `LinetypeId = core::StrongUuid<struct LinetypeIdTag>`, like
   the entity and layer ids.
 - The name is a label for the user and for import and export. Names are unique per document and
-  kind, compared without regard to case, as in DXF.
+  kind, compared without regard to case. That follows the common DXF convention and rules out names
+  that differ only in case, which users would confuse.
 - A resource's lengths, e.g. a linetype's dashes and gaps, are in the document's unit
   (ADR 0004).
 
@@ -92,7 +94,8 @@ There are three ways to model this:
 - References the document can't represent, such as an unknown name, BYBLOCK before blocks exist
   or a definition femtoCAD doesn't support, use a built-in resource, and the import warns about
   them.
-- The export writes the resources as tables and the references as names.
+- The export writes the resources as tables and the references as names. It adapts names the
+  format can't express and warns about them (ADR 0009).
 
 ## Consequences
 
