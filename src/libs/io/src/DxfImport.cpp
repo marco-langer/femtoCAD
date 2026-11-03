@@ -227,6 +227,7 @@ namespace {
                 ++m_lineweightCounts.invalidEntities;
             }
 
+            entity.setVisible(dxfEntity.is_visible);
             entity.setColor(toEntityColor(dxfEntity.color, dxfEntity.true_color));
             entity.setLineweight(toEntityLineweight(dxfEntity.lineweight));
             setLinetype(entity, dxfEntity);

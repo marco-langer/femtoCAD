@@ -37,6 +37,7 @@ public:
     [[nodiscard]] Entity clone() const
     {
         Entity entity{ m_geometry };
+        entity.m_visible = m_visible;
         entity.m_color = m_color;
         entity.m_lineweight = m_lineweight;
         entity.m_linetype = m_linetype;
@@ -49,6 +50,10 @@ public:
 
     const Geometry& geometry() const { return m_geometry; }
     void setGeometry(Geometry geometry) { m_geometry = std::move(geometry); }
+
+    /** Invisible entities aren't drawn and don't count towards their layer's bounding box. */
+    bool isVisible() const { return m_visible; }
+    void setVisible(bool visible) { m_visible = visible; }
 
     const EntityColor& color() const { return m_color; }
     void setColor(EntityColor color) { m_color = color; }
@@ -66,6 +71,7 @@ public:
 private:
     EntityId m_id;
     Geometry m_geometry;
+    bool m_visible{ true };
     EntityColor m_color{ ByLayer{} };
     EntityLineweight m_lineweight{ ByLayer{} };
     EntityLinetype m_linetype{ ByLayer{} };

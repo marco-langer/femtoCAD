@@ -62,6 +62,67 @@ TEST(LayerTest, boundingBox)
     EXPECT_THAT(bb.value(), fcad::test_utils::IsBoundingBox(expectedBb));
 }
 
+TEST(LayerTest, boundingBox_SkipsInvisibleEntities)
+{
+    // Arrange
+    fcad::domain::Layer layer{ "Layer Name" };
+
+    layer.add(
+        fcad::domain::Line{ fcad::geo::Line{
+            .start = fcad::geo::Coordinate{ .x = 1.0, .y = 4.0 },
+            .end = fcad::geo::Coordinate{ .x = 3.0, .y = 2.0 },
+        } }
+    );
+
+    fcad::domain::Line invisibleLine{ fcad::geo::Line{
+        .start = fcad::geo::Coordinate{ .x = -10.0, .y = -10.0 },
+        .end = fcad::geo::Coordinate{ .x = 10.0, .y = 10.0 },
+    } };
+    invisibleLine.setVisible(false);
+    layer.add(std::move(invisibleLine));
+
+    fcad::domain::Circle invisibleCircle{ fcad::geo::Circle{
+        .center = { 20.0, 20.0 },
+        .radius = fcad::geo::Radius{ 1.0 },
+    } };
+    invisibleCircle.setVisible(false);
+    layer.add(std::move(invisibleCircle));
+
+    // Act
+    const std::optional<fcad::geo::BoundingBox> bb{ fcad::domain::boundingBox(layer) };
+
+    // Assert
+    ASSERT_TRUE(bb.has_value());
+
+    const fcad::geo::BoundingBox expectedBb{
+        .min = fcad::geo::Coordinate{ .x = 1.0, .y = 2.0 },
+        .max = fcad::geo::Coordinate{ .x = 3.0, .y = 4.0 },
+    };
+
+    EXPECT_THAT(bb.value(), fcad::test_utils::IsBoundingBox(expectedBb));
+}
+
+TEST(LayerTest, boundingBox_OnlyInvisibleEntities)
+{
+    // Arrange
+    fcad::domain::Layer layer{ "Layer Name" };
+
+    fcad::domain::Arc arc{ fcad::geo::Arc{
+        .center = { 3.0, 1.0 },
+        .startAngle = fcad::core::Radians::zero,
+        .endAngle = fcad::core::Radians::pi,
+        .radius = fcad::geo::Radius{ 0.5 },
+    } };
+    arc.setVisible(false);
+    layer.add(std::move(arc));
+
+    // Act
+    const std::optional<fcad::geo::BoundingBox> bb{ fcad::domain::boundingBox(layer) };
+
+    // Assert
+    EXPECT_FALSE(bb.has_value());
+}
+
 TEST(LayerTest, lineweightIsDefaultByDefault)
 {
     const fcad::domain::Layer layer{ "Layer Name" };

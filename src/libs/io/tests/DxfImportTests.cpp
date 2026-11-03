@@ -26,8 +26,9 @@
 
 namespace {
 
-// The colors and lineweights in the test files: example.dxf has one layer or entity per case, its
-// copies with other units use ByLayer entity colors and no lineweights only.
+// The colors, lineweights and visibility in the test files: example.dxf has one layer or entity
+// per case, its copies with other units use ByLayer entity colors, no lineweights and visible
+// entities only.
 enum class ExampleProperties {
     ByLayer,
     Mixed,
@@ -57,6 +58,9 @@ fcad::domain::Layers exampleLayers(double scale, ExampleProperties properties)
     } };
 
     if (properties == ExampleProperties::Mixed) {
+        // The other entities have no visibility, 0 or 2, which all mean visible.
+        indexColorLine.setVisible(false);
+
         indexColorLine.setColor(fcad::domain::Rgb{ .r = 255, .g = 0, .b = 0 });
         trueColorLine.setColor(fcad::domain::Rgb{ .r = 0x30, .g = 0x50, .b = 0xA0 });
         byBlockCircle.setColor(fcad::domain::Adaptive{});

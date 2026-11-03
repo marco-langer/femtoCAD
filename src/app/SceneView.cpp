@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <ranges>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -282,7 +283,8 @@ void SceneView::uploadGeometry()
 
         for (const domain::Layer& layer : document.layers()) {
             if (layer.isVisible()) {
-                for (const domain::Line& entity : layer.lines()) {
+                for (const domain::Line& entity :
+                     layer.lines() | std::views::filter(&domain::Line::isVisible)) {
                     const geo::Line& line{ entity.geometry() };
                     const QColor color{ toQColor(domain::resolved(entity.color(), layer.color())) };
                     const float lineweight{ toMillimeters(

@@ -69,6 +69,7 @@ private:
 
 using Layers = std::vector<Layer>;
 
+/** The bounding box of the layer's visible entities, or none if it has none. */
 std::optional<geo::BoundingBox> boundingBox(const Layer& layer);
 
 }   // namespace fcad::domain

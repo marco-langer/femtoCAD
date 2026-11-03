@@ -10,13 +10,10 @@ namespace {
     template <typename Geometry>
     std::optional<geo::BoundingBox> boundingBox(const std::vector<Entity<Geometry>>& entities)
     {
-        if (entities.empty()) {
-            return std::nullopt;
-        }
+        std::optional<geo::BoundingBox> bb;
 
-        geo::BoundingBox bb{ boundingBox(entities.front()) };
-
-        for (const Entity<Geometry>& entity : entities | std::views::drop(1)) {
+        for (const Entity<Geometry>& entity :
+             entities | std::views::filter(&Entity<Geometry>::isVisible)) {
             bb = geo::united(bb, boundingBox(entity));
         }
 
