@@ -6,9 +6,9 @@ See [docs/building.md](docs/building.md).
 
 ## Layout
 
-- `src/libs/` — the libraries, layered as `core ← geo ← domain ← io` (ADR 0002). A library may
-  only depend on libraries to its left. Each one is the CMake target `femtoCAD-<library>` in the
-  namespace `fcad::<library>`:
+- `src/libs/` — the libraries (ADR 0002). Their dependencies form a graph without cycles, today
+  the chain `core ← geo ← domain ← io`. A library depends only on the libraries it needs. Each one
+  is the CMake target `femtoCAD-<library>` in the namespace `fcad::<library>`:
   - `core` — domain-agnostic building blocks: `Angle`, `NonNegative`, the error types `Error` and
     `Result` (ADR 0003), vector utilities.
   - `geo` — geometric value types (`Coordinate`, `Line`, `Circle`, `Arc`, `Radius`, ...) and

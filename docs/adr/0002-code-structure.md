@@ -17,14 +17,17 @@ the app gets tests.
 
 ## Decision
 
-- The code is split into libraries with a fixed dependency direction:
+- The code is split into libraries whose dependencies form a graph without cycles. Each library
+  depends only on the libraries it needs, and CMake enforces this through
+  `target_link_libraries`. Today the graph is a chain:
 
   ```
   core  ←  geo  ←  domain  ←  io  ←  app
   ```
 
-  A library may only depend on libraries to its left. CMake enforces this through
-  `target_link_libraries`.
+- Libraries that don't need each other stay independent, even when both build on the same
+  libraries. A library doesn't get access to another one just because that one sits lower in the
+  graph.
 - Contents:
   - `core`: domain-agnostic building blocks such as `Angle`, `NonNegative` and utilities.
   - `geo`: geometric value types (`Coordinate`, `Line`, `Circle`, `Arc`, `Radius`, ...) and
@@ -52,7 +55,9 @@ the app gets tests.
 
 ## Consequences
 
-- The build rejects dependencies against the direction, e.g. geometry code using layers.
+- The build rejects dependencies a library doesn't declare, e.g. geometry code using layers.
+- Once the graph branches, it no longer shows at a glance which dependencies are allowed.
+  Reviewers check new dependencies against the graph in CONTRIBUTING.md.
 - opendxf no longer reaches `domain` and below, so these build and test without it.
 - Each library is tested on its own, close to its code. `ctest` still runs all test executables.
 - More libraries and test executables mean more CMake boilerplate.
