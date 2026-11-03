@@ -238,6 +238,8 @@ LINE
 AcDbLine
 8
 Lines
+60
+1
 6
 dotted
 48
@@ -290,6 +292,8 @@ CIRCLE
 AcDbCircle
 8
 Circles
+60
+0
 6
 BYBLOCK
 62
@@ -310,6 +314,8 @@ ARC
 AcDbCircle
 8
 Arcs
+60
+2
 6
 NOPE
 48

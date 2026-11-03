@@ -58,6 +58,13 @@ TEST(EntityTest, moveKeepsTheId)
     EXPECT_THAT(moved.geometry(), fcad::test_utils::IsLine(someLine));
 }
 
+TEST(EntityTest, isVisibleByDefault)
+{
+    const fcad::domain::Line line{ someLine };
+
+    EXPECT_TRUE(line.isVisible());
+}
+
 TEST(EntityTest, colorIsByLayerByDefault)
 {
     const fcad::domain::Line line{ someLine };
@@ -87,6 +94,7 @@ TEST(EntityTest, cloneHasANewIdAndTheSameContent)
     const fcad::domain::EntityLineweight lineweight{ fcad::domain::Lineweight{ 35 } };
 
     fcad::domain::Line line{ someLine };
+    line.setVisible(false);
     line.setColor(color);
     line.setLineweight(lineweight);
     const fcad::domain::EntityLinetype linetype{ fcad::domain::LinetypeId::generate() };
@@ -99,6 +107,7 @@ TEST(EntityTest, cloneHasANewIdAndTheSameContent)
     // Assert
     EXPECT_NE(clone.id(), line.id());
     EXPECT_THAT(clone.geometry(), fcad::test_utils::IsLine(someLine));
+    EXPECT_FALSE(clone.isVisible());
     EXPECT_EQ(clone.color(), color);
     EXPECT_EQ(clone.lineweight(), lineweight);
     EXPECT_EQ(clone.linetype(), linetype);
